@@ -51,6 +51,7 @@ param(
 	    "tools\Beef.CodeGen.Core",
         "tools\Beef.Database.Core",
         "tools\Beef.Database.MySql",
+        "tools\Beef.Database.Postgres",
         "tools\Beef.Database.SqlServer",
         "tools\Beef.Test.NUnit",
 	    "templates\Beef.Template.Solution")

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Beef.Demo.Business.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '[Ref].[Status]'.
+/// Represents the Entity Framework (EF) model for SqlServer database object [Ref].[Status].
 /// </summary>
 public partial class Status
 {

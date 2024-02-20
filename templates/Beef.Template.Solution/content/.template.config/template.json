@@ -35,15 +35,19 @@
       "choices": [
         {
           "choice": "SqlServer",
-          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Entity Framework Core (default)."
+          "description": "Indicates that the data source is a Microsoft SQL Server database accessed via Entity Framework Core (default)."
         },
         {
           "choice": "SqlServerProcs",
-          "description": "Indicates that the data source is a Microsoft SQL Server Database accessed via Stored Procedures."
+          "description": "Indicates that the data source is a Microsoft SQL Server database accessed via Stored Procedures."
         },
         {
           "choice": "MySQL",
-          "description": "Indicates that the data source is a MySQL Database accessed via Entity Framework Core."
+          "description": "Indicates that the data source is a MySQL database accessed via Entity Framework Core."
+        },
+        {
+          "choice": "Postgres",
+          "description": "Indicates that the data source is a PostgreSQL database accessed via Entity Framework Core."
         },
         {
           "choice": "Cosmos",
@@ -65,7 +69,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "3.9.0"
+        "value": "3.12.0"
       },
       "replaces": "CoreExVersion"
     },
@@ -73,7 +77,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "5.9.0"
+        "value": "5.10.0"
       },
       "replaces": "BeefVersion"
     },
@@ -93,9 +97,13 @@
       "type": "computed",
       "value": "(datasource == \"MySQL\")"
     },
+    "implement_postgres": {
+      "type": "computed",
+      "value": "(datasource == \"Postgres\")"
+    },
     "implement_entityframework": {
       "type": "computed",
-      "value": "(datasource == \"SqlServer\" || datasource == \"MySQL\")"
+      "value": "(datasource == \"SqlServer\" || datasource == \"MySQL\" || datasource == \"Postgres\")"
     },
     "implement_httpagent": {
       "type": "computed",
@@ -111,7 +119,28 @@
       "parameters": {
         "format": "yyyyMMdd"
       },
+      "fileRename": "20190101",
       "replaces": "20190101"
+    },
+    "appNameLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "appname",
+        "toLower": true
+      },
+      "fileRename": "lowerapp",
+      "replaces": "lowerapp"
+    },
+    "companyLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "company",
+        "toLower": true
+      },
+      "fileRename": "lowercom",
+      "replaces": "lowercom"
     }
   },
   "sources": [
@@ -126,12 +155,12 @@
           "exclude": [ "Company.AppName.Database/**/*" ]
         },
         {
-          "condition": "(implement_database || implement_sqlserver)",
+          "condition": "(implement_database || implement_sqlserver || implement_postgres)",
           "exclude": [ "Company.AppName.Database/Migrations/20190101-000001-create-gender.sql", "Company.AppName.Database/Migrations/20190101-000002-create-person.sql" ]
         },
         {
           "condition": "(implement_mysql)",
-          "exclude": [ "Company.AppName.Database/Migrations/20190101-000001-create-AppName-schema.sql", "Company.AppName.Database/Migrations/20190101-000002-create-AppName-Gender.sql", "Company.AppName.Database/Migrations/20190101-000003-create-AppName-Person.sql" ]
+          "exclude": [ "Company.AppName.Database/Migrations/20190101-000001-create-lowerapp-schema.sql", "Company.AppName.Database/Migrations/20190101-000002-create-lowerapp-Gender.sql", "Company.AppName.Database/Migrations/20190101-000003-create-lowerapp-Person.sql" ]
         },
         {
           "condition": "(!implement_entityframework)",

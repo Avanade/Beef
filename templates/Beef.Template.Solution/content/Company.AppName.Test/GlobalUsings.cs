@@ -7,6 +7,9 @@ global using Beef.Database.SqlServer;
 #if (implement_mysql)
 global using Beef.Database.MySql;
 #endif
+#if (implement_postgres)
+global using Beef.Database.Postgres;
+#endif
 global using CoreEx;
 #if (implement_cosmos)
 global using CoreEx.Cosmos;

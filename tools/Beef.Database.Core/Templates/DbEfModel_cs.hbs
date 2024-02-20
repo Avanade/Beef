@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace {{Root.NamespaceBusiness}}.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '{{DbTable.QualifiedName}}'.
+/// Represents the Entity Framework (EF) model for {{Root.DatabaseProvider}} database object {{DbTable.QualifiedName}}.
 /// </summary>
 public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDeleted{{#ifval ColumnTenantId}}, ITenantId{{/ifval}}{{else}}{{#ifval ColumnTenantId}} : ITenantId{{/ifval}}{{/ifval}}
 {

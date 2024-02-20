@@ -127,6 +127,13 @@ namespace Beef.Template.Solution.UnitTest
         }
 
         [Test]
+        public void Postgres()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.Ps", "Bar", "Postgres");
+        }
+
+        [Test]
         public void Cosmos()
         {
             OneTimeSetUp();
@@ -155,7 +162,7 @@ namespace Beef.Template.Solution.UnitTest
             Assert.That(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, Is.Zero, "dotnet run all [entity]");
 
             // Database: Execute code-generation.
-            if (datasource == "SqlServerProcs" || datasource == "SqlServer" || datasource == "MySQL")
+            if (datasource == "SqlServerProcs" || datasource == "SqlServer" || datasource == "MySQL" || datasource == "Postgres")
             {
                 Assert.That(ExecuteCommand("dotnet", "run drop --accept-prompts", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run drop [database]");
                 Assert.That(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run all [database]");

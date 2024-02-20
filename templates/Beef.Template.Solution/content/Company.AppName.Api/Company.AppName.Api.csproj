@@ -7,6 +7,8 @@
   <ItemGroup>
     <PackageReference Include="CoreEx.AspNetCore" Version="CoreExVersion" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.1.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Business\Company.AppName.Business.csproj" />

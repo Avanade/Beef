@@ -285,7 +285,10 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
 
 ## End-to-End testing
 
-For the purposes of this sample, copy the file and contents of [`PerformanceReviewTest.cs`](../MyEf.Hr.Test/Apis/PerformanceReviewTest.cs) (`MyEf.Hr.Test/Apis` folder) and [`PerformanceReviewValidatorTest.cs`](../MyEf.Hr.Test/Validators/PerformanceReviewValidatorTest.cs) (`MyEf.Hr.Test/Validators` folder) into local project.
+For the purposes of this sample peform the following:
+
+- Copy the file and contents of [`PerformanceReviewTest.cs`](../MyEf.Hr.Test/Apis/PerformanceReviewTest.cs) into your test project `MyEf.Hr.Test/Apis` folder;
+- Copy the file and contents of [`PerformanceReviewValidatorTest.cs`](../MyEf.Hr.Test/Validators/PerformanceReviewValidatorTest.cs) into your test project `MyEf.Hr.Test/Validators` folder.
 
 For the end-to-end testing to function the performance review related data must first be populated into the database; append the following into the existing `Data.yaml` (`MyEf.Hr.Test/Data`).
 
@@ -306,7 +309,7 @@ At this stage we now have added and tested the performance review capabilities. 
 
 To verify, build the solution and ensure no compilation errors.
 
-Within test explorer, run the PerformanceReviewTest and PerformanceReviewValidatorTest set of tests and confirm they all pass.
+Within test explorer, run the `PerformanceReviewTest` and `PerformanceReviewValidatorTest` set of tests and confirm they all pass.
 
 The following tests were newly added and should pass:
 

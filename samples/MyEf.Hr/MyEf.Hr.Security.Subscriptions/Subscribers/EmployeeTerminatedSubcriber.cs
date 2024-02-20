@@ -1,22 +1,15 @@
 ﻿namespace MyEf.Hr.Security.Subscriptions.Subscribers;
 
 [EventSubscriber("MyEf.Hr.Employee", "Terminated")]
-public class EmployeeTerminatedSubcriber : SubscriberBase<Employee>
+public class EmployeeTerminatedSubcriber(OktaHttpClient okta, ILogger<EmployeeTerminatedSubcriber> logger) : SubscriberBase<Employee>(_employeeValidator)
 {
     private static readonly Validator<Employee> _employeeValidator = Validator.Create<Employee>()
         .HasProperty(x => x.Id, p => p.Mandatory())
         .HasProperty(x => x.Email, p => p.Mandatory().Email())
         .HasProperty(x => x.Termination, p => p.Mandatory());
 
-    private readonly OktaHttpClient _okta;
-    private readonly ILogger _logger;
-
-    public EmployeeTerminatedSubcriber(OktaHttpClient okta, ILogger<EmployeeTerminatedSubcriber> logger)
-    {
-        _okta = okta ?? throw new ArgumentNullException(nameof(okta));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        ValueValidator = _employeeValidator;
-    }
+    private readonly OktaHttpClient _okta = okta.ThrowIfNull();
+    private readonly ILogger _logger = logger.ThrowIfNull();
 
     public override ErrorHandling SecurityHandling => ErrorHandling.Retry;
 

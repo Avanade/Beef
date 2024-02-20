@@ -14,6 +14,9 @@
     <!--#if (implement_mysql) -->
     <PackageReference Include="Beef.Database.MySql" Version="BeefVersion" />
     <!--#endif -->
+    <!--#if (implement_postgres) -->
+    <PackageReference Include="Beef.Database.Postgres" Version="BeefVersion" />
+    <!--#endif -->
   </ItemGroup>
 
   <ItemGroup>

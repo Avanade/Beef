@@ -18,6 +18,9 @@ global using CoreEx.Database.SqlServer.Outbox;
 #if (implement_mysql)
 global using CoreEx.Database.MySql;
 #endif
+#if (implement_postgres)
+global using CoreEx.Database.Postgres;
+#endif
 global using CoreEx.Entities;
 global using CoreEx.Entities.Extended;
 #if (implement_entityframework)
@@ -48,6 +51,9 @@ global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Logging;
 #if (implement_mysql)
 global using MySql.Data.MySqlClient;
+#endif
+#if (implement_postgres)
+global using Npgsql;
 #endif
 global using System;
 global using System.Collections.Generic;

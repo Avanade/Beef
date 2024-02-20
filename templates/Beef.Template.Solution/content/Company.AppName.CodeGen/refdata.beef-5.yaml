@@ -22,6 +22,14 @@ entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
   - { name: Gender, entityFrameworkModel: EfModel.Gender }
 //#endif
+//#if (implement_postgres)
+refDataType: int
+autoImplement: EntityFramework
+etagDefaultMapperConverter: EncodedStringToUInt32Converter
+entities:
+  # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
+  - { name: Gender, entityFrameworkModel: EfModel.Gender }
+//#endif
 //#if (implement_cosmos)
 cosmosName: ICosmos
 refDataType: Guid

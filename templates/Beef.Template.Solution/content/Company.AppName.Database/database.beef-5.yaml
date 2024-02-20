@@ -23,21 +23,36 @@ tables:
 //#endif
 //#if (implement_sqlserver)
 schema: AppName
+efModel: true
 tables:
   # Reference data tables/models.
-- { name: Gender, efModel: true }
+- name: Gender
 
   # Master data tables/models.
-- { name: Person, efModel: true }
+- name: Person
 //#endif
 //#if (implement_mysql)
 schema: ''
+efModel: true
 autoDotNetRename: SnakeKebabToPascalCase
 columnNameRowVersion: row_version
 tables:
   # Reference data tables/models.
-- { name: gender, efModel: true }
+- name: gender
 
   # Master data tables/models.
-- { name: person, efModel: true }
+- name: person
+//#endif
+//#if (implement_postgres)
+schema: lowerapp
+efModel: true
+autoDotNetRename: SnakeKebabToPascalCase
+columnNameRowVersion: xmin
+aliasColumns: [ xmin^RowVersion ]
+tables:
+  # Reference data tables/models.
+- name: gender
+
+  # Master data tables/models.
+- name: person
 //#endif

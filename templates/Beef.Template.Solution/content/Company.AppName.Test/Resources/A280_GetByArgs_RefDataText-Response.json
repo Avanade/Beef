@@ -1,9 +1,9 @@
 ﻿[
   {
-    //#if (!implement_mysql)
+    //#if (!implement_mysql && !implement_postgres)
     "id": "00000003-0000-0000-0000-000000000000",
     //#endif
-    //#if (implement_mysql)
+    //#if (implement_mysql || implement_postgres)
     "id": 3,
     //#endif
     "firstName": "Rachael",
@@ -13,10 +13,10 @@
     "birthday": "1972-06-28T00:00:00"
   },
   {
-    //#if (!implement_mysql)
+    //#if (!implement_mysql && !implement_postgres)
     "id": "00000001-0000-0000-0000-000000000000",
     //#endif
-    //#if (implement_mysql)
+    //#if (implement_mysql || implement_postgres)
     "id": 1,
     //#endif
     "firstName": "Wendy",

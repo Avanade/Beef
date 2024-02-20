@@ -22,6 +22,7 @@ public class Startup
                 .AddRequestCache()
                 .AddValidationTextProvider()
                 .AddValidators<AppNameSettings>()
+                .AddMappers<AppNameSettings>()
                 .AddSingleton<IIdentifierGenerator, IdentifierGenerator>();
 
 #if (implement_database || implement_sqlserver)
@@ -32,6 +33,11 @@ public class Startup
 #if (implement_mysql)
         // Add the database services (scoped per request/connection).
         services.AddDatabase(sp => new AppNameDb(() => new MySqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
+
+#endif
+#if (implement_postgres)
+        // Add the database services (scoped per request/connection).
+        services.AddDatabase(sp => new AppNameDb(() => new NpgsqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
 
 #endif
 #if (implement_entityframework)
@@ -65,12 +71,7 @@ public class Startup
                 .AddGeneratedDataSvcServices()
                 .AddGeneratedDataServices();
 
-#if (!implement_database)
-        // Add type-to-type mapping services using reflection.
-        services.AddMappers<AppNameSettings>();
-
-#endif
-        // Add the event publishing; this will need to be updated from the logger publisher to the actual as appropriate.
+        // Add the event publishing; this will need to be updated from the null publisher to the actual as appropriate.
         services.AddEventDataFormatter()
                 .AddNullEventPublisher();
 

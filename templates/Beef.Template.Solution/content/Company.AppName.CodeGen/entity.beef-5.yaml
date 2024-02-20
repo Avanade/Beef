@@ -45,6 +45,9 @@ autoImplement: EntityFramework
 //#if (implement_mysql)
 etagDefaultMapperConverter: EncodedStringToDateTimeConverter
 //#endif
+//#if (implement_postgres)
+etagDefaultMapperConverter: EncodedStringToUInt32Converter
+//#endif
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing a database using EntityFramework.
@@ -53,7 +56,7 @@ entities:
 //#if (implement_sqlserver)
       { name: Id, type: Guid, primaryKey: true, dataName: PersonId },
 //#endif
-//#if (implement_mysql)
+//#if (implement_mysql || implement_postgres)
       { name: Id, type: int, primaryKey: true, dataName: PersonId },
 //#endif
       { name: FirstName },

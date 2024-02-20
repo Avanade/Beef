@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace MyEf.Hr.Business.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '[Hr].[EmergencyContact]'.
+/// Represents the Entity Framework (EF) model for SqlServer database object [Hr].[EmergencyContact].
 /// </summary>
 public partial class EmergencyContact
 {

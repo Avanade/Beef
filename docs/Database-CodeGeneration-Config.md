@@ -10,6 +10,7 @@ The `CodeGeneration` object supports a number of properties that control the gen
 Category | Description
 -|-
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
+[`Columns`](#Columns) | Provides the _Columns_ configuration.
 [`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`EntityFramework`](#EntityFramework) | Provides the _Entity Framework (EF) model_ configuration.
@@ -40,6 +41,15 @@ Property | Description
 `orgUnitJoinSql` | The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.<br/>&dagger; Defaults to `[Sec].[fnGetUserOrgUnits]()`.
 `checkUserPermissionSql` | The SQL stored procedure that is to be used for `Permission` verification.<br/>&dagger; Defaults to `[Sec].[spCheckUserHasPermission]`.
 `getUserPermissionSql` | The SQL function that is to be used for `Permission` verification.<br/>&dagger; Defaults to `[Sec].[fnGetUserHasPermission]`.
+
+<br/>
+
+## Columns
+Provides the _Columns_ configuration.
+
+Property | Description
+-|-
+`aliasColumns` | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.<br/>&dagger; Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.
 
 <br/>
 

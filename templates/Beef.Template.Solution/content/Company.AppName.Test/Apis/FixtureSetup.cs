@@ -21,6 +21,9 @@ public class FixtureSetUp
 #if (implement_mysql)
             return await new MySqlMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
 #endif
+#if (implement_postgres)
+            return await new PostgresMigration(args).MigrateAndLogAsync(ct).ConfigureAwait(false);
+#endif
         });
     }
 #endif

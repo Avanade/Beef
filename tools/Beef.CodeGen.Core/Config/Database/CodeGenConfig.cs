@@ -24,6 +24,7 @@ namespace Beef.CodeGen.Config.Database
         Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying database-driven code generation.",
         Markdown = "")]
     [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CodeGenCategory("Columns", Title = "Provides the _Columns_ configuration.")]
     [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CodeGenCategory("EntityFramework", Title = "Provides the _Entity Framework (EF) model_ configuration.")]
@@ -150,6 +151,18 @@ namespace Beef.CodeGen.Config.Database
         [CodeGenProperty("Infer", Title = "The SQL function that is to be used for `Permission` verification.",
             Description = "Defaults to `[Sec].[fnGetUserHasPermission]`.")]
         public string? GetUserPermissionSql { get; set; }
+
+        #endregion
+
+        #region Columns
+
+        /// <summary>
+        /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
+        /// </summary>
+        [JsonPropertyName("aliasColumns")]
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.",
+            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
+        public List<string>? AliasColumns { get; set; }
 
         #endregion
 
@@ -362,6 +375,11 @@ namespace Beef.CodeGen.Config.Database
         public string? AppName => CodeGenArgs!.GetAppName(true);
 
         /// <summary>
+        /// Gets the database provider name.
+        /// </summary>
+        public string? DatabaseProvider => Migrator?.Provider;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()
@@ -380,16 +398,16 @@ namespace Beef.CodeGen.Config.Database
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceOutbox = DefaultWhereNull(NamespaceOutbox, () => NamespaceBusiness);
 
-            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
-            ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");
+            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Migrator!.DatabaseSchemaConfig.IsDeletedColumnName);
+            ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Migrator!.DatabaseSchemaConfig.TenantIdColumnName);
             ColumnNameOrgUnitId = DefaultWhereNull(ColumnNameOrgUnitId, () => "OrgUnitId");
-            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => "RowVersion");
-            ColumnNameCreatedBy = DefaultWhereNull(ColumnNameCreatedBy, () => "CreatedBy");
-            ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => "CreatedDate");
-            ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
-            ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
-            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => "UpdatedBy");
-            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => "UpdatedDate");
+            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Migrator!.DatabaseSchemaConfig.RowVersionColumnName);
+            ColumnNameCreatedBy = DefaultWhereNull(ColumnNameCreatedBy, () => Migrator!.DatabaseSchemaConfig.CreatedByColumnName);
+            ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => Migrator!.DatabaseSchemaConfig.CreatedDateColumnName);
+            ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => Migrator!.DatabaseSchemaConfig.UpdatedByColumnName);
+            ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => Migrator!.DatabaseSchemaConfig.UpdatedDateColumnName);
+            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Migrator!.DatabaseSchemaConfig.UpdatedByColumnName);
+            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Migrator!.DatabaseSchemaConfig.UpdatedDateColumnName);
 
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
@@ -460,6 +478,16 @@ namespace Beef.CodeGen.Config.Database
             if (string.IsNullOrEmpty(name) || AutoDotNetRename == "None")
                 return name;
 
+            // Try to find the global alias and use.
+            var ca = AliasColumns?.Where(x => x.StartsWith(name + "^", StringComparison.Ordinal)).FirstOrDefault();
+            if (ca != null)
+            {
+                var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 2 && parts[1].Length > 0)
+                    return parts[1];
+            }
+
+            // Now apply the rename according to specified convention.
             if (AutoDotNetRename == "PascalCase")
                 return StringConverter.ToPascalCase(name);
 
