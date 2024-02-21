@@ -18,6 +18,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="content\Company.AppName.Test\appsettings.unittest.json" />
+  </ItemGroup>
+
   <Import Project="..\..\Common.targets" />
   
 </Project>

@@ -120,6 +120,13 @@ namespace Beef.Template.Solution.UnitTest
         }
 
         [Test]
+        public void SqlServer_WithSubscriber()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.EfWs", "Bar", "SqlServer", "AzFunction");
+        }
+
+        [Test]
         public void MySQL()
         {
             OneTimeSetUp();
@@ -147,12 +154,12 @@ namespace Beef.Template.Solution.UnitTest
             SolutionCreateGenerateTest("Foo.Ha", "Bar", "HttpAgent");
         }
 
-        private static void SolutionCreateGenerateTest(string company, string appName, string datasource)
+        private static void SolutionCreateGenerateTest(string company, string appName, string datasource, string subscriber = null)
         {
             // Mkdir and create solution from template. 
             var dir = Path.Combine(_unitTests.FullName, $"{company}.{appName}");
             Directory.CreateDirectory(dir);
-            Assert.That(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, Is.Zero, "dotnet new beef");
+            Assert.That(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource} {(string.IsNullOrEmpty(subscriber) ? "" : $"--subscriber {subscriber}")}", dir).exitCode, Is.Zero, "dotnet new beef");
 
             // Restore nuget packages from our repository.
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish");

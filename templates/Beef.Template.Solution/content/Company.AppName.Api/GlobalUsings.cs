@@ -1,8 +1,20 @@
 ﻿global using Azure.Monitor.OpenTelemetry.AspNetCore;
 global using CoreEx;
 global using CoreEx.AspNetCore.WebApis;
+#if (implement_subscriber)
+#if (implement_database || implement_sqlserver)
+global using CoreEx.Azure.ServiceBus;
+global using CoreEx.Azure.Storage;
+global using CoreEx.Database;
+#endif
+#endif
 global using CoreEx.Entities;
 global using CoreEx.Events;
+#if (implement_subscriber)
+#if (implement_database || implement_sqlserver)
+global using CoreEx.Hosting;
+#endif
+#endif
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;
@@ -29,4 +41,10 @@ global using Company.AppName.Business.Validation;
 global using RefDataNamespace = Company.AppName.Business.Entities;
 #if (implement_cosmos)
 global using AzCosmos = Microsoft.Azure.Cosmos;
+#endif
+#if (implement_subscriber)
+global using AzServiceBus = Azure.Messaging.ServiceBus;
+#if (implement_database || implement_sqlserver)
+global using AzBlobs = Azure.Storage.Blobs;
+#endif
 #endif

@@ -1,5 +1,8 @@
 ﻿//#if (implement_database)
 schema: AppName
+//#if (implement_subscriber)
+outbox: true
+//#endif
 tables:
   # Reference data stored procedures
 - { name: Gender, getAll: true }
@@ -23,6 +26,9 @@ tables:
 //#endif
 //#if (implement_sqlserver)
 schema: AppName
+//#if (implement_subscriber)
+outbox: true
+//#endif
 efModel: true
 tables:
   # Reference data tables/models.

@@ -65,6 +65,22 @@
       "defaultValue": "SqlServer",
       "description": "The data source implementation option."
     },
+    "subscriber": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "AzFunction",
+          "description": "Indicates that the Service Bus subscriber is to be implemented using an Azure Function."
+        },
+        {
+          "choice": "None",
+          "description": "Indicates that no Service Bus subscriber is to be implemented (default)."
+        }
+      ],
+      "defaultValue": "None",
+      "description": "The Service Bus subscriber implementation option."
+    },
     "coreex_version": {
       "type": "generated",
       "generator": "constant",
@@ -112,6 +128,14 @@
     "implement_none": {
       "type": "computed",
       "value": "(datasource == \"None\")"
+    },
+    "implement_subscriber": {
+      "type": "computed",
+      "value": "(subscriber == \"AzFunction\")"
+    },
+    "implement_subscriber_azfunction": {
+      "type": "computed",
+      "value": "(subscriber == \"AzFunction\")"
     },
     "created_date": {
       "type": "generated",
