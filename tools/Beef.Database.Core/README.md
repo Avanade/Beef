@@ -10,8 +10,9 @@ The primary/core capabilities are enabled by [`DbEx`](https://github.com/Avanade
 
 Depending on the underlying database provider specific capabilities are enabled; see:
 
-- [SQL Server](../Beef.Database.SqlServer)
 - [MySQL](../Beef.Database.MySql)
+- [Postgres](../Beef.Database.Postgres)
+- [SQL Server](../Beef.Database.SqlServer)
 
 </br>
 

@@ -124,6 +124,7 @@ For more information see: [data-generation](../../tools/Beef.Database.Core/READM
 ## Samples
 
 See the following samples for end-to-end usage:
-- [SQL Server Entity Framework sample](../../docs/Sample-SqlServer-EF-GettingStarted.md)
-- [SQL Server Stored Procedure sample](../../docs/Sample-SqlServer-StoredProcs-GettingStarted.md)
-- [Cosmos sample](../../docs/Sample-Cosmos-GettingStarted.md)
+- [_Cosmos_ sample](../../docs/Sample-Cosmos-GettingStarted.md)
+- [_PostgreSQL_ Entity Framework sample](../../docs/Sample-Postgres-EF-GettingStarted.md)
+- [_SQL Server_ Entity Framework sample](../../docs/Sample-SqlServer-EF-GettingStarted.md)
+- [_SQL Server_ Stored Procedure sample](../../docs/Sample-SqlServer-StoredProcs-GettingStarted.md)

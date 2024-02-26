@@ -177,6 +177,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{FDBFD331-A
 		docs\Layer-ServiceInterface.md = docs\Layer-ServiceInterface.md
 		docs\Reference-Data.md = docs\Reference-Data.md
 		docs\Sample-Cosmos-GettingStarted.md = docs\Sample-Cosmos-GettingStarted.md
+		docs\Sample-Postgres-EF-GettingStarted.md = docs\Sample-Postgres-EF-GettingStarted.md
 		docs\Sample-SqlServer-EF-GettingStarted.md = docs\Sample-SqlServer-EF-GettingStarted.md
 		docs\Sample-SqlServer-StoredProcs-GettingStarted.md = docs\Sample-SqlServer-StoredProcs-GettingStarted.md
 		docs\Solution-Structure.md = docs\Solution-Structure.md
@@ -201,7 +202,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyEf.Hr.Security.Subscripti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyEf.Hr.Security.Test", "samples\MyEf.Hr\MyEf.Hr.Security.Test\MyEf.Hr.Security.Test.csproj", "{7AE6E1D4-8621-4FC5-8A1F-448FA70DB257}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beef.Database.Postgres", "tools\Beef.Database.Postgres\Beef.Database.Postgres.csproj", "{1FC9C576-99C9-44B2-AD86-9B8A0C76D79E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Database.Postgres", "tools\Beef.Database.Postgres\Beef.Database.Postgres.csproj", "{1FC9C576-99C9-44B2-AD86-9B8A0C76D79E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

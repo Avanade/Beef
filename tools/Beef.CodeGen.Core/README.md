@@ -160,13 +160,13 @@ Command | Description
 Additionally, there are a number of command line options that can be used.
 
 ```
-Business Entity Execution Framework (Beef) Code Generator tool.
+Beef.CodeGen.Core Code Generation Tool.
 
 Usage: Beef.CodeGen.Core [options] <command>
 
 Arguments:
   command                   Execution command type.
-                            Allowed values are: Entity, Database, RefData, DataModel, All.
+                            Allowed values are: Entity, Database, RefData, DataModel, All, Clean, Count.
 
 Options:
   -?|-h|--help              Show help information.
@@ -179,6 +179,13 @@ Options:
   -cv|--connection-varname  Database connection string environment variable name.
   -enc|--expect-no-changes  Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline).
   -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
+
+Extended commands and argument(s):
+  clean   Cleans (removes) all related directories named 'Generated'.
+          - Use --param exclude=name[,name] to exclude named directory(s) from the clean.
+
+  count   Counts and reports the number of files and lines (All and Generated) within all related directories.
+          - Use --param exclude=name[,name] to exclude named directory(s) from the count.
 ```
 
 <br/>

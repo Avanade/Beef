@@ -263,9 +263,10 @@ _Beef_ is open source under the [MIT license](./LICENSE) and is free for commerc
 To start using _Beef_ you do not need to clone or fork the repo; you just need to create a solution with the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md), including referencing the appropriate [NuGet packages](#Framework). To accelerate this a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
 
 See the following for example end-to-end solution/project creation; each demonstrating the same API functionality leveraging different data sources to accomplish:
-- [Cosmos sample](./docs/Sample-Cosmos-GettingStarted.md)
-- [SQL Server Stored Procedures sample](./docs/Sample-SqlServer-StoredProcs-GettingStarted.md)
-- [SQL Server Entity Framework sample](./docs/Sample-SqlServer-EF-GettingStarted.md)
+- [_Cosmos_ sample](./docs/Sample-Cosmos-GettingStarted.md)
+- [_PostgreSQL_ Entity Framework sample](./docs/Sample-Postgres-EF-GettingStarted.md)
+- [_SQL Server_ Entity Framework sample](./docs/Sample-SqlServer-EF-GettingStarted.md)
+- [_SQL Server_ Stored Procedures sample](./docs/Sample-SqlServer-StoredProcs-GettingStarted.md)
 
 Otherwise, follow along with the following sample tutorials that will provide a more in-depth walkthrough solving a defined functional problem:
 
