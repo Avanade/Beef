@@ -5,7 +5,12 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.1.0" />
     <PackageReference Include="CoreEx.AspNetCore" Version="CoreExVersion" />
+    <!--#if (implement_subscriber) -->
+    <PackageReference Include="CoreEx.Azure" Version="CoreExVersion" />
+    <!--#endif -->
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.10" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>

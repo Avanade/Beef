@@ -22,6 +22,7 @@ public class Startup
                 .AddRequestCache()
                 .AddValidationTextProvider()
                 .AddValidators<AppNameSettings>()
+                .AddMappers<AppNameSettings>()
                 .AddSingleton<IIdentifierGenerator, IdentifierGenerator>();
 
 #if (implement_database || implement_sqlserver)
@@ -32,6 +33,11 @@ public class Startup
 #if (implement_mysql)
         // Add the database services (scoped per request/connection).
         services.AddDatabase(sp => new AppNameDb(() => new MySqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
+
+#endif
+#if (implement_postgres)
+        // Add the database services (scoped per request/connection).
+        services.AddDatabase(sp => new AppNameDb(() => new NpgsqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
 
 #endif
 #if (implement_entityframework)
@@ -65,14 +71,37 @@ public class Startup
                 .AddGeneratedDataSvcServices()
                 .AddGeneratedDataServices();
 
-#if (!implement_database)
-        // Add type-to-type mapping services using reflection.
-        services.AddMappers<AppNameSettings>();
-
-#endif
-        // Add the event publishing; this will need to be updated from the logger publisher to the actual as appropriate.
+#if (implement_subscriber)
+        // Add event publishing services.
         services.AddEventDataFormatter()
+                .AddCloudEventSerializer()
+                .AddEventPublisher();
+
+#if (implement_database || implement_sqlserver)
+        // Add sql server transactional event outbox enqueue services.
+        services.AddScoped<IEventSender, EventOutboxEnqueue>();
+
+        // Add transactional event outbox dequeue dependencies.
+        services.AddSingleton(sp => new AzServiceBus.ServiceBusClient(sp.GetRequiredService<AppNameSettings>().ServiceBusConnectionString))
+                .AddSingleton<IServiceSynchronizer>(sp => new BlobLeaseSynchronizer(new AzBlobs.BlobContainerClient(sp.GetRequiredService<AppNameSettings>().StorageConnectionString, "event-synchronizer")));
+
+        // Add transactional event outbox dequeue hosted service (_must_ be explicit with the IServiceBusSender).
+        services.AddScoped<IServiceBusSender, ServiceBusSender>()
+                .AddSqlServerEventOutboxHostedService(sp =>
+                {
+                    return new EventOutboxDequeue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<IServiceBusSender>(), sp.GetRequiredService<ILogger<EventOutboxDequeue>>());
+                });
+#else
+        // Add service bus event sender.
+        services.AddSingleton(sp => new AzServiceBus.ServiceBusClient(sp.GetRequiredService<AppNameSettings>().ServiceBusConnectionString))
+                .AddScoped<IEventSender, ServiceBusSender>();
+#endif
+#else
+        // Add the event publishing; this will need to be updated from the null publisher to the actual as appropriate.
+        services.AddEventDataFormatter()
+                .AddCloudEventSerializer()
                 .AddNullEventPublisher();
+#endif
 
         // Add additional services.
         services.AddControllers();

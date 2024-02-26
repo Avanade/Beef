@@ -1,16 +1,13 @@
-﻿namespace Company.AppName.Api;
-
-/// <summary>
-/// The <b>Web API</b> host/program.
-/// </summary>
-public static class Program
-{
-    /// <summary>
-    /// Main startup.
-    /// </summary>
-    /// <param name="args">The startup arguments.</param>
-    public static void Main(string[] args) => Host.CreateDefaultBuilder()
-        .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-        .ConfigureAppConfiguration(c => c.AddEnvironmentVariables("AppName_").AddCommandLine(args))
-        .Build().Run();
-}
+﻿Host.CreateDefaultBuilder()
+    .ConfigureWebHostDefaults(b => b.UseStartup<Startup>())
+    .ConfigureAppConfiguration(c => c.AddEnvironmentVariables("AppName_").AddCommandLine(args))
+    .ConfigureServices(s =>
+    {
+#if (implement_entityframework)
+        s.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddEntityFrameworkCoreInstrumentation().AddSource("CoreEx.*", "Company.AppName.*"));
+#else
+        s.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "Company.AppName.*"));
+#endif
+    })
+    .Build()
+    .Run();

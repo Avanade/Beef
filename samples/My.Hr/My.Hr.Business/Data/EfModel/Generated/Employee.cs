@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '[Hr].[Employee]'.
+/// Represents the Entity Framework (EF) model for SqlServer database object [Hr].[Employee].
 /// </summary>
 public partial class Employee
 {

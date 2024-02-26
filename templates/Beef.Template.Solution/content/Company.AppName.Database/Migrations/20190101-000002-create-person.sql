@@ -1,8 +1,4 @@
-﻿-- Migration Script
-
-START TRANSACTION;
-
-CREATE TABLE `person` (
+﻿CREATE TABLE `person` (
   `person_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `first_name` VARCHAR(100) NULL,
   `last_name` VARCHAR(100) NULL,
@@ -14,5 +10,3 @@ CREATE TABLE `person` (
   `updated_by` VARCHAR(250) NULL,
   `updated_date` DATETIME(6) NULL
 );
-	
-COMMIT WORK;

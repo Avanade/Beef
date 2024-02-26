@@ -1,0 +1,4 @@
+﻿configType: Beef.CodeGen.Config.Database.CodeGenConfig, Beef.CodeGen.Core
+generators:
+- { type: 'Beef.CodeGen.Generators.DatabaseEfModelGenerator, Beef.CodeGen.Core', template: 'DbEfModel_cs', file: '{{EFModelName}}.cs', directory: '{{Root.PathBusiness}}/Data/EfModel/Generated', text: 'DatabaseEfModelGenerator: Business/Data/EfModel' }
+- { type: 'Beef.CodeGen.Generators.DatabaseEfModelBuilderCodeGenerator, Beef.CodeGen.Core', template: 'DbEfModelBuilder_cs', file: 'ModelBuilderExtensions.cs', directory: '{{Root.PathBusiness}}/Data/EfModel/Generated', text: 'DatabaseEfModelBuilderCodeGenerator: Business/Data/EfModel' }

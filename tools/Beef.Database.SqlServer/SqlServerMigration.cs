@@ -58,7 +58,7 @@ namespace Beef.Database.SqlServer
             if (schema is null || tables.Count == 0)
                 throw new CodeGenException($"A '{nameof(MigrationCommand.CodeGen)}' command for 'YAML' also requires schema and at least one table argument to be specified.");
 
-            return this.ExecuteYamlCodeGenAsync(schema, tables.ToArray(), cancellationToken);
+            return this.ExecuteYamlCodeGenAsync(schema, [.. tables], cancellationToken);
         }
     }
 }

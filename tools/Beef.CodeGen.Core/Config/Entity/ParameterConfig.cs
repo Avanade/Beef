@@ -114,7 +114,7 @@ parameters: [
         /// Gets or sets the underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).
         /// </summary>
         [JsonPropertyName("refDataType")]
-        [CodeGenProperty("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
+        [CodeGenProperty("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = ["string", "int", "Guid"],
             Description = "Defaults to `string` where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.`.")]
         public string? RefDataType { get; set; }
 
@@ -148,7 +148,7 @@ parameters: [
         /// Gets or sets the `Validation` framework. 
         /// </summary>
         [JsonPropertyName("validationFramework")]
-        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = ["CoreEx", "FluentValidation"],
             Description = "Defaults to `Operation.ValidationFramework`.")]
         public string? ValidationFramework { get; set; }
 
@@ -163,7 +163,7 @@ parameters: [
         /// Gets or sets the option that determines the layers in which the parameter is passed.
         /// </summary>
         [JsonPropertyName("layerPassing")]
-        [CodeGenProperty("Manager", Title = "The option that determines the layers in which the parameter is passed.", Options = new string[] { "All", "ToManagerSet", "ToManagerCollSet" },
+        [CodeGenProperty("Manager", Title = "The option that determines the layers in which the parameter is passed.", Options = ["All", "ToManagerSet", "ToManagerCollSet"],
             Description = "Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, " +
             "`ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. " +
             "Where using the `PrimaryKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.")]
@@ -189,7 +189,7 @@ parameters: [
         /// Gets or sets the option for how the parameter will be delcared within the Web API Controller.
         /// </summary>
         [JsonPropertyName("webApiFrom")]
-        [CodeGenProperty("WebApi", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = new string[] { "FromQuery", "FromBody", "FromRoute", "FromEntityProperties" },
+        [CodeGenProperty("WebApi", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = ["FromQuery", "FromBody", "FromRoute", "FromEntityProperties"],
             Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.")]
         public string? WebApiFrom { get; set; }
 

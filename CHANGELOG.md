@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v5.10.0
+- *Enhancement:* Added [PostgreSQL](https://www.postgresql.org/) database support: 
+  - Leverages both `CoreEx.Database.Postgres` (runtime) and `DbEx.Postgres` (migration) packages; encapsulates the `Npgsql` package.
+  - The `Npgsql.EntityFrameworkCore.PostgreSQL` packages is used for the entity framework provider.
+  - The `dotnet new beef` template updated to support new `datasource` option of `postgres`.
+- *Enhancement:* Additional improvements for data migration and code-generation, including `SqlServer` and `MySql`, as a result of `DbEx` (`v2.5.0`) enhancements.
+
 ## v5.9.1
 - *Fixed:* Simplified YAML specification where _only_ a custom manager is required to be implemented. For an `operation` set `type: CustomManagerOnly`, this is a shorthand for `type: Custom, managerCustom: true, excludeIDataSvc: true, excludeDataSvc: true, excludeIData: true, excludeData: true` (i.e. these other properties will no longer need to be set explicitly).
 

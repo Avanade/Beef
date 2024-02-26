@@ -92,7 +92,7 @@ public class EmployeeTest : UsingApiTester<Startup>
     {
         Agent<EmployeeAgent>()
             .ExpectStatusCode(HttpStatusCode.OK)
-            .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions().Include(new string[] { "firstName", "lastName" })))
+            .Run(a => a.GetAsync(1.ToGuid(), new HttpRequestOptions().Include(["firstName", "lastName"])))
             .AssertJson("{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}");
     }
 
@@ -473,7 +473,7 @@ public class EmployeeTest : UsingApiTester<Startup>
             StartDate = DateTime.UtcNow.AddDays(1),
             PhoneNo = "(456) 789 0123",
             Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", State = "WA", PostCode = "98101" },
-            EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" } }
+            EmergencyContacts = [new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", Relationship = "FRD" }]
         };
 
         // Create an employee in the future.

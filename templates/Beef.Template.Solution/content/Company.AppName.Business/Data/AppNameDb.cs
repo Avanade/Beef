@@ -25,8 +25,19 @@ public class AppNameDb : MySqlDatabase
     /// <summary>
     /// Initializes a new instance of the <see cref="AppNameDb"/> class.
     /// </summary>
-    /// <param name="create">The factory to create the <see cref="SqlConnection"/>.</param>
+    /// <param name="create">The factory to create the <see cref="MySqlConnection"/>.</param>
     /// <param name="logger">The optional <see cref="ILogger"/>.</param>
     public AppNameDb(Func<MySqlConnection> create, ILogger<AppNameDb>? logger = null) : base(create, logger) { }
+}
+#endif
+#if (implement_postgres)
+public class AppNameDb : PostgresDatabase
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppNameDb"/> class.
+    /// </summary>
+    /// <param name="create">The factory to create the <see cref="NpgsqlConnection"/>.</param>
+    /// <param name="logger">The optional <see cref="ILogger"/>.</param>
+    public AppNameDb(Func<NpgsqlConnection> create, ILogger<AppNameDb>? logger = null) : base(create, logger) { }
 }
 #endif

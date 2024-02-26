@@ -42,7 +42,7 @@ namespace Beef.CodeGen
         /// <returns>The filename</returns>
         public static string GetConfigFilename(string directory, CommandType type, string company, string appName)
         {
-            List<string> files = new();
+            List<string> files = [];
             foreach (var n in GetConfigFilenames(type))
             {
                 var fi = new FileInfo(Path.Combine(directory, n.Replace("{{Company}}", company, StringComparison.OrdinalIgnoreCase).Replace("{{AppName}}", appName, StringComparison.OrdinalIgnoreCase)));

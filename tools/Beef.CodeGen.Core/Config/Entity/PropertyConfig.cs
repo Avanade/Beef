@@ -145,7 +145,7 @@ properties: [
         /// Gets or sets the <see cref="DateTime"/> transformation to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonPropertyName("dateTimeTransform")]
-        [CodeGenProperty("Property", Title = "The `DateTime` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "DateOnly", "DateTimeLocal", "DateTimeUtc", "DateTimeUnspecified" },
+        [CodeGenProperty("Property", Title = "The `DateTime` transformation to be performed on `Set` and `CleanUp`.", Options = ["UseDefault", "None", "DateOnly", "DateTimeLocal", "DateTimeUtc", "DateTimeUnspecified"],
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `DateTime`.")]
         public string? DateTimeTransform { get; set; }
 
@@ -153,7 +153,7 @@ properties: [
         /// Gets or sets the <see cref="string"/> trimming of white space characters to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonPropertyName("stringTrim")]
-        [CodeGenProperty("Property", Title = "The `string` trimming of white space characters to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "Start", "End", "Both" },
+        [CodeGenProperty("Property", Title = "The `string` trimming of white space characters to be performed on `Set` and `CleanUp`.", Options = ["UseDefault", "None", "Start", "End", "Both"],
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
         public string? StringTrim { get; set; }
 
@@ -161,7 +161,7 @@ properties: [
         /// Gets or sets the <see cref="string"/> transformation to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonPropertyName("stringTransform")]
-        [CodeGenProperty("Property", Title = "The `string` transformation to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "NullToEmpty", "EmptyToNull" },
+        [CodeGenProperty("Property", Title = "The `string` transformation to be performed on `Set` and `CleanUp`.", Options = ["UseDefault", "None", "NullToEmpty", "EmptyToNull"],
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
         public string? StringTransform { get; set; }
 
@@ -169,7 +169,7 @@ properties: [
         /// Gets or sets the <see cref="string"/> casing to be performed on <c>Set</c> and <c>CleanUp</c>.
         /// </summary>
         [JsonPropertyName("stringCasing")]
-        [CodeGenProperty("Property", Title = "The `string` casing to be performed on `Set` and `CleanUp`.", Options = new string[] { "UseDefault", "None", "Lower", "Upper", "Title" },
+        [CodeGenProperty("Property", Title = "The `string` casing to be performed on `Set` and `CleanUp`.", Options = ["UseDefault", "None", "Lower", "Upper", "Title"],
             Description = "Defaults to `UseDefault`. This is only applied where the `Type` is `string`.")]
         public string? StringCasing { get; set; }
 
@@ -212,7 +212,7 @@ properties: [
         /// Gets or sets the underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).
         /// </summary>
         [JsonPropertyName("refDataType")]
-        [CodeGenProperty("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = new string[] { "string", "int", "Guid" },
+        [CodeGenProperty("RefData", Title = "The underlying Reference Data Type that is also used as the Reference Data serialization identifier (SID).", Options = ["string", "int", "Guid"],
             Description = "Defaults to `string` (being the `ReferenceDataBase.Code`) where not specified and the corresponding `Type` starts with (prefix) `RefDataNamespace.` or `^`. Note: an `Id` of type `string` is currently not supported; the use of the `Code` is the recommended approach.")]
         public string? RefDataType { get; set; }
 
@@ -228,7 +228,7 @@ properties: [
         /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overriding the <c>CodeGeneration.RefDataText</c> selection.
         /// </summary>
         [JsonPropertyName("refDataText")]
-        [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.", Options = new string[] { "Optional", "Always", "Never" },
+        [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.", Options = ["Optional", "Always", "Never"],
             Description = "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`)." +
                           "`Optional` indicates when `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` then a value is output, `Always` indicates that the value is _always_ output, and `Never` indicates that feature is turned off.")]
         public string? RefDataText { get; set; }
@@ -339,7 +339,7 @@ properties: [
         /// </summary>
         [JsonPropertyName("dataOperationTypes")]
         [CodeGenProperty("Data", Title = "The operations types (`ExecutionContext.OperationType`) selection to enable inclusion and exclusion of property mapping.",
-            Options = new string[] { "Any", "AnyExceptCreate", "AnyExceptUpdate", "AnyExceptGet", "Get", "Create", "Update", "Delete" },
+            Options = ["Any", "AnyExceptCreate", "AnyExceptUpdate", "AnyExceptGet", "Get", "Create", "Update", "Delete"],
             Description = "Defaults to `Any`.")]
         public string? DataOperationTypes { get; set; }
 
@@ -378,7 +378,7 @@ properties: [
         /// The Entity Framework `Mapper` approach for the property.
         /// </summary>
         [JsonPropertyName("entityFrameworkMapper")]
-        [CodeGenProperty("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = new string[] { "Set", "Ignore", "Map", "Flatten" },
+        [CodeGenProperty("EntityFramework", Title = "The Entity Framework `Mapper` approach for the property.", Options = ["Set", "Ignore", "Map", "Flatten"],
             Description = "Defaults to `Set`.")]
         public string? EntityFrameworkMapper { get; set; }
 
@@ -390,7 +390,7 @@ properties: [
         /// The Cosmos `Mapper` approach for the property.
         /// </summary>
         [JsonPropertyName("cosmosMapper")]
-        [CodeGenProperty("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = new string[] { "Set", "Ignore", "Map", "Flatten" },
+        [CodeGenProperty("Cosmos", Title = "The Cosmos `Mapper` approach for the property.", Options = ["Set", "Ignore", "Map", "Flatten"],
             Description = "Defaults to `Set`.")]
         public string? CosmosMapper { get; set; }
 
@@ -402,7 +402,7 @@ properties: [
         /// The OData `Mapper` approach for the property.
         /// </summary>
         [JsonPropertyName("odataMapper")]
-        [CodeGenProperty("OData", Title = "The OData `Mapper` approach for the property.", Options = new string[] { "Map", "Ignore", "Skip" },
+        [CodeGenProperty("OData", Title = "The OData `Mapper` approach for the property.", Options = ["Map", "Ignore", "Skip"],
             Description = "Defaults to `Map` which indicates the property will be explicitly mapped. A value of `Ignore` will explicitly `Ignore`, whilst a value of `Skip` will skip code-generated mapping altogether.")]
         public string? ODataMapper { get; set; }
 
@@ -414,7 +414,7 @@ properties: [
         /// The HttpAgent `Mapper` approach for the property.
         /// </summary>
         [JsonPropertyName("httpAgentMapper")]
-        [CodeGenProperty("HttpAgent", Title = "The HttpAgent `Mapper` approach for the property.", Options = new string[] { "Set", "Ignore", "Map", "Flatten" },
+        [CodeGenProperty("HttpAgent", Title = "The HttpAgent `Mapper` approach for the property.", Options = ["Set", "Ignore", "Map", "Flatten"],
             Description = "Defaults to `Set`.")]
         public string? HttpAgentMapper { get; set; }
 
@@ -809,11 +809,11 @@ properties: [
             if (CompareValue(refDataType, "string") && CompareValue(dataConverter, "ReferenceDataCodeConverter<T>"))
                 return (null, refDataGetValueType);
 
-            var s = dataConverter.IndexOfAny(new char[] { '<', '{' });
+            var s = dataConverter.IndexOfAny(['<', '{']);
             if (s < 1)
                 return (dataConverter, refDataGetValueType);
 
-            var e = dataConverter.IndexOfAny(new char[] { '>', '}' });
+            var e = dataConverter.IndexOfAny(['>', '}']);
             if (e < 0 || e < s)
                 return (dataConverter, refDataGetValueType);
 

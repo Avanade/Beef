@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<Config.Entity.CodeGenConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
-            => (config ?? throw new System.ArgumentNullException(nameof(config))).Entities!.Any(x => x.ExcludeData != "Exclude" && x.Operations!.Count > 0) ? new Config.Entity.CodeGenConfig[] { config } : System.Array.Empty<Config.Entity.CodeGenConfig>();
+            => (config ?? throw new System.ArgumentNullException(nameof(config))).Entities!.Any(x => x.ExcludeData != "Exclude" && x.Operations!.Count > 0) ? [config] : System.Array.Empty<Config.Entity.CodeGenConfig>();
     }
 }

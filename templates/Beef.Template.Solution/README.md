@@ -50,6 +50,7 @@ Parameter | Description
 `SqlServer` | Microsoft SQL Server with Entity Framework (default).
 `SqlServerProcs` | Microsoft SQL Server with Stored Procedures.
 `MySQL` | Oracle MySQL with Entity Framework.
+`Postgres` | PostgreSQL with Entity Framework.
 `Cosmos` | Azure Cosmos DB.
 `HttpAgent` | Backend HTTP.
 `None` | Empty solution/projects skeleton.
@@ -58,10 +59,10 @@ The `dotnet new` command is used to create, e.g.:
 
 ```
 dotnet new beef --company My.Company --appname Sales
-dotnet new beef --company My.Company --appname Sales --datasource Cosmos
+dotnet new beef --company My.Company --appname Sales --datasource SqlServer
 ```
 
- The following will be created:
+The following will be created:
 
 ```
 

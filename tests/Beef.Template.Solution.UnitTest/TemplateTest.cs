@@ -120,10 +120,24 @@ namespace Beef.Template.Solution.UnitTest
         }
 
         [Test]
+        public void SqlServer_WithSubscriber()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.EfWs", "Bar", "SqlServer", "AzFunction");
+        }
+
+        [Test]
         public void MySQL()
         {
             OneTimeSetUp();
             SolutionCreateGenerateTest("Foo.My", "Bar", "MySQL");
+        }
+
+        [Test]
+        public void Postgres()
+        {
+            OneTimeSetUp();
+            SolutionCreateGenerateTest("Foo.Ps", "Bar", "Postgres");
         }
 
         [Test]
@@ -140,12 +154,12 @@ namespace Beef.Template.Solution.UnitTest
             SolutionCreateGenerateTest("Foo.Ha", "Bar", "HttpAgent");
         }
 
-        private static void SolutionCreateGenerateTest(string company, string appName, string datasource)
+        private static void SolutionCreateGenerateTest(string company, string appName, string datasource, string subscriber = null)
         {
             // Mkdir and create solution from template. 
             var dir = Path.Combine(_unitTests.FullName, $"{company}.{appName}");
             Directory.CreateDirectory(dir);
-            Assert.That(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, Is.Zero, "dotnet new beef");
+            Assert.That(ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource} {(string.IsNullOrEmpty(subscriber) ? "" : $"--subscriber {subscriber}")}", dir).exitCode, Is.Zero, "dotnet new beef");
 
             // Restore nuget packages from our repository.
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish");
@@ -155,7 +169,7 @@ namespace Beef.Template.Solution.UnitTest
             Assert.That(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, Is.Zero, "dotnet run all [entity]");
 
             // Database: Execute code-generation.
-            if (datasource == "SqlServerProcs" || datasource == "SqlServer" || datasource == "MySQL")
+            if (datasource == "SqlServerProcs" || datasource == "SqlServer" || datasource == "MySQL" || datasource == "Postgres")
             {
                 Assert.That(ExecuteCommand("dotnet", "run drop --accept-prompts", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run drop [database]");
                 Assert.That(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run all [database]");

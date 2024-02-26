@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace MyEf.Hr.Business.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '[Hr].[TerminationReason]'.
+/// Represents the Entity Framework (EF) model for SqlServer database object [Hr].[TerminationReason].
 /// </summary>
 public partial class TerminationReason
 {

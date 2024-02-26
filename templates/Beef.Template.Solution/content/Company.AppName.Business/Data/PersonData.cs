@@ -21,11 +21,20 @@ public partial class PersonData
          .TableValuedParamWith(args?.Genders, "GenderCodes", () => _db.CreateTableValuedParameter(args!.Genders!.ToCodeList()));
     }
 #endif
-#if (implement_entityframework)
+#if (implement_sqlserver || implement_mysql)
     private IQueryable<EfModel.Person> GetByArgsOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args)
     {
         _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName!, w)));
         _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName!, w)));
+        _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
+        return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
+    }
+#endif
+#if (implement_postgres)
+    private IQueryable<EfModel.Person> GetByArgsOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args)
+    {
+        _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.ILike(x.FirstName!, w)));
+        _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.ILike(x.LastName!, w)));
         _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
         return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
     }

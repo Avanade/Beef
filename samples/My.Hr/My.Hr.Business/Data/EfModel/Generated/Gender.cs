@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '[Hr].[Gender]'.
+/// Represents the Entity Framework (EF) model for SqlServer database object [Hr].[Gender].
 /// </summary>
 public partial class Gender
 {

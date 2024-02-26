@@ -21,9 +21,6 @@ namespace MyEf.Hr.Api
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
             // Add the core services.
             services.AddSettings<HrSettings>()
                     .AddExecutionContext()
@@ -81,7 +78,7 @@ namespace MyEf.Hr.Api
             services.AddHttpClient();
 
             // Add Azure monitor open telemetry.
-            services.AddOpenTelemetry().UseAzureMonitor();
+            services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource());
             services.Configure<EntityFrameworkInstrumentationOptions>(options => options.SetDbStatementForText = true);
             services.ConfigureOpenTelemetryTracerProvider((sp, builder) => builder.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 

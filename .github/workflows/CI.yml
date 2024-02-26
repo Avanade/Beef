@@ -23,7 +23,8 @@ jobs:
       My_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=My.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       MyEf_Hr_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=MyEf.Hr;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
-      Baz_ConnectionStrings__Database: Server=localhost;Port=3306;Database=Foo.Baz;Uid=ciuser;Pwd=ciStrong#!Password;AllowUserVariables=true;UseAffectedRows=false;
+      Bam_ConnectionStrings__Database: Server=localhost;Port=3306;Database=Foo.Bam;Uid=ciuser;Pwd=ciStrong#!Password;AllowUserVariables=true;UseAffectedRows=false;
+      Bap_ConnectionStrings__Database: Server=localhost;Port=5432;Database=Foo.Bap;User Id=postgres;Pwd=ciStrong#!Password;
       Cdr_CosmosConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
 
     services:
@@ -42,10 +43,18 @@ jobs:
           - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: yourStrong#!Password
-          MYSQL_DATABASE: Foo.Baz
+          MYSQL_DATABASE: Foo.Bam
           MYSQL_USER: ciuser
           MYSQL_PASSWORD: ciStrong#!Password
         options: --name mysql
+
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: ciStrong#!Password
+        options: --name postgres
 
     steps:
     - uses: actions/checkout@v4
@@ -66,6 +75,7 @@ jobs:
         dotnet restore ./tools/Beef.Database.Core
         dotnet restore ./tools/Beef.Database.SqlServer
         dotnet restore ./tools/Beef.Database.MySql
+        dotnet restore ./tools/Beef.Database.Postgres
         dotnet restore ./tools/Beef.Test.NUnit
         dotnet restore ./templates/Beef.Template.Solution
 
@@ -75,6 +85,7 @@ jobs:
         dotnet build ./tools/Beef.Database.Core --no-restore
         dotnet build ./tools/Beef.Database.SqlServer --no-restore
         dotnet build ./tools/Beef.Database.MySql --no-restore
+        dotnet build ./tools/Beef.Database.Postgres --no-restore
         dotnet build ./tools/Beef.Test.NUnit --no-restore
         dotnet build ./templates/Beef.Template.Solution --no-restore
 
@@ -85,6 +96,7 @@ jobs:
         dotnet pack ./tools/Beef.Database.Core --output ./packages --configuration Debug --no-build
         dotnet pack ./tools/Beef.Database.SqlServer --output ./packages --configuration Debug --no-build
         dotnet pack ./tools/Beef.Database.MySql --output ./packages --configuration Debug --no-build
+        dotnet pack ./tools/Beef.Database.Postgres --output ./packages --configuration Debug --no-build
         dotnet pack ./tools/Beef.Test.NUnit --output ./packages --configuration Debug --no-build
         dotnet pack ./templates/Beef.Template.Solution --output ./packages --configuration Debug --no-build
         dotnet new nugetconfig
@@ -254,18 +266,35 @@ jobs:
      # Template - MySQL with Entity Framework
 
     - name: Template/MySQL/Ef create
-      run: dotnet new beef --company Foo.My --appname Baz --datasource MySQL --output Foo.My.Baz
+      run: dotnet new beef --company Foo.My --appname Bam --datasource MySQL --output Foo.My.Bam
 
     - name: Template/MySQL/Ef database
-      working-directory: ./Foo.My.Baz/Foo.My.Baz.Database
-      run: dotnet run dropandall --connection-varname Baz_ConnectionStrings__Database --accept-prompts
+      working-directory: ./Foo.My.Bam/Foo.My.Bam.Database
+      run: dotnet run dropandall --connection-varname Bam_ConnectionStrings__Database --accept-prompts
 
     - name: Template/MySQL/Ef code-gen
-      working-directory: ./Foo.My.Baz/Foo.My.Baz.CodeGen
+      working-directory: ./Foo.My.Bam/Foo.My.Bam.CodeGen
       run: dotnet run all
 
     - name: Template/MySQL/Ef test
-      working-directory: ./Foo.My.Baz
+      working-directory: ./Foo.My.Bam
+      run: dotnet test 
+
+     # Template - Postgres with Entity Framework
+
+    - name: Template/Postgres/Ef create
+      run: dotnet new beef --company Foo.Ps --appname Bap --datasource Postgres --output Foo.Ps.Bap
+
+    - name: Template/Postgres/Ef database
+      working-directory: ./Foo.Ps.Bap/Foo.Ps.Bap.Database
+      run: dotnet run dropandall --connection-varname Bap_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/Postgres/Ef code-gen
+      working-directory: ./Foo.Ps.Bap/Foo.Ps.Bap.CodeGen
+      run: dotnet run all
+
+    - name: Template/Postgres/Ef test
+      working-directory: ./Foo.Ps.Bap
       run: dotnet test 
 
      # Template - HttpAgent

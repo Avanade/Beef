@@ -24,6 +24,7 @@ namespace Beef.CodeGen.Config.Database
         Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying database-driven code generation.",
         Markdown = "")]
     [CodeGenCategory("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CodeGenCategory("Columns", Title = "Provides the _Columns_ configuration.")]
     [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CodeGenCategory("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CodeGenCategory("EntityFramework", Title = "Provides the _Entity Framework (EF) model_ configuration.")]
@@ -33,6 +34,8 @@ namespace Beef.CodeGen.Config.Database
     [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigRootBase<CodeGenConfig>, ISpecialColumnNames
     {
+        private static readonly char[] _snakeKebabSeparators = ['_', '-'];
+
         #region Key
 
         /// <summary>
@@ -153,13 +156,25 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region Columns
+
+        /// <summary>
+        /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
+        /// </summary>
+        [JsonPropertyName("aliasColumns")]
+        [CodeGenPropertyCollection("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.",
+            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
+        public List<string>? AliasColumns { get; set; }
+
+        #endregion
+
         #region DotNet
 
         /// <summary>
         /// Gets or sets the option to automatically rename the SQL Tables and Columns for use in .NET.
         /// </summary>
         [JsonPropertyName("autoDotNetRename")]
-        [CodeGenProperty("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
+        [CodeGenProperty("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = ["None", "PascalCase", "SnakeKebabToPascalCase"],
             Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
 
@@ -362,6 +377,11 @@ namespace Beef.CodeGen.Config.Database
         public string? AppName => CodeGenArgs!.GetAppName(true);
 
         /// <summary>
+        /// Gets the database provider name.
+        /// </summary>
+        public string? DatabaseProvider => Migrator?.Provider;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()
@@ -380,16 +400,16 @@ namespace Beef.CodeGen.Config.Database
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceOutbox = DefaultWhereNull(NamespaceOutbox, () => NamespaceBusiness);
 
-            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
-            ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");
+            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Migrator!.Args.IsDeletedColumnName);
+            ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Migrator!.Args.TenantIdColumnName);
             ColumnNameOrgUnitId = DefaultWhereNull(ColumnNameOrgUnitId, () => "OrgUnitId");
-            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => "RowVersion");
-            ColumnNameCreatedBy = DefaultWhereNull(ColumnNameCreatedBy, () => "CreatedBy");
-            ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => "CreatedDate");
-            ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
-            ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
-            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => "UpdatedBy");
-            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => "UpdatedDate");
+            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Migrator!.Args.RowVersionColumnName);
+            ColumnNameCreatedBy = DefaultWhereNull(ColumnNameCreatedBy, () => Migrator!.Args.CreatedByColumnName);
+            ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => Migrator!.Args.CreatedDateColumnName);
+            ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => Migrator!.Args.UpdatedByColumnName);
+            ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => Migrator!.Args.UpdatedDateColumnName);
+            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Migrator!.Args.UpdatedByColumnName);
+            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Migrator!.Args.UpdatedDateColumnName);
 
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
@@ -443,7 +463,7 @@ namespace Beef.CodeGen.Config.Database
             var sw = Stopwatch.StartNew();
             Migrator = CodeGenArgs.GetDatabaseMigrator();
             var db = Migrator.Database;
-            DbTables = await db.SelectSchemaAsync(Migrator.DatabaseSchemaConfig, Migrator.Args.DataParserArgs).ConfigureAwait(false);
+            DbTables = await db.SelectSchemaAsync(Migrator).ConfigureAwait(false);
 
             sw.Stop();
             CodeGenArgs.Logger?.Log(LogLevel.Information, "{Content}", $"    Database schema query complete [{sw.ElapsedMilliseconds}ms]");
@@ -460,12 +480,22 @@ namespace Beef.CodeGen.Config.Database
             if (string.IsNullOrEmpty(name) || AutoDotNetRename == "None")
                 return name;
 
+            // Try to find the global alias and use.
+            var ca = AliasColumns?.Where(x => x.StartsWith(name + "^", StringComparison.Ordinal)).FirstOrDefault();
+            if (ca != null)
+            {
+                var parts = ca.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 2 && parts[1].Length > 0)
+                    return parts[1];
+            }
+
+            // Now apply the rename according to specified convention.
             if (AutoDotNetRename == "PascalCase")
                 return StringConverter.ToPascalCase(name);
 
             // That only leaves SnakeKebabToPascalCase.
             var sb = new StringBuilder();
-            name.Split(new char[] { '_', '-' }, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
+            name.Split(_snakeKebabSeparators, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
             return sb.ToString();
         }
 

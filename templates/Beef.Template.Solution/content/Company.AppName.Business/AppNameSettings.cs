@@ -41,4 +41,18 @@ public class AppNameSettings : SettingsBase
     /// </summary>
     public string XxxAgentUrl => GetRequiredValue<string>();
 #endif
+#if (implement_subscriber)
+
+    /// <summary>
+    /// Gets the Azure Service Bus connection string.
+    /// </summary>
+    public string ServiceBusConnectionString => GetRequiredValue<string>("ConnectionStrings__ServiceBus");
+#if (implement_database || implement_sqlserver)
+
+    /// <summary>
+    /// Gets the Azure Blob Storage connection string.
+    /// </summary>
+    public string StorageConnectionString => GetRequiredValue<string>("ConnectionStrings__Storage");
+#endif
+#endif
 }

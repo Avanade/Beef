@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Beef.Demo.Business.Data.EfModel;
 
 /// <summary>
-/// Represents the Entity Framework (EF) model for database object '[Ref].[Gender]'.
+/// Represents the Entity Framework (EF) model for SqlServer database object [Ref].[Gender].
 /// </summary>
 public partial class Gender
 {

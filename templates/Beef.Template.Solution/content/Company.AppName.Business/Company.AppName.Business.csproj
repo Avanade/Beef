@@ -15,6 +15,9 @@
     <!--#if (implement_mysql) -->
     <PackageReference Include="CoreEx.Database.MySql" Version="CoreExVersion" />
     <!--#endif -->
+    <!--#if (implement_postgres) -->
+    <PackageReference Include="CoreEx.Database.Postgres" Version="CoreExVersion" />
+    <!--#endif -->
     <!--#if (implement_entityframework) -->
     <PackageReference Include="CoreEx.EntityFrameworkCore" Version="CoreExVersion" />
     <!--#endif -->
@@ -24,6 +27,9 @@
     <!--#endif -->
     <!--#if (implement_mysql) -->
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0-beta.2" />
+    <!--#endif -->
+    <!--#if (implement_postgres) -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
     <!--#endif -->
   </ItemGroup>
 </Project>

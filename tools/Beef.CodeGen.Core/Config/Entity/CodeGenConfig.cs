@@ -92,7 +92,7 @@ entities:
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
         [JsonPropertyName("refDataType")]
-        [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
+        [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = ["int", "long", "Guid", "string"],
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier. Results in all underlying entities becoming Reference Data.")]
         public string? RefDataType { get; set; }
 
@@ -120,7 +120,7 @@ entities:
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
         [JsonPropertyName("jsonSerializer")]
-        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "SystemText", "Newtonsoft" },
+        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = ["SystemText", "Newtonsoft"],
             Description = "Defaults to `SystemText`. This can be overridden within the `Entity`(s).")]
         public string? JsonSerializer { get; set; }
 
@@ -128,7 +128,7 @@ entities:
         /// Gets or sets the default JSON name for the ETag property.
         /// </summary>
         [JsonPropertyName("etagJsonName")]
-        [CodeGenProperty("Entity", Title = "The default JSON name for the `ETag` property.", Options = new string[] { "etag", "eTag", "_etag", "_eTag", "ETag", "ETAG" },
+        [CodeGenProperty("Entity", Title = "The default JSON name for the `ETag` property.", Options = ["etag", "eTag", "_etag", "_eTag", "ETag", "ETAG"],
             Description = "Defaults to `etag`. Note that the `JsonName` can be set individually per property where required.")]
         public string? ETagJsonName { get; set; }
 
@@ -199,7 +199,7 @@ entities:
         /// Gets or sets the `Validation` framework. 
         /// </summary>
         [JsonPropertyName("validationFramework")]
-        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = ["CoreEx", "FluentValidation"],
             Description = "Defaults to `CoreEx` (literal). This can be overridden within the `Entity`(s), `Operation`(s) and `Parameter`(s).")]
         public string? ValidationFramework { get; set; }
 
@@ -211,7 +211,7 @@ entities:
         /// Gets or sets the data source auto-implementation option. 
         /// </summary>
         [JsonPropertyName("autoImplement")]
-        [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
+        [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = ["Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None"],
             Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). " +
                           "Additionally, the `AutoImplement` can be further specified/overridden per `Operation`.")]
         public string? AutoImplement { get; set; }
@@ -236,7 +236,7 @@ entities:
         /// Gets or sets the database provider.
         /// </summary>
         [JsonPropertyName("databaseProvider")]
-        [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true, Options = new string[] { "SqlServer", "MySQL" },
+        [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true, Options = ["SqlServer", "MySQL"],
             Description = "Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.")]
         public string? DatabaseProvider { get; set; }
 
@@ -285,7 +285,7 @@ entities:
         /// </summary>
         [JsonPropertyName("refDataDefaultMapperConverter")]
         [CodeGenProperty("Data", Title = "The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined.", 
-            Options = new string[] { 
+            Options = [ 
                 "ReferenceDataCodeConverter", "ReferenceDataCodeConverter{T}", "ReferenceDataCodeConverter<T>",
                 "ReferenceDataIdConverter{T, int}", "ReferenceDataIdConverter<T, int>", "ReferenceDataIdConverter{T, int?}", "ReferenceDataIdConverter<T, int?>",
                 "ReferenceDataIdConverter{T, long}", "ReferenceDataIdConverter<T, long>", "ReferenceDataIdConverter{T, long?}", "ReferenceDataIdConverter<T, long?>",
@@ -295,7 +295,7 @@ entities:
                 "ReferenceDataInt64IdConverter", "ReferenceDataInt64IdConverter{T}", "ReferenceDataInt64IdConverter<T>",
                 "ReferenceDataNullableInt64IdConverter", "ReferenceDataNullableInt64IdConverter{T}", "ReferenceDataNullableInt64IdConverter<T>",
                 "ReferenceDataGuidIdConverter", "ReferenceDataGuidIdConverter{T}", "ReferenceDataGuidIdConverter<T>",
-                "ReferenceDataNullableGuidIdConverter", "ReferenceDataNullableGuidIdConverter{T}", "ReferenceDataNullableGuidIdConverter<T>" },
+                "ReferenceDataNullableGuidIdConverter", "ReferenceDataNullableGuidIdConverter{T}", "ReferenceDataNullableGuidIdConverter<T>" ],
             Description = "Defaults to `ReferenceDataCodeConverter<T>`. Where this value is suffixed by `<T>` or `{T}` this will automatically be set to the `Type`.")]
         public string? RefDataDefaultMapperConverter { get; set; }
 
@@ -347,7 +347,7 @@ entities:
         /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonPropertyName("eventPublish")]
-        [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+        [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = ["None", "DataSvc", "Data"],
             Description = "Defaults to `DataSvc`. Used to enable the sending of messages to the likes of EventHub, ServiceBus, SignalR, etc. This can be overridden within the `Entity`(s).")]
         public string? EventPublish { get; set; }
 
@@ -363,7 +363,7 @@ entities:
         /// Gets or sets the URI kind for the event source URIs.
         /// </summary>
         [JsonPropertyName("eventSourceKind")]
-        [CodeGenProperty("Events", Title = "The URI kind for the event source URIs.", Options = new string[] { "None", "Absolute", "Relative", "RelativeOrAbsolute" },
+        [CodeGenProperty("Events", Title = "The URI kind for the event source URIs.", Options = ["None", "Absolute", "Relative", "RelativeOrAbsolute"],
             Description = "Defaults to `None` (being the event source is not updated).")]
         public string? EventSourceKind { get; set; }
 
@@ -387,7 +387,7 @@ entities:
         /// Gets or sets the formatting for the Action when an Event is published.
         /// </summary>
         [JsonPropertyName("eventActionFormat")]
-        [CodeGenProperty("Event", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "PastTense" }, IsImportant = true,
+        [CodeGenProperty("Event", Title = "The formatting for the Action when an Event is published.", Options = ["None", "PastTense"], IsImportant = true,
             Description = "Defaults to `None` (no formatting required, i.e. as-is)`.")]
         public string? EventActionFormat { get; set; }
 
@@ -563,7 +563,7 @@ entities:
         /// <summary>
         /// Gets the list of all the used validators.
         /// </summary>
-        public List<ParameterConfig> Validators { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> Validators { get; } = [];
 
         /// <summary>
         /// <inheritdoc/>

@@ -35,6 +35,9 @@ public class AppNameEfDbContext : DbContext, IEfDbContext
 #if (implement_mysql)
             optionsBuilder.UseMySql(BaseDatabase.GetConnection(), ServerVersion.Create(new Version(8, 0, 33), Pomelo.EntityFrameworkCore.MySql.Infrastructure.ServerType.MySql));
 #endif
+#if (implement_postgres)
+            optionsBuilder.UseNpgsql(BaseDatabase.GetConnection());
+#endif
     }
 
     /// <summary>

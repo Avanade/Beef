@@ -18,6 +18,15 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="content\company.appname.services\Company.AppName.Services.csproj" />
+    <None Remove="content\Company.AppName.Test\appsettings.unittest.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="content\Company.AppName.Services\" />
+  </ItemGroup>
+
   <Import Project="..\..\Common.targets" />
   
 </Project>

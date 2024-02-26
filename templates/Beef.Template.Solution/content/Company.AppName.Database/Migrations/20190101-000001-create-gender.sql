@@ -1,6 +1,4 @@
-﻿START TRANSACTION;
-
-CREATE TABLE `gender` (
+﻿CREATE TABLE `gender` (
   `gender_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `code` VARCHAR(50) NOT NULL UNIQUE,
   `text` VARCHAR(250) NULL,
@@ -12,5 +10,3 @@ CREATE TABLE `gender` (
   `updated_by` VARCHAR(250) NULL,
   `updated_date` DATETIME(6) NULL
 );
-	
-COMMIT WORK;

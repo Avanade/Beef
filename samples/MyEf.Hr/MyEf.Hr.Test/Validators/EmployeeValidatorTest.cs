@@ -144,7 +144,7 @@ public class EmployeeValidatorTest
     public void A160_Validate_Contacts_Empty()
     {
         var e = CreateValidEmployee();
-        e.EmergencyContacts = new EmergencyContactCollection { new EmergencyContact() };
+        e.EmergencyContacts = [new EmergencyContact()];
 
         using var test = GenericTester.Create();
 
@@ -161,8 +161,8 @@ public class EmployeeValidatorTest
     public void A170_Validate_Contacts_Invalid()
     {
         var e = CreateValidEmployee();
-        e.EmergencyContacts = new EmergencyContactCollection 
-        { 
+        e.EmergencyContacts =
+        [
             new EmergencyContact
             {
                 FirstName = "Brian",
@@ -170,7 +170,7 @@ public class EmployeeValidatorTest
                 PhoneNo = "425 333 4445",
                 Relationship = "XX"
             }
-        };
+        ];
 
         using var test = GenericTester.Create();
 
@@ -183,7 +183,7 @@ public class EmployeeValidatorTest
     public void A180_Validate_Contacts_TooMany()
     {
         var e = CreateValidEmployee();
-        e.EmergencyContacts = new EmergencyContactCollection();
+        e.EmergencyContacts = [];
 
         for (int i = 0; i < 6; i++)
         {

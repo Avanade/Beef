@@ -41,7 +41,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the relationship type.
         /// </summary>
         [JsonPropertyName("type")]
-        [CodeGenProperty("Key", Title = "The relationship type between the parent and child (self).", IsImportant = true, Options = new string[] { "OneToMany", "ManyToOne" },
+        [CodeGenProperty("Key", Title = "The relationship type between the parent and child (self).", IsImportant = true, Options = ["OneToMany", "ManyToOne"],
             Description = "Defaults to `OneToMany`.")]
         public string? Type { get; set; }
 
@@ -69,7 +69,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonPropertyName("onDelete")]
         [CodeGenProperty("EF", Title = "The operation applied to dependent entities in the relationship when the principal is deleted or the relationship is severed.",
-            Options = new string[] { "NoAction", "Cascade", "ClientCascade", "ClientNoAction", "ClientSetNull", "Restrict", "SetNull" },
+            Options = ["NoAction", "Cascade", "ClientCascade", "ClientNoAction", "ClientSetNull", "Restrict", "SetNull"],
             Description = "Defaults to `NoAction`. See https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.deletebehavior for more information.")]
         public string? OnDelete { get; set; }
 
@@ -121,12 +121,12 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the list of foreign key(s) <see cref="DbColumnSchema"/>.
         /// </summary>
-        public List<RefKeyColumn> ForeignKeyDbColumns = new();
+        public List<RefKeyColumn> ForeignKeyDbColumns = [];
 
         /// <summary>
         /// Gets the list of principal key(s) <see cref="DbColumnSchema"/>.
         /// </summary>
-        public List<RefKeyColumn> PrincipalKeyDbColumns = new();
+        public List<RefKeyColumn> PrincipalKeyDbColumns = [];
 
         /// <summary>
         /// Foreign/principal key column.

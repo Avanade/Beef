@@ -350,7 +350,7 @@ tables:
         /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
-        public List<TableColumnConfig> Columns { get; } = new List<TableColumnConfig>();
+        public List<TableColumnConfig> Columns { get; } = [];
 
         /// <summary>
         /// Gets the related IsDeleted column.
@@ -550,7 +550,7 @@ tables:
             if (CompareValue(DbTable.IsAView, true))
                 PrepareView();
 
-            Relationships ??= new List<EfRelationshipConfig>();
+            Relationships ??= [];
             foreach (var relationship in Relationships!)
             {
                 await relationship.PrepareAsync(Root!, this).ConfigureAwait(false);
@@ -562,7 +562,7 @@ tables:
         /// </summary>
         private void PrepareStoredProcedures()
         {
-            StoredProcedures ??= new List<StoredProcedureConfig>();
+            StoredProcedures ??= [];
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !StoredProcedures.Any(x => x.Name == "Delete"))
@@ -585,7 +585,7 @@ tables:
                 var spc = new StoredProcedureConfig { Name = "GetAll", Type = "GetColl" };
                 if (GetAllOrderBy != null)
                 {
-                    spc.OrderBy = new List<OrderByConfig>();
+                    spc.OrderBy = [];
                     foreach (var ob in GetAllOrderBy)
                     {
                         var parts = ob.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -597,7 +597,7 @@ tables:
                 }
                 else if (DbTable!.IsRefData)
                 {
-                    spc.OrderBy = new List<OrderByConfig>(new OrderByConfig[] { new OrderByConfig { Name = "SortOrder" }, new OrderByConfig { Name = "Code" } });
+                    spc.OrderBy = new List<OrderByConfig>(new OrderByConfig[] { new() { Name = "SortOrder" }, new() { Name = "Code" } });
                 }
 
                 StoredProcedures.Add(spc);
@@ -612,7 +612,7 @@ tables:
         /// </summary>
         private void PrepareView()
         {
-            ViewWhere = new List<string>();
+            ViewWhere = [];
             if (ColumnTenantId != null)
                 ViewWhere.Add($"[{Alias}].[{ColumnTenantId.Name}] = dbo.fnGetTenantId(NULL)");
 

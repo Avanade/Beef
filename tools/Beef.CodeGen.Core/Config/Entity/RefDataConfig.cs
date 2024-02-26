@@ -35,7 +35,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the Data constructor parameters.
         /// </summary>
-        public List<ParameterConfig> DataCtorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> DataCtorParameters { get; } = [];
 
         /// <summary>
         /// <inheritdoc/>

@@ -84,7 +84,7 @@ namespace Beef.Database
                     la.Insert(i + 1, ma);
             }
 
-            return la.ToArray();
+            return [.. la];
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Beef.Database
             // Infer database schema.
             migrator.Logger.LogInformation("{Content}", "  ** Code-generation of temporary entity YAML requested **");
             migrator.Logger.LogInformation("{Content}", "  Querying database to infer table(s)/column(s) schema...");
-            var dbTables = await migrator.Database.SelectSchemaAsync(migrator.DatabaseSchemaConfig, migrator.Args.DataParserArgs, cancellationToken).ConfigureAwait(false);
+            var dbTables = await migrator.Database.SelectSchemaAsync(migrator, cancellationToken).ConfigureAwait(false);
 
             var data = new DbData();
             foreach (var table in tables)
@@ -112,7 +112,7 @@ namespace Beef.Database
                 var dbTable = dbTables.FirstOrDefault(x => x.Schema == schema && x.Name == name);
                 if (dbTable is null)
                 {
-                    migrator.Logger.LogError("{Content}", $"Specified table {migrator.DatabaseSchemaConfig.ToFullyQualifiedTableName(schema!, name)} not found in database.");
+                    migrator.Logger.LogError("{Content}", $"Specified table {migrator.SchemaConfig.ToFullyQualifiedTableName(schema!, name)} not found in database.");
                     return (false, null);
                 }
 
@@ -178,7 +178,7 @@ namespace Beef.Database
         /// </summary>
         private class DbData
         {
-            public List<DbTableSchemaEx> Tables { get; } = new();
+            public List<DbTableSchemaEx> Tables { get; } = [];
 
             public List<DbTableSchemaEx> RefDataTables => Tables.Where(x => x.IsRefData).ToList();
 
@@ -188,10 +188,8 @@ namespace Beef.Database
         /// <summary>
         /// Extend the <see cref="DbTableSchema"/> to support code-gen requirements.
         /// </summary>
-        private class DbTableSchemaEx : DbTableSchema
+        private class DbTableSchemaEx(DbTableSchema table) : DbTableSchema(table)
         {
-            public DbTableSchemaEx(DbTableSchema table) : base(table) { }
-
             public bool IncludeCrud { get; set; }
 
             public bool IncludeGetByArgs { get; set; }
@@ -200,7 +198,7 @@ namespace Beef.Database
 
             public string MoustacheDotNetName => "{{" + DotNetName + "}}";
 
-            public bool IsPrimaryKeyAnIdentifier => PrimaryKeyColumns.Count == 1 && PrimaryKeyColumns[0].DotNetName.EndsWith(Config.IdColumnNameSuffix);
+            public bool IsPrimaryKeyAnIdentifier => PrimaryKeyColumns.Count == 1 && PrimaryKeyColumns[0].Name.EndsWith(Migration.SchemaConfig.IdColumnNameSuffix);
         }
     }
 }

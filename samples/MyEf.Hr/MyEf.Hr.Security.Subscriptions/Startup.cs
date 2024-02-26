@@ -28,7 +28,7 @@ public class Startup : HostStartup
             })
             .AddAzureServiceBusOrchestratedSubscriber((_, o) =>
             {
-                o.EventDataDeserializationErrorHandling = ErrorHandling.Handle;
+                o.EventDataDeserializationErrorHandling = ErrorHandling.HandleBySubscriber;
             })
             .AddTypedHttpClient<OktaHttpClient>("OktaApi");
     }
