@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 namespace Beef.Database.Postgres
 {
     /// <summary>
-    /// Provides the <see href="https://www.npgsql.org/">PostgreSQL</see> migration orchestration extending <see cref="DbEx.Postgres.Migration.PostgresMigration"/>
-    /// to further enable <see cref="MigrationCommand.CodeGen"/>.
+    /// Provides the <see href="https://www.npgsql.org/">PostgreSQL</see> migration orchestration extending <see cref="DbEx.Postgres.Migration.PostgresMigration"/> to further enable <see cref="MigrationCommand.CodeGen"/>.
     /// </summary>
     public class PostgresMigration : DbEx.Postgres.Migration.PostgresMigration
     {
@@ -25,7 +24,6 @@ namespace Beef.Database.Postgres
             // Add in the beef schema stuff where requested.
             if (args.BeefSchema)
                 args.AddAssemblyAfter(typeof(DbEx.Postgres.Migration.PostgresMigration).Assembly, typeof(PostgresMigration).Assembly);
-
         }
 
         /// <summary>
@@ -40,8 +38,9 @@ namespace Beef.Database.Postgres
             if (yaml is null)
                 return this.ExecuteCodeGenAsync(cancellationToken);
 
+            var schema = Args.GetParameter<string>("Param1");
             var tables = new List<string>();
-            for (int i = 1; true; i++)
+            for (int i = 2; true; i++)
             {
                 var table = Args.GetParameter<string>($"Param{i}");
                 if (table is null)
@@ -50,10 +49,10 @@ namespace Beef.Database.Postgres
                 tables.Add(table);
             }
 
-            if (tables.Count == 0)
-                throw new CodeGenException($"A '{nameof(MigrationCommand.CodeGen)}' command for 'YAML' also requires at least one table argument to be specified.");
+            if (schema is null || tables.Count == 0)
+                throw new CodeGenException($"A '{nameof(MigrationCommand.CodeGen)}' command for 'YAML' also requires schema and at least one table argument to be specified.");
 
-            return this.ExecuteYamlCodeGenAsync(null, [.. tables], cancellationToken);
+            return this.ExecuteYamlCodeGenAsync(schema, [.. tables], cancellationToken);
         }
     }
 }

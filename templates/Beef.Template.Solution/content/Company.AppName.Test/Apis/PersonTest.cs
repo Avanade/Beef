@@ -225,7 +225,7 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectETag()
             .ExpectIdentifier()
             .ExpectValue(_ => v)
-            .ExpectEvent("Company.AppName.Person".ToLowerInvariant(), "created")
+            .ExpectEvent("lowercom.lowerapp.person", "created")
             .Run(a => a.CreateAsync(v)).Value!;
 
         // Check the value was created properly.
@@ -318,7 +318,7 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectETag(v.ETag)
             .ExpectIdentifier()
             .ExpectValue(_ => v)
-            .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "updated")
+            .ExpectEvent("lowercom.lowerapp.person", "updated")
             .Run(a => a.UpdateAsync(v, id)).Value!;
 
         // Check the value was updated properly.
@@ -409,7 +409,7 @@ public class PersonTest : UsingApiTester<Startup>
             .ExpectETag(v.ETag)
             .ExpectIdentifier()
             .ExpectValue(_ => v)
-            .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "updated")
+            .ExpectEvent("lowercom.lowerapp.person", "updated")
             .Run(a => a.PatchAsync(HttpPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new HttpRequestOptions { ETag = v.ETag })).Value!;
 
         // Check the value was updated properly.
@@ -444,7 +444,7 @@ public class PersonTest : UsingApiTester<Startup>
         // Delete value.
         Agent<PersonAgent>()
             .ExpectStatusCode(HttpStatusCode.NoContent)
-            .ExpectEvent($"Company.AppName.Person".ToLowerInvariant(), "deleted")
+            .ExpectEvent("lowercom.lowerapp.person", "deleted")
             .Run(a => a.DeleteAsync(id));
 
         // Check value no longer exists.

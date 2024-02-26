@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using CoreEx;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Reflection;
@@ -28,9 +29,9 @@ namespace Beef.Database.Postgres
         /// <param name="appName">The application/domain name.</param>
         /// <returns>The <see cref="PostgresMigrationConsole"/> instance.</returns>
         public static PostgresMigrationConsole Create(string connectionString, string company, string appName)
-            => new(new MigrationArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)) }
-                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, company ?? throw new ArgumentNullException(nameof(company)))
-                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName ?? throw new ArgumentNullException(nameof(appName))));
+            => new(new MigrationArgs { ConnectionString = connectionString.ThrowIfNull(nameof(connectionString)) }
+                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, company.ThrowIfNull(nameof(company)))
+                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName.ThrowIfNull(nameof(appName))));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostgresMigrationConsole"/> class that provides a default for the <paramref name="connectionString"/>.
@@ -51,7 +52,7 @@ namespace Beef.Database.Postgres
             new DbEx.Postgres.Console.PostgresMigrationConsole(new DbEx.Migration.MigrationArgs { Logger = Logger }).WriteScriptHelp();
             Logger?.LogInformation("{help}", string.Empty);
             Logger?.LogInformation("{help}", "Extended CodeGen command and argument(s):");
-            Logger?.LogInformation("{help}", "  codegen yaml <Table> [<Table>...]   Creates a temporary Beef entity code-gen YAML file for the specified table(s).");
+            Logger?.LogInformation("{help}", "  codegen yaml <schema> <table> [<table>...]   Creates a temporary Beef entity code-gen YAML file for the specified table(s).");
             Logger?.LogInformation("{help}", "                                               - A table name with a prefix ! denotes that no CRUD operations are required.");
             Logger?.LogInformation("{help}", "                                               - A table name with a prefix * denotes that a 'GetByArgs' operation is required.");
             Logger?.LogInformation("{help}", string.Empty);

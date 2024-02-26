@@ -34,6 +34,8 @@ namespace Beef.CodeGen.Config.Database
     [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigRootBase<CodeGenConfig>, ISpecialColumnNames
     {
+        private static readonly char[] _snakeKebabSeparators = ['_', '-'];
+
         #region Key
 
         /// <summary>
@@ -172,7 +174,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the option to automatically rename the SQL Tables and Columns for use in .NET.
         /// </summary>
         [JsonPropertyName("autoDotNetRename")]
-        [CodeGenProperty("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = new string[] { "None", "PascalCase", "SnakeKebabToPascalCase" },
+        [CodeGenProperty("DotNet", Title = "The option to automatically rename the SQL Tables and Columns for use in .NET.", Options = ["None", "PascalCase", "SnakeKebabToPascalCase"],
             Description = "Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.")]
         public string? AutoDotNetRename { get; set; }
 
@@ -398,16 +400,16 @@ namespace Beef.CodeGen.Config.Database
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceOutbox = DefaultWhereNull(NamespaceOutbox, () => NamespaceBusiness);
 
-            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Migrator!.DatabaseSchemaConfig.IsDeletedColumnName);
-            ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Migrator!.DatabaseSchemaConfig.TenantIdColumnName);
+            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Migrator!.Args.IsDeletedColumnName);
+            ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Migrator!.Args.TenantIdColumnName);
             ColumnNameOrgUnitId = DefaultWhereNull(ColumnNameOrgUnitId, () => "OrgUnitId");
-            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Migrator!.DatabaseSchemaConfig.RowVersionColumnName);
-            ColumnNameCreatedBy = DefaultWhereNull(ColumnNameCreatedBy, () => Migrator!.DatabaseSchemaConfig.CreatedByColumnName);
-            ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => Migrator!.DatabaseSchemaConfig.CreatedDateColumnName);
-            ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => Migrator!.DatabaseSchemaConfig.UpdatedByColumnName);
-            ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => Migrator!.DatabaseSchemaConfig.UpdatedDateColumnName);
-            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Migrator!.DatabaseSchemaConfig.UpdatedByColumnName);
-            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Migrator!.DatabaseSchemaConfig.UpdatedDateColumnName);
+            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Migrator!.Args.RowVersionColumnName);
+            ColumnNameCreatedBy = DefaultWhereNull(ColumnNameCreatedBy, () => Migrator!.Args.CreatedByColumnName);
+            ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => Migrator!.Args.CreatedDateColumnName);
+            ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => Migrator!.Args.UpdatedByColumnName);
+            ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => Migrator!.Args.UpdatedDateColumnName);
+            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Migrator!.Args.UpdatedByColumnName);
+            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Migrator!.Args.UpdatedDateColumnName);
 
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
@@ -461,7 +463,7 @@ namespace Beef.CodeGen.Config.Database
             var sw = Stopwatch.StartNew();
             Migrator = CodeGenArgs.GetDatabaseMigrator();
             var db = Migrator.Database;
-            DbTables = await db.SelectSchemaAsync(Migrator.DatabaseSchemaConfig, Migrator.Args.DataParserArgs).ConfigureAwait(false);
+            DbTables = await db.SelectSchemaAsync(Migrator).ConfigureAwait(false);
 
             sw.Stop();
             CodeGenArgs.Logger?.Log(LogLevel.Information, "{Content}", $"    Database schema query complete [{sw.ElapsedMilliseconds}ms]");
@@ -493,7 +495,7 @@ namespace Beef.CodeGen.Config.Database
 
             // That only leaves SnakeKebabToPascalCase.
             var sb = new StringBuilder();
-            name.Split(new char[] { '_', '-' }, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
+            name.Split(_snakeKebabSeparators, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
             return sb.ToString();
         }
 

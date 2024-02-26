@@ -74,7 +74,7 @@ tables:
         /// </summary>
         [JsonPropertyName("type")]
         [CodeGenProperty("Key", Title = "The stored procedure operation type.", IsImportant = true,
-            Options = new string[] { "Get", "GetColl", "Create", "Update", "Upsert", "Delete", "Merge" },
+            Options = ["Get", "GetColl", "Create", "Update", "Upsert", "Delete", "Merge"],
             Description = "Defaults to `GetColl`.")]
         public string? Type { get; set; }
 
@@ -214,7 +214,7 @@ tables:
         /// <summary>
         /// Gets the selected columns.
         /// </summary>
-        public List<StoredProcedureColumnConfig> SelectedColumns { get; } = new List<StoredProcedureColumnConfig>();
+        public List<StoredProcedureColumnConfig> SelectedColumns { get; } = [];
 
         /// <summary>
         /// Indicates whether the OrgUnitId column is included as a parameter.
@@ -239,7 +239,7 @@ tables:
         /// <summary>
         /// Gets the settable columns.
         /// </summary>
-        public List<StoredProcedureColumnConfig> SettableColumns { get; } = new List<StoredProcedureColumnConfig>();
+        public List<StoredProcedureColumnConfig> SettableColumns { get; } = [];
 
         /// <summary>
         /// Gets the settable columns for an insert.
@@ -302,13 +302,13 @@ tables:
                 _ => "WRITE"
             });
 
-            Parameters ??= new List<ParameterConfig>();
+            Parameters ??= [];
 
-            Where ??= new List<WhereConfig>();
+            Where ??= [];
 
-            OrderBy ??= new List<OrderByConfig>();
+            OrderBy ??= [];
 
-            Execute ??= new List<ExecuteConfig>();
+            Execute ??= [];
 
             foreach (var parameter in Parameters)
             {
@@ -469,12 +469,12 @@ tables:
                         SettableColumns.Insert(0, new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn, MergeValueSql = p?.ParameterName });
                     }
 
-                    MergeOverrideIdentityColumns ??= new List<string>();
+                    MergeOverrideIdentityColumns ??= [];
 
-                    MergeOn = new List<string>();
-                    MergeMatchSourceColumns = new List<string>();
-                    MergeMatchTargetColumns = new List<string>();
-                    MergeListJoinOn = new List<string>();
+                    MergeOn = [];
+                    MergeMatchSourceColumns = [];
+                    MergeMatchTargetColumns = [];
+                    MergeListJoinOn = [];
                     foreach (var c in Parent!.Columns.Where(x => !x.DbColumn!.IsComputed))
                     {
                         if (c.DbColumn!.IsPrimaryKey)

@@ -4,6 +4,7 @@ using DbEx.DbSchema;
 using OnRamp;
 using OnRamp.Config;
 using System;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -97,7 +98,7 @@ tables:
         /// Gets or sets the where clause equality operator.
         /// </summary>
         [JsonPropertyName("operator")]
-        [CodeGenProperty("Key", Title = "The where clause equality operator", IsImportant = true, Options = new string[] { "EQ", "NE", "LT", "LE", "GT", "GE", "LIKE" },
+        [CodeGenProperty("Key", Title = "The where clause equality operator", IsImportant = true, Options = ["EQ", "NE", "LT", "LE", "GT", "GE", "LIKE"],
             Description = "Defaults to `EQ`.")]
         public string? Operator { get; set; }
 
@@ -154,9 +155,9 @@ tables:
             SqlType = DefaultWhereNull(SqlType, () =>
             {
                 var c = (Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn) ?? throw new CodeGenException(this, nameof(Column), $"Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
-                var sb = new StringBuilder();
                 if (CompareValue(Collection, true))
                 {
+                    var sb = new StringBuilder();
                     var udt = c!.Type!.ToUpperInvariant() switch
                     {
                         "UNIQUEIDENTIFIER" => "UniqueIdentifier",
@@ -168,23 +169,12 @@ tables:
                     };
 
                     sb.Append($"[dbo].[udt{udt}List] READONLY");
+                    return sb.ToString();
                 }
                 else
                 {
-                    sb.Append($"{c!.Type!.ToUpperInvariant()}");
-                    if (Root!.Migrator!.DatabaseSchemaConfig.IsDbTypeString(c.Type))
-                        sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
-
-                    sb.Append(c.Type.ToUpperInvariant() switch
-                    {
-                        "DECIMAL" => $"({c.Precision}, {c.Scale})",
-                        "NUMERIC" => $"({c.Precision}, {c.Scale})",
-                        "TIME" => c.Scale.HasValue && c.Scale.Value > 0 ? $"({c.Scale})" : string.Empty,
-                        _ => string.Empty
-                    });
+                    return c.DbTable.Migration.SchemaConfig.ToFormattedSqlType(c, false);
                 }
-
-                return sb.ToString();
             });
 
             if (CompareValue(Collection, true))

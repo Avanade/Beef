@@ -49,7 +49,7 @@ tables:
         /// Gets or sets the location of the statement in relation to the underlying primary stored procedure statement.
         /// </summary>
         [JsonPropertyName("location")]
-        [CodeGenProperty("Key", Title = "The location of the statement in relation to the underlying primary stored procedure statement.", IsImportant = true, Options = new string[] { "Before", "After" },
+        [CodeGenProperty("Key", Title = "The location of the statement in relation to the underlying primary stored procedure statement.", IsImportant = true, Options = ["Before", "After"],
             Description = "Defaults to `After`.")]
         public string? Location { get; set; }
 

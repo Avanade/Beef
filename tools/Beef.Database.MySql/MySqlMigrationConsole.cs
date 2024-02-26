@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using CoreEx;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Reflection;
@@ -9,7 +10,8 @@ namespace Beef.Database.MySql
     /// <summary>
     /// Provides the SQL Server migration console capability.
     /// </summary>
-    public class MySqlMigrationConsole : MigrationConsoleBase<MySqlMigrationConsole>
+    /// <param name="args">The default <see cref="MigrationArgs"/> that will be overridden/updated by the command-line argument values.</param>
+    public class MySqlMigrationConsole(MigrationArgs? args = null) : MigrationConsoleBase<MySqlMigrationConsole>(args)
     {
         /// <summary>
         /// Creates a new <see cref="MySqlMigrationConsole"/> using <typeparamref name="T"/> to default the probing <see cref="Assembly"/>.
@@ -27,21 +29,15 @@ namespace Beef.Database.MySql
         /// <param name="appName">The application/domain name.</param>
         /// <returns>The <see cref="MySqlMigrationConsole"/> instance.</returns>
         public static MySqlMigrationConsole Create(string connectionString, string company, string appName)
-            => new(new MigrationArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)) }
-                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, company ?? throw new ArgumentNullException(nameof(company)))
-                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName ?? throw new ArgumentNullException(nameof(appName))));
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlMigrationConsole"/> class.
-        /// </summary>
-        /// <param name="args">The default <see cref="MigrationArgs"/> that will be overridden/updated by the command-line argument values.</param>
-        public MySqlMigrationConsole(MigrationArgs? args = null) : base(args) { }
+            => new(new MigrationArgs { ConnectionString = connectionString.ThrowIfNull(nameof(connectionString)) }
+                .AddParameter(CodeGen.CodeGenConsole.CompanyParamName, company.ThrowIfNull(nameof(company)))
+                .AddParameter(CodeGen.CodeGenConsole.AppNameParamName, appName.ThrowIfNull(nameof(appName))));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MySqlMigrationConsole"/> class that provides a default for the <paramref name="connectionString"/>.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
-        public MySqlMigrationConsole(string connectionString) : this(new MigrationArgs { ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString)) }) { }
+        public MySqlMigrationConsole(string connectionString) : this(new MigrationArgs { ConnectionString = connectionString.ThrowIfNull(nameof(connectionString)) }) { }
 
         /// <inheritdoc/>
         protected override DbEx.Migration.DatabaseMigrationBase CreateMigrator() => new MySqlMigration(Args);
@@ -57,8 +53,8 @@ namespace Beef.Database.MySql
             Logger?.LogInformation("{help}", string.Empty);
             Logger?.LogInformation("{help}", "Extended CodeGen command and argument(s):");
             Logger?.LogInformation("{help}", "  codegen yaml <Table> [<Table>...]   Creates a temporary Beef entity code-gen YAML file for the specified table(s).");
-            Logger?.LogInformation("{help}", "                                               - A table name with a prefix ! denotes that no CRUD operations are required.");
-            Logger?.LogInformation("{help}", "                                               - A table name with a prefix * denotes that a 'GetByArgs' operation is required.");
+            Logger?.LogInformation("{help}", "                                      - A table name with a prefix ! denotes that no CRUD operations are required.");
+            Logger?.LogInformation("{help}", "                                      - A table name with a prefix * denotes that a 'GetByArgs' operation is required.");
             Logger?.LogInformation("{help}", string.Empty);
         }
     }

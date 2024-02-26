@@ -105,7 +105,7 @@ entities:
         /// Gets or sets the Const Type option.
         /// </summary>
         [JsonPropertyName("constType")]
-        [CodeGenProperty("Key", Title = "The Const .NET Type option.", Options = new string[] { "int", "long", "Guid", "string" },
+        [CodeGenProperty("Key", Title = "The Const .NET Type option.", Options = ["int", "long", "Guid", "string"],
             Description = "The .NET Type to be used for the `const` values. Defaults to `string`.")]
         public string? ConstType { get; set; }
 
@@ -133,7 +133,7 @@ entities:
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
         [JsonPropertyName("refDataType")]
-        [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
+        [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = ["int", "long", "Guid", "string"],
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.")]
         public string? RefDataType { get; set; }
 
@@ -149,7 +149,7 @@ entities:
         /// Gets or sets the Reference Data sort order option.
         /// </summary>
         [JsonPropertyName("refDataSortOrder")]
-        [CodeGenProperty("RefData", Title = "The Reference Data sort order option.", Options = new string[] { "SortOrder", "Id", "Code", "Text" },
+        [CodeGenProperty("RefData", Title = "The Reference Data sort order option.", Options = ["SortOrder", "Id", "Code", "Text"],
             Description = "Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.")]
         public string? RefDataSortOrder { get; set; }
 
@@ -215,7 +215,7 @@ entities:
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
         [JsonPropertyName("jsonSerializer")]
-        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "SystemText", "Newtonsoft" },
+        [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = ["SystemText", "Newtonsoft"],
             Description = "Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `SystemText`.")]
         public string? JsonSerializer { get; set; }
 
@@ -249,7 +249,7 @@ entities:
         /// Gets or sets the entity collection type used where <see cref="CollectionInherits"/> is not specified.
         /// </summary>
         [JsonPropertyName("collectionType")]
-        [CodeGenProperty("Collection", Title = "The entity collection type used where `CollectionInherits` is not specified.", Options = new string[] { "Standard", "Keyed", "Dictionary" })]
+        [CodeGenProperty("Collection", Title = "The entity collection type used where `CollectionInherits` is not specified.", Options = ["Standard", "Keyed", "Dictionary"])]
         public string? CollectionType { get; set; }
 
         /// <summary>
@@ -338,7 +338,7 @@ entities:
         /// Gets or sets the data source auto-implementation option. 
         /// </summary>
         [JsonPropertyName("autoImplement")]
-        [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
+        [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = ["Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None"],
             Description = "Defaults to `CodeGeneration.AutoImplement` (where `RefDataType` or `EntityFrameworkModel` or `CosmosModel` or `HttpAgent` is not null; otherwise, `None`. " 
             + "Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). " 
             + "Additionally, the `AutoImplement` can be further specified/overridden per `Operation`.")]
@@ -348,7 +348,7 @@ entities:
         /// Gets or sets the access modifier for the generated `Data` constructor.
         /// </summary>
         [JsonPropertyName("dataCtor")]
-        [CodeGenProperty("Data", Title = "The access modifier for the generated `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
+        [CodeGenProperty("Data", Title = "The access modifier for the generated `Data` constructor.", Options = ["Public", "Private", "Protected"],
             Description = "Defaults to `Public`.")]
         public string? DataCtor { get; set; }
 
@@ -660,7 +660,7 @@ entities:
         /// Gets or sets the access modifier for the generated `DataSvc` constructor.
         /// </summary>
         [JsonPropertyName("dataSvcCtor")]
-        [CodeGenProperty("DataSvc", Title = "The access modifier for the generated `DataSvc` constructor.", Options = new string[] { "Public", "Private", "Protected" },
+        [CodeGenProperty("DataSvc", Title = "The access modifier for the generated `DataSvc` constructor.", Options = ["Public", "Private", "Protected"],
             Description = "Defaults to `Public`.")]
         public string? DataSvcCtor { get; set; }
 
@@ -689,7 +689,7 @@ entities:
         /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonPropertyName("eventPublish")]
-        [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+        [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = ["None", "DataSvc", "Data"],
             Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the `Operation`(s).")]
         public string? EventPublish { get; set; }
 
@@ -720,7 +720,7 @@ entities:
         /// Gets or sets the access modifier for the generated `Manager` constructor.
         /// </summary>
         [JsonPropertyName("managerCtor")]
-        [CodeGenProperty("Manager", Title = "The access modifier for the generated `Manager` constructor.", Options = new string[] { "Public", "Private", "Protected" },
+        [CodeGenProperty("Manager", Title = "The access modifier for the generated `Manager` constructor.", Options = ["Public", "Private", "Protected"],
             Description = "Defaults to `Public`.")]
         public string? ManagerCtor { get; set; }
 
@@ -768,7 +768,7 @@ entities:
         /// Gets or sets the `Validation` framework. 
         /// </summary>
         [JsonPropertyName("validationFramework")]
-        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = ["CoreEx", "FluentValidation"],
             Description = "Defaults to `CodeGeneration.ValidationFramework`. This can be overridden within the `Operation`(s) and `Parameter`(s).")]
         public string? ValidationFramework { get; set; }
 
@@ -797,7 +797,7 @@ entities:
         /// Gets or sets the access modifier for the generated Web API `Controller` constructor.
         /// </summary>
         [JsonPropertyName("webApiCtor")]
-        [CodeGenProperty("WebApi", Title = "The access modifier for the generated Web API `Controller` constructor.", Options = new string[] { "Public", "Private", "Protected" },
+        [CodeGenProperty("WebApi", Title = "The access modifier for the generated Web API `Controller` constructor.", Options = ["Public", "Private", "Protected"],
             Description = "Defaults to `Public`.")]
         public string? WebApiCtor { get; set; }
 
@@ -878,7 +878,7 @@ entities:
         /// Gets or sets the option to exclude the generation of the <c>Data</c> class (<c>XxxData.cs</c>).
         /// </summary>
         [JsonPropertyName("excludeData")]
-        [CodeGenProperty("Exclude", Title = "The option to exclude the generation of the `Data` class (`XxxData.cs`).", Options = new string[] { "Include", "Exclude", "RequiresMapper" },
+        [CodeGenProperty("Exclude", Title = "The option to exclude the generation of the `Data` class (`XxxData.cs`).", Options = ["Include", "Exclude", "RequiresMapper"],
             Description = "Defaults to `Include` indicating _not_ to exlude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
         public string? ExcludeData { get; set; }
 
@@ -1133,12 +1133,12 @@ entities:
         /// <summary>
         /// Gets the Manager constructor parameters.
         /// </summary>
-        public List<ParameterConfig> ManagerCtorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> ManagerCtorParameters { get; } = [];
 
         /// <summary>
         /// Gets the DataSvc constructor parameters.
         /// </summary>
-        public List<ParameterConfig> DataSvcCtorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> DataSvcCtorParameters { get; } = [];
 
         /// <summary>
         /// Gets the IEntityData <see cref="OperationConfig"/> collection.
@@ -1158,7 +1158,7 @@ entities:
         /// <summary>
         /// Gets the Data constructor parameters.
         /// </summary>
-        public List<ParameterConfig> DataCtorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> DataCtorParameters { get; } = [];
 
         /// <summary>
         /// Gets the <see cref="DatabaseName"/> as a <see cref="ParameterConfig"/>.
@@ -1188,7 +1188,7 @@ entities:
         /// <summary>
         /// Gets the WebApi Constructor parameters.
         /// </summary>
-        public List<ParameterConfig> WebApiCtorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> WebApiCtorParameters { get; } = [];
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
@@ -1531,7 +1531,7 @@ entities:
         /// </summary>
         private async Task PreparePropertiesAsync()
         {
-            Properties ??= new List<PropertyConfig>();
+            Properties ??= [];
 
             if (RefDataType != null)
             {
@@ -1575,7 +1575,7 @@ entities:
         /// </summary>
         private async Task PrepareOperationsAsync()
         {
-            Operations ??= new List<OperationConfig>();
+            Operations ??= [];
 
             // Enables/supports existing 'crud: true'; will error on deprecation at some point in the future.
             if (!string.IsNullOrEmpty(Behavior))
@@ -1616,7 +1616,7 @@ entities:
             if (CompareValue(GetByArgs, true) && !Operations.Any(x => x.Name == "GetByArgs"))
             {
                 var at = $"{Name}Args";
-                Operations.Insert(0, new OperationConfig { Name = "GetByArgs", Type = "GetColl", Paging = true, WebApiRoute = "", Parameters = new List<ParameterConfig> { new ParameterConfig() { Name = "Args", Type = at, Validator = $"{Name}ArgsValidator" } } });
+                Operations.Insert(0, new OperationConfig { Name = "GetByArgs", Type = "GetColl", Paging = true, WebApiRoute = "", Parameters = [new ParameterConfig() { Name = "Args", Type = at, Validator = $"{Name}ArgsValidator" }] });
                 if (!Parent!.Entities!.Any(x => x.Name == at))
                     Root!.CodeGenArgs?.Logger?.LogWarning("{Warning}", $"Warning: Config [{BuildFullyQualifiedName(nameof(GetByArgs))}] references entity '{at}' that has not been defined; this is needed to complete implementation.");
             }

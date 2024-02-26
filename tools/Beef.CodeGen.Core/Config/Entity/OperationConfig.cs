@@ -162,7 +162,7 @@ operations: [
         /// Gets or sets the operation override for the `Entity.AutoImplement`.
         /// </summary>
         [JsonPropertyName("autoImplement")]
-        [CodeGenProperty("Data", Title = "The operation override for the `Entity.AutoImplement`.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
+        [CodeGenProperty("Data", Title = "The operation override for the `Entity.AutoImplement`.", IsImportant = true, Options = ["Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None"],
             Description = "Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.")]
         public string? AutoImplement { get; set; }
 
@@ -279,7 +279,7 @@ operations: [
         /// Gets or sets the HTTP Agent API Method for the operation.
         /// </summary>
         [JsonPropertyName("httpAgentMethod")]
-        [CodeGenProperty("HttpAgent", Title = "The HTTP Agent Method for the operation.", IsImportant = true, Options = new string[] { "HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch" },
+        [CodeGenProperty("HttpAgent", Title = "The HTTP Agent Method for the operation.", IsImportant = true, Options = ["HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"],
             Description = "Defaults to `Operation.WebApiMethod`.")]
         public string? HttpAgentMethod { get; set; }
 
@@ -345,7 +345,7 @@ operations: [
         /// Gets or sets the `Validation` framework. 
         /// </summary>
         [JsonPropertyName("validationFramework")]
-        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = new string[] { "CoreEx", "FluentValidation" },
+        [CodeGenProperty("Manager", Title = "The `Validation` framework to use for the entity-based validation.", Options = ["CoreEx", "FluentValidation"],
             Description = "Defaults to `Entity.ValidationFramework`. This can be overridden within the `Parameter`(s).")]
         public string? ValidationFramework { get; set; }
 
@@ -353,7 +353,7 @@ operations: [
         /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.
         /// </summary>
         [JsonPropertyName("managerOperationType")]
-        [CodeGenProperty("Manager", Title = "The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.", Options = new string[] { "Create", "Read", "Update", "Delete", "Unspecified" },
+        [CodeGenProperty("Manager", Title = "The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.", Options = ["Create", "Read", "Update", "Delete", "Unspecified"],
             Description = "The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.")]
         public string? ManagerOperationType { get; set; }
 
@@ -407,7 +407,7 @@ operations: [
         /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
         [JsonPropertyName("eventPublish")]
-        [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
+        [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = ["None", "DataSvc", "Data"],
             Description = "Defaults to the `Entity.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.")]
         public string? EventPublish { get; set; }
 
@@ -454,7 +454,7 @@ operations: [
         /// Gets or sets the HTTP Method for the operation.
         /// </summary>
         [JsonPropertyName("webApiMethod")]
-        [CodeGenProperty("WebApi", Title = "The HTTP Method for the operation.", IsImportant = true, Options = new string[] { "HttpGet", "HttpPost", "HttpPut", "HttpDelete" },
+        [CodeGenProperty("WebApi", Title = "The HTTP Method for the operation.", IsImportant = true, Options = ["HttpGet", "HttpPost", "HttpPut", "HttpDelete"],
             Description = "The value defaults as follows: `HttpGet` for `Operation.Type` value `Get` or `GetColl`, `HttpPost` for `Operation.Type` value `Create` or `Custom`, " +
             "`HttpPut` for `Operation.Type` value `Update`, and `HttpDelete` for `Operation.Type` value `Delete`. An `Operation.Type` value `Patch` can not be specified and will always default to `HttpPatch`.")]
         public string? WebApiMethod { get; set; }
@@ -463,7 +463,7 @@ operations: [
         /// Gets or sets the primary HTTP Status Code that will be returned for the operation where there is a non-null return value. 
         /// </summary>
         [JsonPropertyName("webApiStatus")]
-        [CodeGenProperty("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a non-`null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound" },
+        [CodeGenProperty("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a non-`null` return value.", Options = ["OK", "Accepted", "Created", "NoContent", "NotFound"],
             Description = "The value defaults as follows: `OK` for `Operation.Type` value `Get`, `GetColl`, `Update`, `Delete` or `Custom`, `Created` for `Operation.Type` value `Create`.")]
         public string? WebApiStatus { get; set; }
 
@@ -471,7 +471,7 @@ operations: [
         /// Gets or sets the alternate HTTP Status Code that will be returned for the operation where there is a null return value. 
         /// </summary>
         [JsonPropertyName("webApiAlternateStatus")]
-        [CodeGenProperty("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound" },
+        [CodeGenProperty("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value.", Options = ["OK", "Accepted", "Created", "NoContent", "NotFound"],
             Description = "The value defaults as follows: `NotFound` for `Operation.Type` value `Get` and `NoContent` for `Operation.Type` value `GetColl`; otherwise, `null`.")]
         public string? WebApiAlternateStatus { get; set; }
 
@@ -791,7 +791,7 @@ operations: [
         /// <summary>
         /// Gets the list of events derived from the <see cref="EventSubject"/>.
         /// </summary>
-        public List<OperationEvent> Events { get; } = new List<OperationEvent>();
+        public List<OperationEvent> Events { get; } = [];
 
         /// <summary>
         /// Gets the formatted summary text.
@@ -1253,7 +1253,7 @@ operations: [
         /// </summary>
         private async Task PrepareParametersAsync()
         {
-            Parameters ??= new List<ParameterConfig>();
+            Parameters ??= [];
 
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);

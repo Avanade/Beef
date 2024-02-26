@@ -68,7 +68,7 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outputDirectory">The output path/directory; defaults to the resulting <see cref="OnRamp.Console.CodeGenConsole.GetBaseExeDirectory"/> <see cref="DirectoryInfo.Parent"/>.</param>
         /// <returns>The <see cref="CodeGenConsole"/> instance.</returns>
-        public static CodeGenConsole Create(string company, string appName, string apiName = "Api", string? outputDirectory = null) => Create(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outputDirectory);
+        public static CodeGenConsole Create(string company, string appName, string apiName = "Api", string? outputDirectory = null) => Create([Assembly.GetCallingAssembly()], company, appName, apiName, outputDirectory);
 
         /// <summary>
         /// Creates a new instance of the <see cref="CodeGenConsole"/> class.

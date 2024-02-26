@@ -8,7 +8,7 @@ public class HrSettings : SettingsBase
     /// <summary>
     /// Gets the setting prefixes in order of precedence.
     /// </summary>
-    public static string[] Prefixes { get; } = { "Hr/", "Common/" };
+    public static string[] Prefixes { get; } = ["Hr/", "Common/"];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HrSettings"/> class.

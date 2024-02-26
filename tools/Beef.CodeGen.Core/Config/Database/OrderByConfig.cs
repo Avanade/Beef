@@ -56,7 +56,7 @@ tables:
         /// Gets or sets the sort order option.
         /// </summary>
         [JsonPropertyName("order")]
-        [CodeGenProperty("Key", Title = "The corresponding sort order.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
+        [CodeGenProperty("Key", Title = "The corresponding sort order.", IsImportant = true, Options = ["Ascending", "Descending"],
             Description = "Defaults to `Ascending`.")]
         public string? Order { get; set; }
 

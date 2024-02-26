@@ -71,7 +71,7 @@ queries:
         /// Gets or sets the join type option.
         /// </summary>
         [JsonPropertyName("type")]
-        [CodeGenProperty("Key", Title = "The SQL join type.", IsImportant = true, Options = new string[] { "Inner", "Left", "Right", "Full" },
+        [CodeGenProperty("Key", Title = "The SQL join type.", IsImportant = true, Options = ["Inner", "Left", "Right", "Full"],
             Description = "Defaults to `Inner`.")]
         public string? Type { get; set; }
 
@@ -204,7 +204,7 @@ queries:
         /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
-        public List<QueryJoinColumnConfig> Columns { get; } = new List<QueryJoinColumnConfig>();
+        public List<QueryJoinColumnConfig> Columns { get; } = [];
 
         /// <summary>
         /// Gets the related IsDeleted column.
@@ -269,7 +269,7 @@ queries:
         /// <summary>
         /// Gets the list of primary key columns.
         /// </summary>
-        public List<QueryJoinColumnConfig> PrimaryKeyColumns { get; } = new List<QueryJoinColumnConfig>();
+        public List<QueryJoinColumnConfig> PrimaryKeyColumns { get; } = [];
 
         /// <summary>
         /// Gets the Join table qualified name.
@@ -346,7 +346,7 @@ queries:
         /// </summary>
         public async Task PrepareJoinOnAsync()
         {
-            On ??= new List<QueryJoinOnConfig>();
+            On ??= [];
 
             foreach (var on in On)
             {

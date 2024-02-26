@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 namespace Beef.Database.MySql
 {
     /// <summary>
-    /// Provides the <see href="https://dev.mysql.com/">MySQL</see> migration orchestration extending <see cref="DbEx.MySql.Migration.MySqlMigration"/>
-    /// to further enable <see cref="MigrationCommand.CodeGen"/>.
+    /// Provides the <see href="https://dev.mysql.com/">MySQL</see> migration orchestration extending <see cref="DbEx.MySql.Migration.MySqlMigration"/> to further enable <see cref="MigrationCommand.CodeGen"/>.
     /// </summary>
     public class MySqlMigration : DbEx.MySql.Migration.MySqlMigration
     {
@@ -25,7 +24,6 @@ namespace Beef.Database.MySql
             // Add in the beef schema stuff where requested.
             if (args.BeefSchema)
                 args.AddAssemblyAfter(typeof(DbEx.MySql.Migration.MySqlMigration).Assembly, typeof(MySqlMigration).Assembly);
-
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace Beef.Database.MySql
             if (tables.Count == 0)
                 throw new CodeGenException($"A '{nameof(MigrationCommand.CodeGen)}' command for 'YAML' also requires at least one table argument to be specified.");
 
-            return this.ExecuteYamlCodeGenAsync(null, tables.ToArray(), cancellationToken);
+            return this.ExecuteYamlCodeGenAsync(null, [.. tables], cancellationToken);
         }
     }
 }

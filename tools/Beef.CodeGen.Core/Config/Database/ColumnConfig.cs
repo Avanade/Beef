@@ -3,7 +3,7 @@
 using DbEx.DbSchema;
 using OnRamp.Config;
 using System;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Database
@@ -175,6 +175,8 @@ namespace Beef.CodeGen.Config.Database
     /// <typeparam name="TParent">The parent <see cref="Type"/>.</typeparam>
     public abstract class ColumnConfigBase<TParent> : ConfigBase<CodeGenConfig, TParent>, IColumnConfig where TParent : ConfigBase, ITableReference, ISpecialColumns
     {
+        private static readonly string[] _intTypes = ["int", "short", "long", "unit", "ushort", "ulong", "byte"];
+
         /// <summary>
         /// Gets or sets the column name.
         /// </summary>
@@ -228,9 +230,14 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the SQL for defining initial value for comparisons.
         /// </summary>
-        public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
-            ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
-            : (Root!.Migrator!.DatabaseSchemaConfig.IsDbTypeInteger(DbColumn!.Type) || Root!.Migrator!.DatabaseSchemaConfig.IsDbTypeDecimal(DbColumn!.Type) ? "0" : "''");
+        public string SqlInitialValue => Root!.Migrator!.SchemaConfig.ToFormattedSqlStatementValue(DbColumn!,
+            IsDbTypeInteger || string.Equals("decimal", DbColumn!.DotNetType, StringComparison.OrdinalIgnoreCase) ? 0 
+            : (string.Equals("Guid", DbColumn!.DotNetType, StringComparison.OrdinalIgnoreCase) ? Guid.Empty : string.Empty));
+
+        /// <summary>
+        /// Indicates whether the db type is an integer.
+        /// </summary>
+        public bool IsDbTypeInteger => _intTypes.Contains(DbColumn!.DotNetType, StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Indicates where the column is the "TenantId" column.
@@ -362,24 +369,8 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         private void UpdateSqlProperties()
         {
-            var sb = new StringBuilder(DbColumn!.Type!.ToUpperInvariant());
-            if (Root!.Migrator!.DatabaseSchemaConfig.IsDbTypeString(DbColumn!.Type))
-                sb.Append(DbColumn!.Length.HasValue && DbColumn!.Length.Value > 0 ? $"({DbColumn!.Length.Value})" : "(MAX)");
-
-            sb.Append(DbColumn!.Type.ToUpperInvariant() switch
-            {
-                "DECIMAL" => $"({DbColumn!.Precision}, {DbColumn!.Scale})",
-                "NUMERIC" => $"({DbColumn!.Precision}, {DbColumn!.Scale})",
-                "TIME" => DbColumn!.Scale.HasValue && DbColumn!.Scale.Value > 0 ? $"({DbColumn!.Scale})" : string.Empty,
-                _ => string.Empty
-            });
-
-            EfSqlType = sb.ToString();
-
-            if (DbColumn!.IsNullable)
-                sb.Append(" NULL");
-
-            SqlType = sb.ToString();
+            EfSqlType = DbColumn!.DbTable.Migration.SchemaConfig.ToFormattedSqlType(DbColumn, false);
+            SqlType = DbColumn!.SqlType;
             ParameterSql = $"{ParameterName} AS {SqlType}";
             UdtSql = $"[{Name}] {SqlType}";
         }

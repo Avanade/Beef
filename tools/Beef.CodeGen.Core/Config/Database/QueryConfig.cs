@@ -255,12 +255,12 @@ queries:
         /// <summary>
         /// Gets the SQL formatted selected columns.
         /// </summary>
-        public List<IColumnConfig> SelectedColumns { get; } = new List<IColumnConfig>();
+        public List<IColumnConfig> SelectedColumns { get; } = [];
 
         /// <summary>
         /// Gets the list of primary key columns.
         /// </summary>
-        public List<QueryColumnConfig> PrimaryKeyColumns { get; } = new List<QueryColumnConfig>();
+        public List<QueryColumnConfig> PrimaryKeyColumns { get; } = [];
 
         /// <summary>
         /// Gets the SQL formatted selected columns excluding the <see cref="PrimaryKeyColumns"/>.
@@ -270,7 +270,7 @@ queries:
         /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
-        public List<QueryColumnConfig> Columns { get; } = new List<QueryColumnConfig>();
+        public List<QueryColumnConfig> Columns { get; } = [];
 
         /// <summary>
         /// Gets the related IsDeleted column.
@@ -396,7 +396,7 @@ queries:
                 }
             }
 
-            Where ??= new List<QueryWhereConfig>();
+            Where ??= [];
 
             if (ColumnTenantId != null)
                 Where.Add(new QueryWhereConfig { Statement = $"[{Alias}].[{ColumnTenantId.Name}] = dbo.fnGetTenantId(NULL)" });
@@ -458,7 +458,7 @@ queries:
         /// </summary>
         private async Task PrepareJoinsAsync()
         {
-            Joins ??= new List<QueryJoinConfig>();
+            Joins ??= [];
 
             // Prepare the Join and also make sure the alias is unique.
             var dict = new Dictionary<string, int> { { Alias!, 1 } };
@@ -486,7 +486,7 @@ queries:
         /// </summary>
         private void UpdateViewMetadata()
         {
-            var dt = new DbTableSchema(Root!.Migrator!.DatabaseSchemaConfig, ViewSchema!, ViewName!) { IsAView = true };
+            var dt = new DbTableSchema(Root!.Migrator!, ViewSchema!, ViewName!) { IsAView = true };
             foreach (var c in SelectedColumns)
             {
                 var dc = new DbColumnSchema(dt, c.NameAlias!, c.DbColumn!.Type);
