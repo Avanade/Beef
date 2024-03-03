@@ -45,7 +45,7 @@ public partial class ReferenceDataData : IReferenceDataData
             {
                 item.AlternateName = dr.GetValue<string>("AlternateName");
                 item.TripCode = dr.GetValue<string>("TripCode");
-                item.Country = ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default.ToSource.Convert(dr.GetValue<Guid?>("CountryId"));
+                item.Country = ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default.ConvertToSource(dr.GetValue<Guid?>("CountryId"));
             }, cancellationToken: ct);
         }, InvokerArgs.TransactionSuppress);
 
@@ -84,7 +84,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             EyeColorToModelEfMapperCtor();
         }
 
@@ -106,7 +106,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToEyeColorEfMapperCtor();
         }
 
@@ -174,7 +174,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             StatusToModelEfMapperCtor();
         }
 
@@ -196,7 +196,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToStatusEfMapperCtor();
         }
 

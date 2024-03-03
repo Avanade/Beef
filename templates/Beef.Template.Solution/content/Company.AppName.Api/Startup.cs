@@ -71,7 +71,7 @@ public class Startup
                 .AddGeneratedDataSvcServices()
                 .AddGeneratedDataServices();
 
-#if (implement_subscriber)
+#if (implement_services)
         // Add event publishing services.
         services.AddEventDataFormatter()
                 .AddCloudEventSerializer()
@@ -107,6 +107,9 @@ public class Startup
         services.AddControllers();
         services.AddHealthChecks();
         services.AddHttpClient();
+
+        // Add Azure monitor open telemetry.
+        services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 
         // Add the swagger capabilities.
         services.AddSwaggerGen(options =>

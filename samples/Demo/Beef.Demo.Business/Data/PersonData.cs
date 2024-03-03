@@ -12,8 +12,8 @@ namespace Beef.Demo.Business.Data
 
         private void GetByArgsOnQuery(DatabaseParameterCollection p, PersonArgs? args)
         {
-            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
-             .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
+            p.ParamWithWildcard(args?.FirstName, "FirstName")
+             .ParamWithWildcard(args?.LastName, "LastName")
              .TableValuedParamWith(args?.Genders, "GenderIds", () => _db.CreateTableValuedParameter(args!.Genders!.ToIdList<Guid>()));
         }
 
@@ -69,8 +69,8 @@ namespace Beef.Demo.Business.Data
             await _db.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
                 .Params(p =>
                 {
-                    p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
-                     .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
+                    p.ParamWithWildcard(args?.FirstName, "FirstName")
+                     .ParamWithWildcard(args?.LastName, "LastName")
                      .TableValuedParamWith(args?.Genders, "GenderIds", () => _db.CreateTableValuedParameter(args!.Genders!.ToIdList<Guid>()));
                 })
                 .SelectMultiSetAsync(pdcr.Paging,
@@ -102,7 +102,7 @@ namespace Beef.Demo.Business.Data
 
             System.Diagnostics.Debug.WriteLine($"Two, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
             await _db.StoredProcedure("[Demo].[spPersonGetDetail]")
-                .Param(DbMapper.Default.GetParameterName(nameof(PersonDetail.Id)), id)
+                .Param("PersonId", id)
                 .SelectMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd!.History = r));
@@ -152,5 +152,7 @@ namespace Beef.Demo.Business.Data
         {
             return Task.FromResult<FileContentResult?>(new FileContentResult(Encoding.ASCII.GetBytes($"Documentation for '{id}'."), "text/plain"));
         }
+
+        Task<Result<string?>> SimulateWorkOnImplementationAsync(Guid id) => Result.Go<string?>($"hello {id}").AsTask();
     }
 }

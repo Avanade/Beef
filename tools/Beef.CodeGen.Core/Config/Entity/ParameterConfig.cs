@@ -261,7 +261,7 @@ parameters: [
         /// <summary>
         /// Gets the parameter argument using the specified converter.
         /// </summary>
-        public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}.Default.ToDestination.Convert({ArgumentName})";
+        public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}.Default.ConvertToDestination({ArgumentName})";
 
         /// <summary>
         /// Gets or sets the related entity.

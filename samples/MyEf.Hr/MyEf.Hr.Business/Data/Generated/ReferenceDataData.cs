@@ -55,7 +55,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             GenderToModelEfMapperCtor();
         }
 
@@ -77,7 +77,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToGenderEfMapperCtor();
         }
 
@@ -99,7 +99,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             TerminationReasonToModelEfMapperCtor();
         }
 
@@ -121,7 +121,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToTerminationReasonEfMapperCtor();
         }
 
@@ -143,7 +143,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             RelationshipTypeToModelEfMapperCtor();
         }
 
@@ -165,7 +165,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToRelationshipTypeEfMapperCtor();
         }
 
@@ -187,7 +187,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             USStateToModelEfMapperCtor();
         }
 
@@ -209,7 +209,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToUSStateEfMapperCtor();
         }
 
@@ -231,7 +231,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = s.Text, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = s.IsActive, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = s.SortOrder, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             PerformanceOutcomeToModelEfMapperCtor();
         }
 
@@ -253,7 +253,7 @@ public partial class ReferenceDataData : IReferenceDataData
             Map((s, d) => d.Text = (string?)s.Text!, OperationTypes.Any, s => s.Text == default, d => d.Text = default);
             Map((s, d) => d.IsActive = (bool)s.IsActive!, OperationTypes.Any, s => s.IsActive == default, d => d.IsActive = default);
             Map((s, d) => d.SortOrder = (int)s.SortOrder!, OperationTypes.Any, s => s.SortOrder == default, d => d.SortOrder = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             ModelToPerformanceOutcomeEfMapperCtor();
         }
 

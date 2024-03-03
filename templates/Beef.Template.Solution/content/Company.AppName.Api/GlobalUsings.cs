@@ -1,7 +1,7 @@
 ﻿global using Azure.Monitor.OpenTelemetry.AspNetCore;
 global using CoreEx;
 global using CoreEx.AspNetCore.WebApis;
-#if (implement_subscriber)
+#if (implement_services)
 #if (implement_database || implement_sqlserver)
 global using CoreEx.Azure.ServiceBus;
 global using CoreEx.Azure.Storage;
@@ -10,7 +10,7 @@ global using CoreEx.Database;
 #endif
 global using CoreEx.Entities;
 global using CoreEx.Events;
-#if (implement_subscriber)
+#if (implement_services)
 #if (implement_database || implement_sqlserver)
 global using CoreEx.Hosting;
 #endif
@@ -42,7 +42,7 @@ global using RefDataNamespace = Company.AppName.Business.Entities;
 #if (implement_cosmos)
 global using AzCosmos = Microsoft.Azure.Cosmos;
 #endif
-#if (implement_subscriber)
+#if (implement_services)
 global using AzServiceBus = Azure.Messaging.ServiceBus;
 #if (implement_database || implement_sqlserver)
 global using AzBlobs = Azure.Storage.Blobs;

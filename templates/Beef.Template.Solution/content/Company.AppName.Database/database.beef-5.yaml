@@ -1,6 +1,6 @@
 ﻿//#if (implement_database)
 schema: AppName
-//#if (implement_subscriber)
+//#if (implement_services)
 outbox: true
 //#endif
 tables:
@@ -26,7 +26,7 @@ tables:
 //#endif
 //#if (implement_sqlserver)
 schema: AppName
-//#if (implement_subscriber)
+//#if (implement_services)
 outbox: true
 //#endif
 efModel: true

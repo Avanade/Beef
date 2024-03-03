@@ -4,6 +4,7 @@ using OnRamp;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -593,14 +594,14 @@ properties: [
         /// <summary>
         /// Gets the data converter C# code for reference data data access.
         /// </summary>
-        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.ToSource.Convert(";
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverterName}.ConvertToSource(";
 
         /// <summary>
         /// Gets the EntityFramework data mapper - entity to model code.
         /// </summary>
         public string? EntityFrameworkDataMapperToModelCode => EntityFrameworkMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToDestination.Convert(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
+            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ConvertToDestination(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
             "Map" => $"Map((o, s, d) => d.{DataName ?? Name} = o.Map(s.{DataMapperPropertyName}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
             "Flatten" => $"Flatten(s => s.{DataMapperPropertyName}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default);",
             _ => "!! code-gen error !!"
@@ -611,7 +612,7 @@ properties: [
         /// </summary>
         public string? EntityFrameworkDataMapperFromModelCode => EntityFrameworkMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ConvertToSource(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v, OperationTypes.{DataOperationTypes}, d => d.{DataName ?? Name} = default);",
             _ => "!! code-gen error !!"
@@ -622,7 +623,7 @@ properties: [
         /// </summary>
         public string? CosmosDataMapperToModelCode => CosmosMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToDestination.Convert(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
+            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ConvertToDestination(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
             "Map" => $"Map((o, s, d) => d.{DataName ?? Name} = o.Map(s.{DataMapperPropertyName}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
             "Flatten" => $"Flatten(s => s.{DataMapperPropertyName}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default);",
             _ => "!! code-gen error !!"
@@ -633,7 +634,7 @@ properties: [
         /// </summary>
         public string? CosmosDataMapperFromModelCode => CosmosMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ConvertToSource(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v, OperationTypes.{DataOperationTypes}, d => d.{DataName ?? Name} = default);",
             _ => "!! code-gen error !!"
@@ -644,7 +645,7 @@ properties: [
         /// </summary>
         public string? HttpAgentDataMapperToModelCode => HttpAgentMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToDestination.Convert(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
+            "Set" => $"Map((s, d) => d.{DataName ?? Name} = {(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ConvertToDestination(")}s.{DataMapperPropertyName}{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
             "Map" => $"Map((o, s, d) => d.{DataName ?? Name} = o.Map(s.{DataMapperPropertyName}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default, d => d.{DataName ?? Name} = default);",
             "Flatten" => $"Flatten(s => s.{DataMapperPropertyName}, OperationTypes.{DataOperationTypes}, s => s.{DataMapperPropertyName} == default);",
             _ => "!! code-gen error !!"
@@ -655,7 +656,7 @@ properties: [
         /// </summary>
         public string? HttpAgentDataMapperFromModelCode => HttpAgentMapper switch
         {
-            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ToSource.Convert(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
+            "Set" => $"Map((s, d) => d.{DataMapperPropertyName} = ({PrivateType}){(MapperDataConverterName == null ? "" : $"{MapperDataConverterName}.ConvertToSource(")}s.{DataName ?? Name}!{(MapperDataConverterName == null ? "" : ")")}, OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Map" => $"Map((o, s, d) => d.{DataMapperPropertyName} = o.Map(s.{DataName ?? Name}, d.{DataName ?? Name}), OperationTypes.{DataOperationTypes}, s => s.{DataName ?? Name} == default, d => d.{DataMapperPropertyName} = default);",
             "Flatten" => $"Expand<{(IsChangeLog ? "ChangeLogEx" : Type)}>((d, v) => d.{DataName ?? Name} = v, OperationTypes.{DataOperationTypes}, d => d.{DataName ?? Name} = default);",
             _ => "!! code-gen error !!"

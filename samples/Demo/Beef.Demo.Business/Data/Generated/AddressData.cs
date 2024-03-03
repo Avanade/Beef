@@ -16,19 +16,26 @@ public partial class AddressData
     /// <summary>
     /// Provides the <see cref="Address"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<Address, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<Address, DbMapper>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DbMapper"/> class.
-        /// </summary>
-        public DbMapper()
+        /// <inheritdoc />
+        protected override void OnMapToDb(Address value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            Property(s => s.Street);
-            Property(s => s.City);
-            DbMapperCtor();
+            parameters.AddParameter("Street", value.Street);
+            parameters.AddParameter("City", value.City);
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, Address value, OperationTypes operationType)
+        {
+            value.Street = record.GetValue<string?>("Street");
+            value.City = record.GetValue<string?>("City");
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        partial void OnMapToDbEx(Address value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, Address value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
     }
 
     /// <summary>

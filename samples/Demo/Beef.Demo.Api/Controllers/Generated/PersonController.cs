@@ -385,6 +385,17 @@ public partial class PersonController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> GetDocumentation(Guid id)
         => _webApi.GetAsync<FileContentResult>(Request, p => _manager.GetDocumentationAsync(id), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
+
+    /// <summary>
+    /// Simulate Work.
+    /// </summary>
+    /// <param name="id">The <see cref="Person"/> identifier.</param>
+    /// <returns>A resultant <see cref="string"/>.</returns>
+    [HttpGet("api/v1/persons/simulate")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> SimulateWork(Guid id)
+        => _webApi.GetWithResultAsync<string?>(Request, p => _manager.SimulateWorkAsync(id), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 }
 
 #pragma warning restore

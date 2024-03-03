@@ -163,6 +163,10 @@ namespace Beef.Demo.Common.Agents
         /// <inheritdoc/>
         public Task<HttpResult> GetDocumentationAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync("api/v1/persons/{id}/documentation", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<HttpResult<string?>> SimulateWorkAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<string?>("api/v1/persons/simulate", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
     }
 }
 

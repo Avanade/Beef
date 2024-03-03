@@ -41,7 +41,7 @@ public class AppNameSettings : SettingsBase
     /// </summary>
     public string XxxAgentUrl => GetRequiredValue<string>();
 #endif
-#if (implement_subscriber)
+#if (implement_services)
 
     /// <summary>
     /// Gets the Azure Service Bus connection string.

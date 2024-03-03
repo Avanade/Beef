@@ -68,7 +68,7 @@ public partial class PerformanceReviewData : IPerformanceReviewData
             Map((s, d) => d.PerformanceOutcomeCode = s.OutcomeSid, OperationTypes.Any, s => s.OutcomeSid == default, d => d.PerformanceOutcomeCode = default);
             Map((s, d) => d.Reviewer = s.Reviewer, OperationTypes.Any, s => s.Reviewer == default, d => d.Reviewer = default);
             Map((s, d) => d.Notes = s.Notes, OperationTypes.Any, s => s.Notes == default, d => d.Notes = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             Flatten(s => s.ChangeLog, OperationTypes.Any, s => s.ChangeLog == default);
             EntityToModelEfMapperCtor();
         }
@@ -99,7 +99,7 @@ public partial class PerformanceReviewData : IPerformanceReviewData
             Map((s, d) => d.OutcomeSid = (string?)s.PerformanceOutcomeCode!, OperationTypes.Any, s => s.PerformanceOutcomeCode == default, d => d.OutcomeSid = default);
             Map((s, d) => d.Reviewer = (string?)s.Reviewer!, OperationTypes.Any, s => s.Reviewer == default, d => d.Reviewer = default);
             Map((s, d) => d.Notes = (string?)s.Notes!, OperationTypes.Any, s => s.Notes == default, d => d.Notes = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             Expand<ChangeLogEx>((d, v) => d.ChangeLog = v, OperationTypes.Any, d => d.ChangeLog = default);
             ModelToEntityEfMapperCtor();
         }

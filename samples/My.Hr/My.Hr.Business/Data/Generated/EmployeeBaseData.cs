@@ -13,26 +13,49 @@ public partial class EmployeeBaseData
     /// <summary>
     /// Provides the <see cref="EmployeeBase"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<EmployeeBase, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<EmployeeBase, DbMapper>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DbMapper"/> class.
-        /// </summary>
-        public DbMapper()
+        /// <inheritdoc />
+        protected override void OnMapToDb(EmployeeBase value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            Property(s => s.Id, "EmployeeId").SetPrimaryKey(true);
-            Property(s => s.Email);
-            Property(s => s.FirstName);
-            Property(s => s.LastName);
-            Property(s => s.GenderSid, "GenderCode");
-            Property(s => s.Birthday);
-            Property(s => s.StartDate);
-            Property(s => s.Termination).SetMapper(TerminationDetailData.DbMapper.Default!);
-            Property(s => s.PhoneNo);
-            DbMapperCtor();
+            parameters.AddParameter("EmployeeId", value.Id).SetDirectionToOutputOnCreate(operationType);
+            parameters.AddParameter("Email", value.Email);
+            parameters.AddParameter("FirstName", value.FirstName);
+            parameters.AddParameter("LastName", value.LastName);
+            parameters.AddParameter("GenderCode", value.GenderSid);
+            parameters.AddParameter("Birthday", value.Birthday);
+            parameters.AddParameter("StartDate", value.StartDate);
+            TerminationDetailData.DbMapper.Default.MapToDb(value.Termination, parameters, operationType);
+            parameters.AddParameter("PhoneNo", value.PhoneNo);
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, EmployeeBase value, OperationTypes operationType)
+        {
+            value.Id = record.GetValue<Guid>("EmployeeId");
+            value.Email = record.GetValue<string?>("Email");
+            value.FirstName = record.GetValue<string?>("FirstName");
+            value.LastName = record.GetValue<string?>("LastName");
+            value.GenderSid = record.GetValue<string?>("GenderCode");
+            value.Birthday = record.GetValue<DateTime>("Birthday");
+            value.StartDate = record.GetValue<DateTime>("StartDate");
+            value.Termination = TerminationDetailData.DbMapper.Default.MapFromDb(record, operationType);
+            value.PhoneNo = record.GetValue<string?>("PhoneNo");
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        /// <inheritdoc />
+        protected override void OnMapKeyToDb(CompositeKey key, DatabaseParameterCollection parameters)
+        {
+            key.AssertLength(1);
+            parameters.AddParameter("EmployeeId", key.Args[0]);
+            OnMapKeyToDbEx(key, parameters);
+        }
+
+        partial void OnMapToDbEx(EmployeeBase value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, EmployeeBase value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
+        partial void OnMapKeyToDbEx(CompositeKey key, DatabaseParameterCollection parameters); // Enables the DbMapper.OnMapKeyToDb to be extended.
     }
 
     /// <summary>

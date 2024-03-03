@@ -460,6 +460,14 @@ entities:
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? DatabaseCustomMapper { get; set; }
 
+        /// <summary>
+        /// Indicates that a `DatabaseMapperEx` will be used versus `DatabaseMapper` (uses Reflection).
+        /// </summary>
+        [JsonPropertyName("databaseMapperEx")]
+        [CodeGenProperty("Database", Title = "Indicates that a `DatabaseMapperEx` (extended/explicit) will be used; versus, `DatabaseMapper` (which uses Reflection internally).",
+            Description = "Defaults to `CodeGeneration.DatabaseMapperEx` (its default value is `true`). The `DatabaseMapperEx` essentially replaces the `DatabaseMapper` as it is more performant; this option can be used where leagcy/existing behavior is required.")]
+        public bool? DatabaseMapperEx { get; set; }
+
         #endregion
 
         #region EntityFramework
@@ -1004,6 +1012,11 @@ entities:
         public List<PropertyConfig>? DatabaseMapperProperties => Properties!.Where(x => CompareNullOrValue(x.DatabaseIgnore, false) && x.Name != "ETag" && !x.IsChangeLog).ToList();
 
         /// <summary>
+        /// Gets the list of properties that form the unique key; excluding inherited and specific exclusion for reference data inheritence.
+        /// </summary>
+        public List<PropertyConfig>? DatabasePrimaryKeyProperties => DatabaseMapperProperties!.Where(x => x.PrimaryKey.HasValue && x.PrimaryKey.Value).ToList();
+
+        /// <summary>
         /// Gets the list of properties that are to be used for entity framework mapping.
         /// </summary>
         public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => !CompareValue(x.EntityFrameworkMapper, "Ignore")).ToList();
@@ -1396,6 +1409,7 @@ entities:
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
+            DatabaseMapperEx = DefaultWhereNull(DatabaseMapperEx, () => Parent!.DatabaseMapperEx);
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName);
             CosmosName = DefaultWhereNull(CosmosName, () => Parent!.CosmosName);
             ODataName = DefaultWhereNull(ODataName, () => Parent!.ODataName);

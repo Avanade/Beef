@@ -221,31 +221,59 @@ public partial class PersonData : IPersonData
     /// <inheritdoc/>
     public Task<FileContentResult> GetDocumentationAsync(Guid id) => GetDocumentationOnImplementationAsync(id);
 
+    /// <inheritdoc/>
+    public Task<Result<string?>> SimulateWorkAsync(Guid id) => SimulateWorkOnImplementationAsync(id);
+
     /// <summary>
     /// Provides the <see cref="Person"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<Person, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<Person, DbMapper>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DbMapper"/> class.
-        /// </summary>
-        public DbMapper()
+        /// <inheritdoc />
+        protected override void OnMapToDb(Person value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            Property(s => s.Id, "PersonId").SetPrimaryKey(false);
-            Property(s => s.FirstName);
-            Property(s => s.LastName);
-            Property(s => s.UniqueCode);
-            Property(s => s.Gender, "GenderId").SetConverter(ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default);
-            Property(s => s.EyeColorSid, "EyeColorCode");
-            Property(s => s.Birthday).SetDbType(System.Data.DbType.Date);
-            Property(s => s.Address).SetMapper(AddressData.DbMapper.Default!);
-            Property(s => s.Metadata, "MetadataJson").SetConverter(ObjectToJsonConverter<Dictionary<string, string>>.Default);
-            Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-            Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
-            DbMapperCtor();
+            parameters.AddParameter("PersonId", value.Id);
+            parameters.AddParameter("FirstName", value.FirstName);
+            parameters.AddParameter("LastName", value.LastName);
+            parameters.AddParameter("UniqueCode", value.UniqueCode);
+            parameters.AddParameter("GenderId", ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ConvertToDestination(value.Gender));
+            parameters.AddParameter("EyeColorCode", value.EyeColorSid);
+            parameters.AddParameter("Birthday", value.Birthday, System.Data.DbType.Date);
+            AddressData.DbMapper.Default.MapToDb(value.Address, parameters, operationType);
+            parameters.AddParameter("MetadataJson", ObjectToJsonConverter<Dictionary<string, string>>.Default.ConvertToDestination(value.Metadata));
+            WhenAnyExceptCreate(operationType, () => parameters.AddParameter(parameters.Database.DatabaseColumns.RowVersionName, StringToBase64Converter.Default.ConvertToDestination(value.ETag)));
+            ChangeLogExDatabaseMapper.Default.MapToDb(value.ChangeLog, parameters, operationType);
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, Person value, OperationTypes operationType)
+        {
+            value.Id = record.GetValue<Guid>("PersonId");
+            value.FirstName = record.GetValue<string?>("FirstName");
+            value.LastName = record.GetValue<string?>("LastName");
+            value.UniqueCode = record.GetValue<string?>("UniqueCode");
+            value.Gender = (RefDataNamespace.Gender?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ConvertToSource(record.GetValue("GenderId"));
+            value.EyeColorSid = record.GetValue<string?>("EyeColorCode");
+            value.Birthday = record.GetValue<DateTime>("Birthday");
+            value.Address = AddressData.DbMapper.Default.MapFromDb(record, operationType);
+            value.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ConvertToSource(record.GetValue("MetadataJson"));
+            WhenAnyExceptCreate(operationType, () => value.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(record.GetValue(record.Database.DatabaseColumns.RowVersionName)));
+            value.ChangeLog = ChangeLogExDatabaseMapper.Default.MapFromDb(record, operationType);
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        /// <inheritdoc />
+        protected override void OnMapKeyToDb(CompositeKey key, DatabaseParameterCollection parameters)
+        {
+            key.AssertLength(1);
+            parameters.AddParameter("PersonId", key.Args[0]);
+            OnMapKeyToDbEx(key, parameters);
+        }
+
+        partial void OnMapToDbEx(Person value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, Person value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
+        partial void OnMapKeyToDbEx(CompositeKey key, DatabaseParameterCollection parameters); // Enables the DbMapper.OnMapKeyToDb to be extended.
     }
 
     /// <summary>
@@ -262,12 +290,12 @@ public partial class PersonData : IPersonData
             Map((s, d) => d.FirstName = s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
             Map((s, d) => d.LastName = s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
             Map((s, d) => d.UniqueCode = s.UniqueCode, OperationTypes.Any, s => s.UniqueCode == default, d => d.UniqueCode = default);
-            Map((s, d) => d.GenderId = ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToDestination.Convert(s.Gender), OperationTypes.Any, s => s.Gender == default, d => d.GenderId = default);
+            Map((s, d) => d.GenderId = ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ConvertToDestination(s.Gender), OperationTypes.Any, s => s.Gender == default, d => d.GenderId = default);
             Map((s, d) => d.EyeColorCode = s.EyeColorSid, OperationTypes.Any, s => s.EyeColorSid == default, d => d.EyeColorCode = default);
             Map((s, d) => d.Birthday = s.Birthday, OperationTypes.Any, s => s.Birthday == default, d => d.Birthday = default);
             Flatten(s => s.Address, OperationTypes.Any, s => s.Address == default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
-            Map((s, d) => d.MetadataJson = ObjectToJsonConverter<Dictionary<string, string>>.Default.ToDestination.Convert(s.Metadata), OperationTypes.Any, s => s.Metadata == default, d => d.MetadataJson = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.MetadataJson = ObjectToJsonConverter<Dictionary<string, string>>.Default.ConvertToDestination(s.Metadata), OperationTypes.Any, s => s.Metadata == default, d => d.MetadataJson = default);
             Flatten(s => s.ChangeLog, OperationTypes.Any, s => s.ChangeLog == default);
             EntityToModelEfMapperCtor();
         }
@@ -296,12 +324,12 @@ public partial class PersonData : IPersonData
             Map((s, d) => d.FirstName = (string?)s.FirstName!, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
             Map((s, d) => d.LastName = (string?)s.LastName!, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
             Map((s, d) => d.UniqueCode = (string?)s.UniqueCode!, OperationTypes.Any, s => s.UniqueCode == default, d => d.UniqueCode = default);
-            Map((s, d) => d.Gender = (string?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ToSource.Convert(s.GenderId!), OperationTypes.Any, s => s.GenderId == default, d => d.Gender = default);
+            Map((s, d) => d.Gender = (string?)ReferenceDataIdConverter<RefDataNamespace.Gender, Guid?>.Default.ConvertToSource(s.GenderId!), OperationTypes.Any, s => s.GenderId == default, d => d.Gender = default);
             Map((s, d) => d.EyeColorSid = (string?)s.EyeColorCode!, OperationTypes.Any, s => s.EyeColorCode == default, d => d.EyeColorSid = default);
             Map((s, d) => d.Birthday = (DateTime)s.Birthday!, OperationTypes.Any, s => s.Birthday == default, d => d.Birthday = default);
             Expand<Address>((d, v) => d.Address = v, OperationTypes.Any, d => d.Address = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
-            Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ToSource.Convert(s.MetadataJson!), OperationTypes.Any, s => s.MetadataJson == default, d => d.Metadata = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.Metadata = (Dictionary<string, string>?)ObjectToJsonConverter<Dictionary<string, string>>.Default.ConvertToSource(s.MetadataJson!), OperationTypes.Any, s => s.MetadataJson == default, d => d.Metadata = default);
             Expand<ChangeLogEx>((d, v) => d.ChangeLog = v, OperationTypes.Any, d => d.ChangeLog = default);
             ModelToEntityEfMapperCtor();
         }

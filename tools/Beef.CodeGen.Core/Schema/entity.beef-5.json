@@ -148,8 +148,14 @@
           "description": "Defaults to \u0060SqlServer\u0060. Enables specific database provider functionality/formatting/etc. where applicable.",
           "enum": [
             "SqlServer",
-            "MySQL"
+            "MySQL",
+            "Postgres"
           ]
+        },
+        "databaseMapperEx": {
+          "type": "boolean",
+          "title": "Indicates that a \u0060DatabaseMapperEx\u0060 will be used; versus, \u0060DatabaseMapper\u0060 (which uses Reflection internally).",
+          "description": "Defaults to \u0060true\u0060. The \u0060DatabaseMapperEx\u0060 essentially replaces the \u0060DatabaseMapper\u0060 as it is more performant (extended/explicit); this option can be used where leagcy/existing behavior is required."
         },
         "entityFrameworkName": {
           "type": "string",
@@ -617,6 +623,11 @@
           "type": "boolean",
           "title": "Indicates that a custom Database \u0060Mapper\u0060 will be used; i.e. not generated.",
           "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
+        },
+        "databaseMapperEx": {
+          "type": "boolean",
+          "title": "Indicates that a \u0060DatabaseMapperEx\u0060 (extended/explicit) will be used; versus, \u0060DatabaseMapper\u0060 (which uses Reflection internally).",
+          "description": "Defaults to \u0060CodeGeneration.DatabaseMapperEx\u0060 (its default value is \u0060true\u0060). The \u0060DatabaseMapperEx\u0060 essentially replaces the \u0060DatabaseMapper\u0060 as it is more performant; this option can be used where leagcy/existing behavior is required."
         },
         "entityFrameworkName": {
           "type": "string",

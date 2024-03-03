@@ -136,7 +136,8 @@ Property | Description
 -|-
 **`databaseName`** | The .NET database interface name (used where `Operation.AutoImplement` is `Database`).<br/>&dagger; Defaults to `IDatabase`. This can be overridden within the `Entity`(s).
 **`databaseSchema`** | The default database schema name.<br/>&dagger; Defaults to `dbo`.
-**`databaseProvider`** | The default database schema name. Valid options are: `SqlServer`, `MySQL`.<br/>&dagger; Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.
+**`databaseProvider`** | The default database schema name. Valid options are: `SqlServer`, `MySQL`, `Postgres`.<br/>&dagger; Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.
+`databaseMapperEx` | Indicates that a `DatabaseMapperEx` will be used; versus, `DatabaseMapper` (which uses Reflection internally).<br/>&dagger; Defaults to `true`. The `DatabaseMapperEx` essentially replaces the `DatabaseMapper` as it is more performant (extended/explicit); this option can be used where leagcy/existing behavior is required.
 
 <br/>
 

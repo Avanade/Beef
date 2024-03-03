@@ -1,0 +1,16 @@
+//#if (implement_database || implement_sqlserver)
+AppName:
+  - Person:
+    - { PersonId: 1, FirstName: Wendy, LastName: Jones, GenderCode: F, Birthday: 1985-03-18 }
+    - { PersonId: 2, FirstName: Brian, LastName: Smith, GenderCode: M, Birthday: 1994-11-07 }
+    - { PersonId: 3, FirstName: Rachael, LastName: Browne, GenderCode: F, Birthday: 1972-06-28 }
+    - { PersonId: 4, FirstName: Waylon, LastName: Smithers, GenderCode: M, Birthday: 1952-02-21 }
+//#endif
+//#if (implement_mysql || implement_postgres)
+lowerapp:
+  - person:
+    - { first_name: Wendy, last_name: Jones, gender_code: F, birthday: 1985-03-18 }
+    - { first_name: Brian, last_name: Smith, gender_code: M, birthday: 1994-11-07 }
+    - { first_name: Rachael, last_name: Browne, gender_code: F, birthday: 1972-06-28 }
+    - { first_name: Waylon, last_name: Smithers, gender_code: M, birthday: 1952-02-21 }
+//#endif

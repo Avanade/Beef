@@ -98,7 +98,8 @@ entities:
       { name: GetDocumentation, type: Custom, returnType: FileContentResult, webApiMethod: HttpGet, webApiRoute: '{id}/documentation', webApiProduces: [ text/plain ], webApiProducesResponseType: none,
         parameters: [
           { name: Id, text: '{{Person}} identifier', type: Guid, isMandatory: true }
-        ]}
+        ]},
+      { name: SimulateWork, type: Custom, withResult: true, returnType: string, webApiRoute: simulate, webApiMethod: HttpGet, webApiStatus: OK, primaryKey: true }
     ]
   }
 
@@ -138,7 +139,7 @@ entities:
   }
 
   # CollectionKeyed must be "selected" and 'AddJsonMergePatch(o => o.EntityKeyCollectionMergeApproach = CoreEx.Json.Merge.EntityKeyCollectionMergeApproach.Merge)' in start up to enable rich-merging functionality.
-- { name: WorkHistory, collection: true, collectionType: "Keyed", excludeAll: true, excludeData: RequiresMapper, autoImplement: Database,
+- { name: WorkHistory, collection: true, collectionType: "Keyed", excludeAll: true, excludeData: RequiresMapper, autoImplement: Database, databaseMapperEx: false, 
     properties: [
       { name: PersonId, text: '{{Person}} identifier (not serialized/read-only for internal data merging)', type: Guid, immutable: true, serializationIgnore: true },
       { name: Name, type: string, stringCasing: Title, primaryKey: true, serializationAlwaysInclude: true },

@@ -19,7 +19,7 @@
       "fileRename": "Company",
       "isRequired": true,
       "datatype": "text",
-      "description": "The company name 'Company' used to define the namespace etc; e.g. 'Company.AppName'."
+      "description": "The company, and optional Product, name used to define the namespace root; e.g. 'Company.Product', 'Microsoft.Azure'."
     },
     "appname": {
       "type": "parameter",
@@ -27,7 +27,7 @@
       "fileRename": "AppName",
       "isRequired": true,
       "datatype": "text",
-      "description": "The application (domain) name 'AppName' used to define the namespace etc; e.g. 'Company.AppName'."
+      "description": "The application, or domain, name (single word) used to define the namespace suffix etc; e.g. 'AppName', ."
     },
     "datasource": {
       "type": "parameter",
@@ -65,27 +65,27 @@
       "defaultValue": "SqlServer",
       "description": "The data source implementation option."
     },
-    "subscriber": {
+    "services": {
       "type": "parameter",
       "datatype": "choice",
       "choices": [
         {
           "choice": "AzFunction",
-          "description": "Indicates that the Service Bus subscriber is to be implemented using an Azure Function."
+          "description": "Indicates that the corresponding Services is to be implemented as an Azure Function."
         },
         {
           "choice": "None",
-          "description": "Indicates that no Service Bus subscriber is to be implemented (default)."
+          "description": "Indicates that no corresponding Services are to be implemented (default)."
         }
       ],
       "defaultValue": "None",
-      "description": "The Service Bus subscriber implementation option."
+      "description": "The corresponding Services implementation option."
     },
     "coreex_version": {
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "3.12.0"
+        "value": "3.13.0"
       },
       "replaces": "CoreExVersion"
     },
@@ -129,13 +129,13 @@
       "type": "computed",
       "value": "(datasource == \"None\")"
     },
-    "implement_subscriber": {
+    "implement_services": {
       "type": "computed",
-      "value": "(subscriber == \"AzFunction\")"
+      "value": "(services == \"AzFunction\")"
     },
-    "implement_subscriber_azfunction": {
+    "implement_services_azfunction": {
       "type": "computed",
-      "value": "(subscriber == \"AzFunction\")"
+      "value": "(services == \"AzFunction\")"
     },
     "created_date": {
       "type": "generated",
@@ -205,6 +205,10 @@
         {
           "condition": "(!implement_database && !implement_entityframework)",
           "exclude": [ "Company.AppName.Business/Data/AppNameDb.cs", "Company.AppName.Test/Data/**/*" ]
+        },
+        {
+          "condition": "!(implement_services)",
+          "exclude": [ "Company.AppName.Services/**/*", "Company.AppName.ServicesTest/**/*" ]
         }
       ]
     }

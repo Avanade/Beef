@@ -63,20 +63,32 @@ public partial class EmployeeData : IEmployeeData
     /// <summary>
     /// Provides the <see cref="Employee"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<Employee, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<Employee, DbMapper>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DbMapper"/> class.
         /// </summary>
-        public DbMapper()
+        public DbMapper() => InheritMapper(EmployeeBaseData.DbMapper.Default);
+
+        /// <inheritdoc />
+        protected override void OnMapToDb(Employee value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            InheritPropertiesFrom(EmployeeBaseData.DbMapper.Default);
-            Property(s => s.Address, "AddressJson").SetConverter(ObjectToJsonConverter<Address>.Default);
-            Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-            Property(s => s.ChangeLog).SetMapper(ChangeLogExDatabaseMapper.Default);
-            DbMapperCtor();
+            parameters.AddParameter("AddressJson", ObjectToJsonConverter<Address>.Default.ConvertToDestination(value.Address));
+            WhenAnyExceptCreate(operationType, () => parameters.AddParameter(parameters.Database.DatabaseColumns.RowVersionName, StringToBase64Converter.Default.ConvertToDestination(value.ETag)));
+            ChangeLogExDatabaseMapper.Default.MapToDb(value.ChangeLog, parameters, operationType);
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, Employee value, OperationTypes operationType)
+        {
+            value.Address = (Address?)ObjectToJsonConverter<Address>.Default.ConvertToSource(record.GetValue("AddressJson"));
+            WhenAnyExceptCreate(operationType, () => value.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(record.GetValue(record.Database.DatabaseColumns.RowVersionName)));
+            value.ChangeLog = ChangeLogExDatabaseMapper.Default.MapFromDb(record, operationType);
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        partial void OnMapToDbEx(Employee value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, Employee value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
     }
 }

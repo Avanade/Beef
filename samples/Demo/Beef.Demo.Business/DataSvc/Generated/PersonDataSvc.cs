@@ -41,6 +41,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     private Func<Person, Task>? _updateWithEfOnAfterAsync;
     private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
     private Func<FileContentResult, Guid, Task>? _getDocumentationOnAfterAsync;
+    private Func<string?, Guid, Task<Result>>? _simulateWorkOnAfterAsync;
 
     #endregion
 
@@ -277,6 +278,13 @@ public partial class PersonDataSvc : IPersonDataSvc
         var r = await _data.GetDocumentationAsync(id).ConfigureAwait(false);
         await Invoker.InvokeAsync(_getDocumentationOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
         return r;
+    }
+
+    /// <inheritdoc/>
+    public Task<Result<string?>> SimulateWorkAsync(Guid id)
+    {
+        return Result.GoAsync(_data.SimulateWorkAsync(id))
+                     .ThenAsync(r => _simulateWorkOnAfterAsync?.Invoke(r, id) ?? Result.SuccessTask);
     }
 }
 

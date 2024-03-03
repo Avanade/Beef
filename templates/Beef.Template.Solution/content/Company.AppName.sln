@@ -20,8 +20,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Company.AppName.Database", "Company.AppName.Database\Company.AppName.Database.csproj", "{36A5A8B9-0139-4C49-90FB-E521A4B89329}"
 EndProject
 //#endif
-//#if (implement_subscriber)
+//#if (implement_services)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Company.AppName.Services", "Company.AppName.Services\Company.AppName.Services.csproj", "{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Company.AppName.Services.Test", "Company.AppName.Services.Test\Company.AppName.Services.Test.csproj", "{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}"
 EndProject
 //#endif
 Global
@@ -108,7 +110,7 @@ Global
 		{36A5A8B9-0139-4C49-90FB-E521A4B89329}.Release|x86.ActiveCfg = Release|Any CPU
 		{36A5A8B9-0139-4C49-90FB-E521A4B89329}.Release|x86.Build.0 = Release|Any CPU
 //#endif
-//#if (implement_subscriber)
+//#if (implement_services)
 		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -121,6 +123,18 @@ Global
 		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}.Release|x64.Build.0 = Release|Any CPU
 		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE}.Release|x86.Build.0 = Release|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Debug|x64.Build.0 = Debug|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Debug|x86.Build.0 = Debug|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Release|x64.ActiveCfg = Release|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Release|x64.Build.0 = Release|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Release|x86.ActiveCfg = Release|Any CPU
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8}.Release|x86.Build.0 = Release|Any CPU
 //#endif
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
@@ -132,8 +146,8 @@ Global
 //#if (implement_database || implement_entityframework)
 		{36A5A8B9-0139-4C49-90FB-E521A4B89329} = {A4E363CD-D0BE-4B43-9C80-18EA6CD2FAA6}
 //#endif
-//#if (implement_subscriber)
-		{289B0EC4-5CED-4DE4-B56E-F94A2DE568EE} = {A4E363CD-D0BE-4B43-9C80-18EA6CD2FAA6}
+//#if (implement_services)
+		{C7307C6C-EC78-4DD5-99D8-447AB2AA96A8} = {53EEA045-4195-4A3F-A7C1-13A517B88080}
 //#endif
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

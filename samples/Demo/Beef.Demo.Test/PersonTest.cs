@@ -1299,6 +1299,17 @@ namespace Beef.Demo.Test
                 .Run(a => a.ParamCollAsync(new AddressCollection { new Address { Street = "Aaa", City = "Bbb" }, new Address { Street = "Aaa", City = "Ddd" }}));
         }
 
+        [Test]
+        public void I420_Simulate_Perf()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                AgentTester.Test<PersonAgent, string>()
+                    .ExpectStatusCode(HttpStatusCode.OK)
+                    .Run(a => a.SimulateWorkAsync(Guid.NewGuid()));
+            }
+        }
+
         #endregion
     }
 }

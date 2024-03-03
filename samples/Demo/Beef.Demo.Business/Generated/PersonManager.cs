@@ -152,6 +152,11 @@ public partial class PersonManager : IPersonManager
     private Func<Guid, Task>? _getDocumentationOnBeforeAsync;
     private Func<FileContentResult, Guid, Task>? _getDocumentationOnAfterAsync;
 
+    private Func<Guid, Task<Result>>? _simulateWorkOnPreValidateAsync;
+    private Action<MultiValidator, Guid>? _simulateWorkOnValidate;
+    private Func<Guid, Task<Result>>? _simulateWorkOnBeforeAsync;
+    private Func<string?, Guid, Task<Result>>? _simulateWorkOnAfterAsync;
+
     #endregion
 
     /// <summary>
@@ -615,6 +620,20 @@ public partial class PersonManager : IPersonManager
         var r = await _dataService.GetDocumentationAsync(id).ConfigureAwait(false);
         await Invoker.InvokeAsync(_getDocumentationOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);
         return Cleaner.Clean(r);
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task<Result<string?>> SimulateWorkAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go().Requires(id)
+                     .Then(() => Cleaner.CleanUp(id))
+                     .ThenAsync(() => _simulateWorkOnPreValidateAsync?.Invoke(id) ?? Result.SuccessTask)
+                     .ValidateAsync(() => MultiValidator.Create()
+                         .Additional(mv => _simulateWorkOnValidate?.Invoke(mv, id)), cancellationToken: ct)
+                     .ThenAsync(() => _simulateWorkOnBeforeAsync?.Invoke(id) ?? Result.SuccessTask)
+                     .ThenAsAsync(() => _dataService.SimulateWorkAsync(id))
+                     .ThenAsync(r => _simulateWorkOnAfterAsync?.Invoke(r, id) ?? Result.SuccessTask)
+                     .Then(r => Cleaner.Clean(r));
     }, InvokerArgs.Unspecified);
 }
 

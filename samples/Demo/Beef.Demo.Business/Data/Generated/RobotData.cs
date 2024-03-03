@@ -26,7 +26,7 @@ public partial class RobotData : IRobotData
 
     /// <inheritdoc/>
     public Task<Result<Robot?>> GetAsync(Guid id)
-        => _cosmos.Items.GetWithResultAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
+        => _cosmos.Items.GetWithResultAsync(TypeToStringConverter<Guid>.Default.ConvertToDestination(id));
 
     /// <inheritdoc/>
     public Task<Result<Robot>> CreateAsync(Robot value)
@@ -38,7 +38,7 @@ public partial class RobotData : IRobotData
 
     /// <inheritdoc/>
     public Task<Result> DeleteAsync(Guid id)
-        => _cosmos.Items.DeleteWithResultAsync(TypeToStringConverter<Guid>.Default.ToDestination.Convert(id));
+        => _cosmos.Items.DeleteWithResultAsync(TypeToStringConverter<Guid>.Default.ConvertToDestination(id));
 
     /// <inheritdoc/>
     public Task<Result<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
@@ -54,7 +54,7 @@ public partial class RobotData : IRobotData
         /// </summary>
         public EntityToModelCosmosMapper()
         {
-            Map((s, d) => d.Id = TypeToStringConverter<Guid>.Default.ToDestination.Convert(s.Id), OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+            Map((s, d) => d.Id = TypeToStringConverter<Guid>.Default.ConvertToDestination(s.Id), OperationTypes.Any, s => s.Id == default, d => d.Id = default);
             Map((s, d) => d.ModelNo = s.ModelNo, OperationTypes.Any, s => s.ModelNo == default, d => d.ModelNo = default);
             Map((s, d) => d.SerialNo = s.SerialNo, OperationTypes.Any, s => s.SerialNo == default, d => d.SerialNo = default);
             Map((s, d) => d.EyeColor = s.EyeColorSid, OperationTypes.Any, s => s.EyeColorSid == default, d => d.EyeColor = default);
@@ -77,7 +77,7 @@ public partial class RobotData : IRobotData
         /// </summary>
         public ModelToEntityCosmosMapper()
         {
-            Map((s, d) => d.Id = (Guid)TypeToStringConverter<Guid>.Default.ToSource.Convert(s.Id!), OperationTypes.Any, s => s.Id == default, d => d.Id = default);
+            Map((s, d) => d.Id = (Guid)TypeToStringConverter<Guid>.Default.ConvertToSource(s.Id!), OperationTypes.Any, s => s.Id == default, d => d.Id = default);
             Map((s, d) => d.ModelNo = (string?)s.ModelNo!, OperationTypes.Any, s => s.ModelNo == default, d => d.ModelNo = default);
             Map((s, d) => d.SerialNo = (string?)s.SerialNo!, OperationTypes.Any, s => s.SerialNo == default, d => d.SerialNo = default);
             Map((s, d) => d.EyeColorSid = (string?)s.EyeColor!, OperationTypes.Any, s => s.EyeColor == default, d => d.EyeColorSid = default);

@@ -55,9 +55,9 @@ public partial class EmployeeData : IEmployeeData
         public EntityToModelEfMapper()
         {
             Base<EmployeeBaseData.EntityToModelEfMapper>();
-            Map((s, d) => d.AddressJson = ObjectToJsonConverter<Address>.Default.ToDestination.Convert(s.Address), OperationTypes.Any, s => s.Address == default, d => d.AddressJson = default);
+            Map((s, d) => d.AddressJson = ObjectToJsonConverter<Address>.Default.ConvertToDestination(s.Address), OperationTypes.Any, s => s.Address == default, d => d.AddressJson = default);
             Map((o, s, d) => d.EmergencyContacts = o.Map(s.EmergencyContacts, d.EmergencyContacts), OperationTypes.Any, s => s.EmergencyContacts == default, d => d.EmergencyContacts = default);
-            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ToDestination.Convert(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
+            Map((s, d) => d.RowVersion = StringToBase64Converter.Default.ConvertToDestination(s.ETag), OperationTypes.Any, s => s.ETag == default, d => d.RowVersion = default);
             Flatten(s => s.ChangeLog, OperationTypes.Any, s => s.ChangeLog == default);
             EntityToModelEfMapperCtor();
         }
@@ -83,9 +83,9 @@ public partial class EmployeeData : IEmployeeData
         public ModelToEntityEfMapper()
         {
             Base<EmployeeBaseData.ModelToEntityEfMapper>();
-            Map((s, d) => d.Address = (Address?)ObjectToJsonConverter<Address>.Default.ToSource.Convert(s.AddressJson!), OperationTypes.Any, s => s.AddressJson == default, d => d.Address = default);
+            Map((s, d) => d.Address = (Address?)ObjectToJsonConverter<Address>.Default.ConvertToSource(s.AddressJson!), OperationTypes.Any, s => s.AddressJson == default, d => d.Address = default);
             Map((o, s, d) => d.EmergencyContacts = o.Map(s.EmergencyContacts, d.EmergencyContacts), OperationTypes.Any, s => s.EmergencyContacts == default, d => d.EmergencyContacts = default);
-            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ToSource.Convert(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
+            Map((s, d) => d.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(s.RowVersion!), OperationTypes.Any, s => s.RowVersion == default, d => d.ETag = default);
             Expand<ChangeLogEx>((d, v) => d.ChangeLog = v, OperationTypes.Any, d => d.ChangeLog = default);
             ModelToEntityEfMapperCtor();
         }

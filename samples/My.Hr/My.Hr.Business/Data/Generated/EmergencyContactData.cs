@@ -13,21 +13,40 @@ public partial class EmergencyContactData
     /// <summary>
     /// Provides the <see cref="EmergencyContact"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<EmergencyContact, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<EmergencyContact, DbMapper>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DbMapper"/> class.
-        /// </summary>
-        public DbMapper()
+        /// <inheritdoc />
+        protected override void OnMapToDb(EmergencyContact value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            Property(s => s.Id, "EmergencyContactId").SetPrimaryKey(false);
-            Property(s => s.FirstName);
-            Property(s => s.LastName);
-            Property(s => s.PhoneNo);
-            Property(s => s.RelationshipSid, "RelationshipTypeCode");
-            DbMapperCtor();
+            parameters.AddParameter("EmergencyContactId", value.Id);
+            parameters.AddParameter("FirstName", value.FirstName);
+            parameters.AddParameter("LastName", value.LastName);
+            parameters.AddParameter("PhoneNo", value.PhoneNo);
+            parameters.AddParameter("RelationshipTypeCode", value.RelationshipSid);
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, EmergencyContact value, OperationTypes operationType)
+        {
+            value.Id = record.GetValue<Guid>("EmergencyContactId");
+            value.FirstName = record.GetValue<string?>("FirstName");
+            value.LastName = record.GetValue<string?>("LastName");
+            value.PhoneNo = record.GetValue<string?>("PhoneNo");
+            value.RelationshipSid = record.GetValue<string?>("RelationshipTypeCode");
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        /// <inheritdoc />
+        protected override void OnMapKeyToDb(CompositeKey key, DatabaseParameterCollection parameters)
+        {
+            key.AssertLength(1);
+            parameters.AddParameter("EmergencyContactId", key.Args[0]);
+            OnMapKeyToDbEx(key, parameters);
+        }
+
+        partial void OnMapToDbEx(EmergencyContact value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, EmergencyContact value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
+        partial void OnMapKeyToDbEx(CompositeKey key, DatabaseParameterCollection parameters); // Enables the DbMapper.OnMapKeyToDb to be extended.
     }
 }

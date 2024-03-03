@@ -38,26 +38,49 @@ public partial class GenderData : IGenderData
     /// <summary>
     /// Provides the <see cref="Gender"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<Gender, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<Gender, DbMapper>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DbMapper"/> class.
-        /// </summary>
-        public DbMapper()
+        /// <inheritdoc />
+        protected override void OnMapToDb(Gender value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            Property(s => s.Id, "GenderId").SetPrimaryKey(true);
-            Property(s => s.Code);
-            Property(s => s.Text);
-            Property(s => s.IsActive);
-            Property(s => s.SortOrder);
-            Property(s => s.AlternateName);
-            Property(s => s.TripCode);
-            Property(s => s.Country, "CountryId").SetConverter(ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default);
-            Property(s => s.ETag, "RowVersion", operationTypes: OperationTypes.AnyExceptCreate).SetConverter(StringToBase64Converter.Default);
-            DbMapperCtor();
+            parameters.AddParameter("GenderId", value.Id).SetDirectionToOutputOnCreate(operationType);
+            parameters.AddParameter("Code", value.Code);
+            parameters.AddParameter("Text", value.Text);
+            parameters.AddParameter("IsActive", value.IsActive);
+            parameters.AddParameter("SortOrder", value.SortOrder);
+            parameters.AddParameter("AlternateName", value.AlternateName);
+            parameters.AddParameter("TripCode", value.TripCode);
+            parameters.AddParameter("CountryId", ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default.ConvertToDestination(value.Country));
+            WhenAnyExceptCreate(operationType, () => parameters.AddParameter(parameters.Database.DatabaseColumns.RowVersionName, StringToBase64Converter.Default.ConvertToDestination(value.ETag)));
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, Gender value, OperationTypes operationType)
+        {
+            value.Id = record.GetValue<Guid>("GenderId");
+            value.Code = record.GetValue<string?>("Code");
+            value.Text = record.GetValue<string?>("Text");
+            value.IsActive = record.GetValue<bool>("IsActive");
+            value.SortOrder = record.GetValue<int>("SortOrder");
+            value.AlternateName = record.GetValue<string?>("AlternateName");
+            value.TripCode = record.GetValue<string?>("TripCode");
+            value.Country = (RefDataNamespace.Country?)ReferenceDataIdConverter<RefDataNamespace.Country, Guid?>.Default.ConvertToSource(record.GetValue("CountryId"));
+            WhenAnyExceptCreate(operationType, () => value.ETag = (string?)StringToBase64Converter.Default.ConvertToSource(record.GetValue(record.Database.DatabaseColumns.RowVersionName)));
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        /// <inheritdoc />
+        protected override void OnMapKeyToDb(CompositeKey key, DatabaseParameterCollection parameters)
+        {
+            key.AssertLength(1);
+            parameters.AddParameter("GenderId", key.Args[0]);
+            OnMapKeyToDbEx(key, parameters);
+        }
+
+        partial void OnMapToDbEx(Gender value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, Gender value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
+        partial void OnMapKeyToDbEx(CompositeKey key, DatabaseParameterCollection parameters); // Enables the DbMapper.OnMapKeyToDb to be extended.
     }
 }
 

@@ -10,7 +10,8 @@
     },
     "logLevel": {
       "default": "Warning",
-      "CoreEx": "Information"
+      "CoreEx": "Information",
+      "Company.AppName.Services": "Information"
     }
   },
   "extensions": {

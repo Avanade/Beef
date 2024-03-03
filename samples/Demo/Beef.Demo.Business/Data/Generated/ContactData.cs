@@ -77,7 +77,7 @@ public partial class ContactData : IContactData
             Map((s, d) => d.FirstName = s.FirstName, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
             Map((s, d) => d.LastName = s.LastName, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
             Map((s, d) => d.StatusCode = s.StatusSid, OperationTypes.Any, s => s.StatusSid == default, d => d.StatusCode = default);
-            Map((s, d) => d.Comms = ObjectToJsonConverter<ContactCommCollection>.Default.ToDestination.Convert(s.Communications), OperationTypes.Any, s => s.Communications == default, d => d.Comms = default);
+            Map((s, d) => d.Comms = ObjectToJsonConverter<ContactCommCollection>.Default.ConvertToDestination(s.Communications), OperationTypes.Any, s => s.Communications == default, d => d.Comms = default);
             EntityToModelEfMapperCtor();
         }
 
@@ -98,7 +98,7 @@ public partial class ContactData : IContactData
             Map((s, d) => d.FirstName = (string?)s.FirstName!, OperationTypes.Any, s => s.FirstName == default, d => d.FirstName = default);
             Map((s, d) => d.LastName = (string?)s.LastName!, OperationTypes.Any, s => s.LastName == default, d => d.LastName = default);
             Map((s, d) => d.StatusSid = (string?)s.StatusCode!, OperationTypes.Any, s => s.StatusCode == default, d => d.StatusSid = default);
-            Map((s, d) => d.Communications = (ContactCommCollection?)ObjectToJsonConverter<ContactCommCollection>.Default.ToSource.Convert(s.Comms!), OperationTypes.Any, s => s.Comms == default, d => d.Communications = default);
+            Map((s, d) => d.Communications = (ContactCommCollection?)ObjectToJsonConverter<ContactCommCollection>.Default.ConvertToSource(s.Comms!), OperationTypes.Any, s => s.Comms == default, d => d.Communications = default);
             ModelToEntityEfMapperCtor();
         }
 

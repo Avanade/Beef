@@ -19,12 +19,40 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="content\Company.AppName.Services.Test\appsettings.unittest.json" />
+    <None Remove="content\Company.AppName.Services.Test\Company.AppName.Services.Test.csproj" />
+    <None Remove="content\Company.AppName.Services.Test\Data\Data.yaml" />
+    <None Remove="content\Company.AppName.Services.Test\Functions\EventSubscriberFunctionTest.cs" />
+    <None Remove="content\Company.AppName.Services.Test\GlobalUsings.cs" />
+    <None Remove="content\Company.AppName.Services.Test\Subscribers\FixtureSetup.cs" />
+    <None Remove="content\Company.AppName.Services\appsettings.json" />
     <None Remove="content\company.appname.services\Company.AppName.Services.csproj" />
+    <None Remove="content\Company.AppName.Services\Functions\EventSubscriberFunction.cs" />
+    <None Remove="content\Company.AppName.Services\GlobalUsings.cs" />
+    <None Remove="content\Company.AppName.Services\host.json" />
+    <None Remove="content\Company.AppName.Services\local.settings.json" />
+    <None Remove="content\Company.AppName.Services\Program.cs" />
+    <None Remove="content\Company.AppName.Services\Startup.cs" />
+    <None Remove="content\Company.AppName.Services\Subscribers\PersonUpsertSubscriber.cs" />
     <None Remove="content\Company.AppName.Test\appsettings.unittest.json" />
+    <None Remove="content\Company.AppName.Services.Test\Subscribers\PersonUpsertSubscriberTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="content\Company.AppName.Services\" />
+    <Content Update="content\Company.AppName.Services\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="content\Company.AppName.Services\host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="content\Company.AppName.Services\local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <Import Project="..\..\Common.targets" />

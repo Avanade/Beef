@@ -24,7 +24,7 @@ public partial class EmployeeData
     /// Executes the 'Get' stored procedure passing the identifier and returns the result.
     /// </summary>
     private Task<Result<Employee?>> GetOnImplementationAsync(Guid id) =>
-        ExecuteStatementAsync(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default[x => x.Id], id));
+        ExecuteStatementAsync(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param("EmployeeId", id));
 
     /// <summary>
     /// Executes the 'Create' stored procedure and returns the result.

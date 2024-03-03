@@ -141,7 +141,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{#if ManagerExtensions}}
       {{#unless SingleValidateParameters}}
         {{#if WithResult}}
-                     .ThenAsync({{#if HasValue}}v{{else}}(){{/if}} => {{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}))
+                     .ThenAsync({{#if HasValue}}v{{else}}(){{/if}} => {{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}}) ?? Result.SuccessTask)
         {{else}}
         await Invoker.InvokeAsync({{PrivateName}}OnPreValidateAsync?.Invoke({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}{{/if}}{{/each}}{{#if Root.CancellationToken}}{{ifne Parameters.Count 0}}, {{/ifne}}ct{{/if}})).ConfigureAwait(false);
         {{/if}}

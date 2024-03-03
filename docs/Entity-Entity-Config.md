@@ -215,6 +215,7 @@ Property | Description
 **`databaseSchema`** | The database schema name (used where `AutoImplement` is `Database`).<br/>&dagger; Defaults to `dbo`.
 `databaseMapperInheritsFrom` | The name of the `Mapper` that the generated Database `Mapper` inherits from.
 `databaseCustomerMapper` | Indicates that a custom Database `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
+`databaseMapperEx` | Indicates that a `DatabaseMapperEx` (extended/explicit) will be used; versus, `DatabaseMapper` (which uses Reflection internally).<br/>&dagger; Defaults to `CodeGeneration.DatabaseMapperEx` (its default value is `true`). The `DatabaseMapperEx` essentially replaces the `DatabaseMapper` as it is more performant; this option can be used where leagcy/existing behavior is required.
 
 <br/>
 

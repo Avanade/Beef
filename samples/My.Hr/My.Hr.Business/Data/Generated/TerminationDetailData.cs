@@ -13,19 +13,26 @@ public partial class TerminationDetailData
     /// <summary>
     /// Provides the <see cref="TerminationDetail"/> property and database column mapping.
     /// </summary>
-    public partial class DbMapper : DatabaseMapper<TerminationDetail, DbMapper>
+    public partial class DbMapper : DatabaseMapperEx<TerminationDetail, DbMapper>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DbMapper"/> class.
-        /// </summary>
-        public DbMapper()
+        /// <inheritdoc />
+        protected override void OnMapToDb(TerminationDetail value, DatabaseParameterCollection parameters, OperationTypes operationType)
         {
-            Property(s => s.Date, "TerminationDate");
-            Property(s => s.ReasonSid, "TerminationReasonCode");
-            DbMapperCtor();
+            parameters.AddParameter("TerminationDate", value.Date);
+            parameters.AddParameter("TerminationReasonCode", value.ReasonSid);
+            OnMapToDbEx(value, parameters, operationType);
         }
-            
-        partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
+
+        /// <inheritdoc />
+        protected override void OnMapFromDb(DatabaseRecord record, TerminationDetail value, OperationTypes operationType)
+        {
+            value.Date = record.GetValue<DateTime>("TerminationDate");
+            value.ReasonSid = record.GetValue<string?>("TerminationReasonCode");
+            OnMapFromDbEx(record, value, operationType);
+        }
+
+        partial void OnMapToDbEx(TerminationDetail value, DatabaseParameterCollection parameters, OperationTypes operationType); // Enables the DbMapper.OnMapToDb to be extended.
+        partial void OnMapFromDbEx(DatabaseRecord record, TerminationDetail value, OperationTypes operationType); // Enables the DbMapper.OnMapFromDb to be extended.
     }
 
     /// <summary>

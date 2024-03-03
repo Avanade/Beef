@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;CA1707</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\**\*" />
+    <EmbeddedResource Include="Migrations\**\*" />
+    <!--#if (implement_database || implement_entityframework) -->
+    <EmbeddedResource Include="Data\**\*" />
+    <!--#endif -->
+    <!--#if (implement_cosmos) -->
+    <EmbeddedResource Include="Cosmos\**\*" />
+    <!--#endif -->
+    <EmbeddedResource Include="Resources\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.unittest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="CoreExVersion" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Company.AppName.Services\Company.AppName.Services.csproj" />
+    <!--#if (implement_database || implement_entityframework) -->
+    <ProjectReference Include="..\Company.AppName.Database\Company.AppName.Database.csproj" />
+    <!--#endif -->
+  </ItemGroup>
+  
+</Project>

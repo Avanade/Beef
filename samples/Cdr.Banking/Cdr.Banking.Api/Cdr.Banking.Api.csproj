@@ -5,7 +5,7 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AspNetCore" Version="3.12.0" />
+    <PackageReference Include="CoreEx.AspNetCore" Version="3.13.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>

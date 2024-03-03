@@ -322,6 +322,15 @@ namespace Beef.Demo.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         Task<HttpResult> GetDocumentationAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Simulate Work.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<string?>> SimulateWorkAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 }
 

@@ -183,6 +183,13 @@ public partial interface IPersonData
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
     Task<FileContentResult> GetDocumentationAsync(Guid id);
+
+    /// <summary>
+    /// Simulate Work.
+    /// </summary>
+    /// <param name="id">The <see cref="Person"/> identifier.</param>
+    /// <returns>A resultant <see cref="string"/>.</returns>
+    Task<Result<string?>> SimulateWorkAsync(Guid id);
 }
 
 #pragma warning restore

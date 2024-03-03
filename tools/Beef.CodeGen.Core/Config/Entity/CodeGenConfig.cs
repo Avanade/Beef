@@ -236,9 +236,17 @@ entities:
         /// Gets or sets the database provider.
         /// </summary>
         [JsonPropertyName("databaseProvider")]
-        [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true, Options = ["SqlServer", "MySQL"],
+        [CodeGenProperty("Database", Title = "The default database schema name.", IsImportant = true, Options = ["SqlServer", "MySQL", "Postgres"],
             Description = "Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.")]
         public string? DatabaseProvider { get; set; }
+
+        /// <summary>
+        /// Indicates that a `DatabaseMapperEx` will be used versus `DatabaseMapper` (uses Reflection).
+        /// </summary>
+        [JsonPropertyName("databaseMapperEx")]
+        [CodeGenProperty("Database", Title = "Indicates that a `DatabaseMapperEx` will be used; versus, `DatabaseMapper` (which uses Reflection internally).",
+            Description = "Defaults to `true`. The `DatabaseMapperEx` essentially replaces the `DatabaseMapper` as it is more performant (extended/explicit); this option can be used where leagcy/existing behavior is required.")]
+        public bool? DatabaseMapperEx { get; set; }
 
         /// <summary>
         /// Gets or sets the default .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.
@@ -594,6 +602,7 @@ entities:
             DatabaseProvider = DefaultWhereNull(DatabaseProvider, () => "SqlServer");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => DatabaseProvider == "SqlServer" ? "dbo" : "");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
+            DatabaseMapperEx = DefaultWhereNull(DatabaseMapperEx, () => true);
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
