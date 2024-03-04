@@ -97,10 +97,10 @@ namespace Beef.Demo.Business.Data
         {
             PersonDetail? pd = null;
 
-            System.Diagnostics.Debug.WriteLine($"One, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
+            System.Diagnostics.Debug.WriteLine($"One, Thread: {Environment.CurrentManagedThreadId}");
             await GetAsync(id);
 
-            System.Diagnostics.Debug.WriteLine($"Two, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
+            System.Diagnostics.Debug.WriteLine($"Two, Thread: {Environment.CurrentManagedThreadId}");
             await _db.StoredProcedure("[Demo].[spPersonGetDetail]")
                 .Param("PersonId", id)
                 .SelectMultiSetAsync(

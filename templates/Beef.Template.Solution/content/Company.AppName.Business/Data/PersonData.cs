@@ -16,8 +16,8 @@ public partial class PersonData
 #if (implement_database)
     private void GetByArgsOnQuery(DatabaseParameterCollection p, PersonArgs? args)
     {
-        p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
-         .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
+        p.ParamWithWildcard(args?.FirstName, "FirstName")
+         .ParamWithWildcard(args?.LastName, "LastName")
          .TableValuedParamWith(args?.Genders, "GenderCodes", () => _db.CreateTableValuedParameter(args!.Genders!.ToCodeList()));
     }
 #endif

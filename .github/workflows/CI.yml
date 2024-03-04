@@ -246,7 +246,7 @@ jobs:
       working-directory: ./Foo.Ef.Bar
       run: dotnet test 
 
-     # Template - Sql Server with Entity Framework
+     # Template - Sql Server with Stored Procedures
 
     - name: Template/SqlServer/Sp create
       run: dotnet new beef --company Foo.Sp --appname Bar --datasource SqlServerProcs --output Foo.Sp.Bar
@@ -312,17 +312,21 @@ jobs:
 
      # Template - Sql Server with Entity Framework and Azure Functions Service
 
-    - name: Template/SqlServer/SpWs create
-      run: dotnet new beef --company Foo.SpWs --appname Bar --datasource SqlServerProcs --output Foo.SpWs.Bar
+    - name: Template/SqlServer/EfWs create
+      run: dotnet new beef --company Foo.EfWs --appname Bar --datasource SqlServer --services AzFunction --output Foo.EfWs.Bar
 
-    - name: Template/SqlServer/SpWs database
-      working-directory: ./Foo.SpWs.Bar/Foo.SpWs.Bar.Database
+    - name: Template/SqlServer/EfWs database
+      working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Database
       run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
 
-    - name: Template/SqlServer/SpWs code-gen
-      working-directory: ./Foo.SpWs.Bar/Foo.SpWs.Bar.CodeGen
+    - name: Template/SqlServer/EfWs code-gen
+      working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.CodeGen
       run: dotnet run all
 
-    - name: Template/SqlServer/SpWs test
-      working-directory: ./Foo.SpWs.Bar
+    - name: Template/SqlServer/EfWs test
+      working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Test
+      run: dotnet test
+
+    - name: Template/SqlServer/EfWs services test
+      working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Services.Test
       run: dotnet test

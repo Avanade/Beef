@@ -109,3 +109,28 @@ Open the solution within Visual Studio:
 cd ..
 Foo.Bar.sln
 ``` 
+
+<br/>
+
+## Subscribing Services
+
+Within a microservices context, where event-based message streaming is used, the templated code from above instantiates the foundation. To further implement this pattern then a domain will likely also need to subscribe to events. An additional `dotnet new beef ... --services AzFunction` switch will also create the required Azure Function _Services_ project and related configuration; including an example unit test. The template will also further implement with an expectation that the event-based messaging infrastructure is Azure Service Bus.
+
+```
+dotnet new beef --company Foo --appname Bar --datasource SqlServer --services AzFunction
+```
+
+The solution should now have been created; and the file system should look like the following:
+
+```
+└── Foo.Bar
+  └── Foo.Bar.Api             # API end-point and operations
+  └── Foo.Bar.Business        # Core business logic components
+  └── Foo.Bar.CodeGen         # Entity and Reference Data code generation console
+  └── Foo.Bar.Database        # Database setup and configuration
+  └── Foo.Bar.Common          # Common / shared components
+  └── Foo.Bar.Test            # Unit and intra-integration tests for Business and Api
+  └── Foo.Bar.Services        # Azure Function Services **NEW**
+  └── Foo.Bar.Services.Test   # Unit and intra-integration tests for Services **NEW**
+  └── Foo.Bar.sln             # Solution file that references all above projects
+```
