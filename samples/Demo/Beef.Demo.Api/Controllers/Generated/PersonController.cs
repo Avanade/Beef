@@ -10,6 +10,7 @@ namespace Beef.Demo.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Person"/> Web API functionality.
 /// </summary>
+[Tags("person", "bananas")]
 [AllowAnonymous]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class PersonController : ControllerBase
@@ -107,6 +108,7 @@ public partial class PersonController : ControllerBase
     /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
     /// </summary>
     /// <returns>The <see cref="PersonCollection"/></returns>
+    [Tags("apples", "oranges")]
     [HttpGet("api/v1/persons/all")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]

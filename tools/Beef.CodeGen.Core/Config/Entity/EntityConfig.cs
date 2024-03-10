@@ -844,6 +844,13 @@ entities:
             Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
         public string? WebApiGetOperation { get; set; }
 
+        /// <summary>
+        /// The list of tags to add for the generated `WebApi`.
+        /// </summary>
+        [JsonPropertyName("webApiTags")]
+        [CodeGenPropertyCollection("WebApi", Title = "The list of tags to add for the generated `WebApi` controller.")]
+        public List<string>? WebApiTags { get; set; }
+
         #endregion
 
         #region Model
@@ -1464,6 +1471,23 @@ entities:
             }
 
             HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => HttpAgentModel);
+
+            // Ensure the WebApiTags are set correctly.
+            if (WebApiTags is not null && WebApiTags.Any())
+            {
+                var list = new List<string>();
+                foreach (var tag in WebApiTags)
+                {
+                    if (tag == "^")
+                        list.AddRange(Parent!.WebApiTags!);
+                    else
+                        list.Add(tag);
+                }
+
+                WebApiTags = list;
+            }
+            else
+                WebApiTags ??= [];
 
             InferInherits();
             Consts = await PrepareCollectionAsync(Consts).ConfigureAwait(false);

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.0
+- *Enhancement:* Added `WebApiTags` code-generation property to enable the specification of `Tags` for the Web API Controller class.
+- *Enhancement:* Added `dotnet run endpoints` option to report all configured endpoints providing a means to audit the generated API surface.
+
 ## v5.11.0
 - *Enhancement:* Added `dotnet new beef ... --services AzFunction` to enable the templating of a corresponding `Company.AppName.Services` project as an Azure Functions project. This will provide an example of leveraging the shared `Company.AppName.Business` logic and consuming the published events using an `EventSubscriberOrchestrator`.
 - *Enhancement:* The `DatabaseMapper` (stored procedures) code-generation logic has been updated to leverage the new extended `DatabaseMapperEx`. This avoids the existing reflection and expression compilation, using explicit code to perform the mapping. Can offer up to 40%+ improvement in some scenarios. Where existing behavior is required then set YAML `databaseMapperEx: false` in the `entity.beef-5.yaml` file (root and/or entity within hierarchy).

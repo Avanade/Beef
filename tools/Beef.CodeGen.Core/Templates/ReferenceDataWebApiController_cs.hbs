@@ -14,6 +14,9 @@ namespace {{Root.NamespaceApi}}.Controllers;
 /// <summary>
 /// Provides the <b>ReferenceData</b> Web API functionality.
 /// </summary>
+{{#ifge WebApiTags.Count 1}}
+[Tags({{#each WebApiTags}}"{{.}}"{{#unless @last}}, {{/unless}}{{/each}})]
+{{/ifge}}
 {{#ifval WebApiAuthorize}}
 [{{{WebApiAuthorize}}}]
 {{/ifval}}
@@ -37,6 +40,9 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A {{RefDataQualifiedEntityName}} collection.</returns>
+  {{#ifge WebApiTags.Count 1}}
+    [Tags({{#each WebApiTags}}"{{.}}"{{#unless @last}}, {{/unless}}{{/each}})]
+  {{/ifge}}
   {{#ifval WebApiAuthorize}}
     [{{{WebApiAuthorize}}}]
   {{/ifval}}

@@ -166,7 +166,7 @@ Usage: Beef.CodeGen.Core [options] <command>
 
 Arguments:
   command                   Execution command type.
-                            Allowed values are: Entity, Database, RefData, DataModel, All, Clean, Count.
+                            Allowed values are: Entity, Database, RefData, DataModel, All, Clean, Count, EndPoints.
 
 Options:
   -?|-h|--help              Show help information.
@@ -181,11 +181,13 @@ Options:
   -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
 
 Extended commands and argument(s):
-  clean   Cleans (removes) all related directories named 'Generated'.
-          - Use --param exclude=name[,name] to exclude named directory(s) from the clean.
+  clean       Cleans (removes) all related directories named 'Generated'.
+              - Use --param exclude=name[,name] to exclude named directory(s) from the clean.
 
-  count   Counts and reports the number of files and lines (All and Generated) within all related directories.
-          - Use --param exclude=name[,name] to exclude named directory(s) from the count.
+  count       Counts and reports the number of files and lines (All and Generated) within all related directories.
+              - Use --param exclude=name[,name] to exclude named directory(s) from the count.
+
+  endpoints   Lists (audits) the code-generated endpoints and related configuration.
 ```
 
 <br/>

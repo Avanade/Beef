@@ -7,6 +7,7 @@ namespace Cdr.Banking.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Account"/> Web API functionality.
 /// </summary>
+[Tags("Banking")]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class AccountController : ControllerBase
 {
@@ -30,6 +31,7 @@ public partial class AccountController : ControllerBase
     /// <param name="openStatus">The Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).</param>
     /// <param name="isOwned">Indicates whether Is Owned.</param>
     /// <returns>The <see cref="AccountCollection"/></returns>
+    [Tags("Banking", "Accounts")]
     [HttpGet("api/v1/banking/accounts")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.AccountCollection), (int)HttpStatusCode.OK)]

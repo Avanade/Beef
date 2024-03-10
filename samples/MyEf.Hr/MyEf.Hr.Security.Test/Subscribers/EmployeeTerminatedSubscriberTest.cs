@@ -102,9 +102,10 @@ public class EmployeeTerminatedSubscriberTest
     public void OktaServiceUnavailable_Retry()
     {
         var mcf = MockHttpClientFactory.Create();
-        var mc = mcf.CreateClient("OktaApi", "https://test-okta/");
+        var mc = mcf.CreateClient("OktaApi", "https://test-okta/").WithConfigurations();
         mc.Request(HttpMethod.Get, "/api/v1/users?search=profile.email eq \"bob@email.com\"").Respond.WithSequence(x =>
         {
+            x.Respond().With(HttpStatusCode.ServiceUnavailable);
             x.Respond().With(HttpStatusCode.ServiceUnavailable);
             x.Respond().With(HttpStatusCode.ServiceUnavailable);
             x.Respond().With(HttpStatusCode.ServiceUnavailable);

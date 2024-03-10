@@ -6,7 +6,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
         : base(client, jsonSerializer, executionContext, settings, logger)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
-        DefaultOptions.WithRetry().EnsureSuccess().ThrowKnownException();
+        DefaultOptions.EnsureSuccess().ThrowKnownException();
     }
 
     /// <summary>

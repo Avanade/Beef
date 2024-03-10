@@ -183,6 +183,14 @@ entities:
         [CodeGenProperty("WebApi", Title = "The base (prefix) `URI` prepended to all `Operation.WebApiRoute` values.", IsImportant = true)]
         public string? WebApiRoutePrefix { get; set; }
 
+        /// <summary>
+        /// The list of tags to add for the generated `WebApi`.
+        /// </summary>
+        [JsonPropertyName("webApiTags")]
+        [CodeGenPropertyCollection("WebApi", Title = "The list of tags to add for the generated `WebApi`.",
+            Description = "This can be overridden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+        public List<string>? WebApiTags { get; set; }
+
         #endregion
 
         #region Manager
@@ -615,6 +623,7 @@ entities:
             RefDataTextDataName = DefaultWhereNull(RefDataTextDataName, () => "Text");
             RefDataIsActiveDataName = DefaultWhereNull(RefDataIsActiveDataName, () => "IsActive");
             RefDataSortOrderDataName = DefaultWhereNull(RefDataSortOrderDataName, () => "SortOrder");
+            WebApiTags ??= [];
 
             if (!string.IsNullOrEmpty(WebApiRoutePrefix))
                 RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :

@@ -81,7 +81,7 @@ Then complete the following house cleaning tasks within the newly created projec
 
 Update project dependencies as follows.
 
-1. Add the `CoreEx.Azure` and `CoreEx.Validation` NuGet packages as dependencies.
+1. Add the `CoreEx.Azure`, `CoreEx.Validation` and `Microsoft.Extensions.Http.Polly` NuGet packages as dependencies.
 2. Add `MyHr.Ef.Common` as a project reference dependency (within a real implemenation the `*.Common` assemblies should be published as internal packages for reuse across domains; that is largely their purpose).
 
 <br/>
@@ -216,17 +216,13 @@ Create a new corresponding `appsettings.json` file, then copy in the following c
 Setting | Description
 -|-
 `OktaHttpClient:BaseUri` | The base [`Uri`](https://learn.microsoft.com/en-us/dotnet/api/system.uri) for the external OKTA API.
-`OktaHttpClient:HttpRetryCount`* | Specifies the number of times the HTTP request should be retried when a transient error occurs.
-`OktaHttpClient:HttpTimeoutSeconds`* | Specifies the maximum number of seconds for the HTTP request to complete before timing out. 
 `ServiceBusOrchestratedSubscriber.AbandonOnTransient`* | Indicates that the message should be explicitly abandoned where transient error occurs.
 `ServiceBusOrchestratedSubscriber.RetryDelay`* | The timespan to delay (multiplied by delivery count) after each transient error is encountered; continues to lock message.
 
 ``` json
 {
   "OktaHttpClient": {
-    "BaseUri": "https://dev-1234.okta.com",
-    "HttpRetryCount": 2,
-    "HttpTimeoutSeconds": 120
+    "BaseUri": "https://dev-1234.okta.com"
   },
   "ServiceBusOrchestratedSubscriber": {
     "AbandonOnTransient": true,
@@ -260,7 +256,7 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
         : base(client, jsonSerializer, executionContext, settings, logger)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
-        DefaultOptions.WithRetry().EnsureSuccess().ThrowKnownException();
+        DefaultOptions.EnsureSuccess().ThrowKnownException();
     }
 
     /// <summary>

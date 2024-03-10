@@ -30,6 +30,6 @@ public class Startup : HostStartup
             {
                 o.EventDataDeserializationErrorHandling = ErrorHandling.HandleBySubscriber;
             })
-            .AddTypedHttpClient<OktaHttpClient>("OktaApi");
+            .AddTypedHttpClient<OktaHttpClient>("OktaApi").AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(retryCount: 3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))); ;
     }
 }

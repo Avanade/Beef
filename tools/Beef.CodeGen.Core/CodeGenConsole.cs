@@ -267,6 +267,9 @@ namespace Beef.CodeGen
             if (cmd.HasFlag(CommandType.Count))
                 ExecuteCount();
 
+            if (cmd.HasFlag(CommandType.EndPoints))
+                await ExecuteEndpointsAsync(exedir, company, appName).ConfigureAwait(false);
+
             if (count > 1)
             {
                 Args.Logger?.LogInformation("{Content}", new string('-', 80));
@@ -364,7 +367,7 @@ namespace Beef.CodeGen
             CountDirectoryAndItsChildren(dcs);
 
             var columnLength = Math.Max(dcs.TotalLineCount.ToString().Length, 5);
-            dcs.Write(Args.Logger!, columnLength, 0);
+            dcs.Write(Args.Logger!, columnLength, 0, dcs.Directory.Parent is null ? 0 : dcs.Directory.Parent.FullName.Length + 1);
 
             Args.Logger?.LogInformation("{Content}", string.Empty);
             Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms]");
@@ -403,171 +406,56 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Provides <see cref="DirectoryInfo"/> count statistics.
+        /// Executes the endpoints.
         /// </summary>
-        internal class DirectoryCountStatistics
+        private async Task ExecuteEndpointsAsync(string? exedir, string company, string appName)
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DirectoryCountStatistics"/> class.
-            /// </summary>
-            public DirectoryCountStatistics(DirectoryInfo directory, string[] exclude)
+            var sw = Stopwatch.StartNew();
+
+            EndPointStatistics endpoints;
+            if (IsEntitySupported)
             {
-                Directory = directory;
-                if (directory.Name == "Generated")
-                    IsGenerated = true;
+                var root = await LoadConfigAsync(CodeGenFileManager.GetConfigFilename(exedir!, CommandType.Entity, company, appName)).ConfigureAwait(false);
+                endpoints = new EndPointStatistics();
+                endpoints.AddEntityEndPoints(root);
+                endpoints.WriteTabulated(Args.Logger!, root.CodeGenArgs!.ConfigFileName!);
 
-                Exclude = exclude ?? [];
-            }
-
-            /// <summary>
-            /// Gets the <see cref="DirectoryInfo"/>.
-            /// </summary>
-            public DirectoryInfo Directory { get; }
-
-            /// <summary>
-            /// Gets the directory/path names to exclude.
-            /// </summary>
-            public string[] Exclude { get; private set; }
-
-            /// <summary>
-            /// Gets the file count.
-            /// </summary>
-            public int FileCount { get; private set; }
-
-            /// <summary>
-            /// Gets the total file count including children.
-            /// </summary>
-            public int TotalFileCount => FileCount + Children.Sum(x => x.TotalFileCount);
-
-            /// <summary>
-            /// Gets the generated file count.
-            /// </summary>
-            public int GeneratedFileCount { get; private set; }
-
-            /// <summary>
-            /// Gets the total generated file count including children.
-            /// </summary>
-            public int GeneratedTotalFileCount => GeneratedFileCount + Children.Sum(x => x.GeneratedTotalFileCount);
-
-            /// <summary>
-            /// Gets the line count;
-            /// </summary>
-            public int LineCount { get; private set; }
-
-            /// <summary>
-            /// Gets the total line count including children.
-            /// </summary>
-            public int TotalLineCount => LineCount + Children.Sum(x => x.TotalLineCount);
-
-            /// <summary>
-            /// Gets the generated line count.
-            /// </summary>
-            public int GeneratedLineCount { get; private set; }
-
-            /// <summary>
-            /// Gets the total line count including children.
-            /// </summary>
-            public int GeneratedTotalLineCount => GeneratedLineCount + Children.Sum(x => x.GeneratedTotalLineCount);
-
-            /// <summary>
-            /// Indicates whether the contents of the directory are generated.
-            /// </summary>
-            public bool IsGenerated { get; private set; }
-
-            /// <summary>
-            /// Gets the child <see cref="DirectoryCountStatistics"/> instances.
-            /// </summary>
-            public List<DirectoryCountStatistics> Children { get; } = [];
-
-            /// <summary>
-            /// Increments the file count.
-            /// </summary>
-            public void IncrementFileCount()
-            {
-                FileCount++;
-                if (IsGenerated)
-                    GeneratedFileCount++;
-            }
-
-            /// <summary>
-            /// Increments the line count.
-            /// </summary>
-            public void IncrementLineCount()
-            {
-                LineCount++;
-                if (IsGenerated)
-                    GeneratedLineCount++;
-            }
-
-            /// <summary>
-            /// Adds a child <see cref="DirectoryCountStatistics"/> instance.
-            /// </summary>
-            public DirectoryCountStatistics AddChildDirectory(DirectoryInfo di)
-            {
-                var dcs = new DirectoryCountStatistics(di, Exclude);
-                if (IsGenerated)
-                    dcs.IsGenerated = true;
-
-                Children.Add(dcs);
-                return dcs;
-            }
-
-            /// <summary>
-            /// Write the count statistics.
-            /// </summary>
-            /// <param name="logger">The <see cref="ILogger"/>.</param>
-            /// <param name="columnLength">The maximum column length.</param>
-            /// <param name="indent">The indent size to show hierarchy.</param>
-            public void Write(ILogger logger, int columnLength, int indent = 0)
-            {
-                if (indent == 0)
+                if (IsRefDataSupported)
                 {
-                    var hdrAll = string.Format("{0, " + columnLength + "}", "All");
-                    var hdrGen = string.Format("{0, " + (columnLength + 5) + "}", "Generated");
-                    var hdrfiles = string.Format("{0, " + columnLength + "}", "Files");
-                    var hdrlines = string.Format("{0, " + columnLength + "}", "Lines");
-
-                    logger.LogInformation("{Content}", $"{hdrAll} | {hdrAll} | {hdrGen} | {hdrGen} | Path/");
-                    logger.LogInformation("{Content}", $"{hdrfiles} | {hdrlines} | {hdrfiles} Perc | {hdrlines} Perc | Directory");
-                    logger.LogInformation("{Content}", new string('-', 75));
-                }
-
-                var totfiles = string.Format("{0, " + columnLength + "}", TotalFileCount);
-                var totlines = string.Format("{0, " + columnLength + "}", TotalLineCount);
-                var totgenFiles = string.Format("{0, " + columnLength + "}", GeneratedTotalFileCount);
-                var totgenFilesPerc = string.Format("{0, " + 3 + "}", GeneratedTotalFileCount == 0 ? 0 : Math.Round((double)GeneratedTotalFileCount / (double)TotalFileCount * 100.0, 0));
-                var totgenLines = string.Format("{0, " + columnLength + "}", GeneratedTotalLineCount);
-                var totgenLinesPerc = string.Format("{0, " + 3 + "}", GeneratedTotalLineCount == 0 ? 0 : Math.Round((double)GeneratedTotalLineCount / (double)TotalLineCount * 100.0, 0));
-
-                logger.LogInformation("{Content}", $"{totfiles}   {totlines}   {totgenFiles} {totgenFilesPerc}%   {totgenLines} {totgenLinesPerc}%   {new string(' ', indent * 2)}{Directory.FullName}");
-                    
-                foreach (var dcs in Children)
-                {
-                    if (dcs.TotalFileCount > 0)
-                        dcs.Write(logger, columnLength, indent + 1);
+                    Args.Logger!.LogInformation("{Content}", new string('-', 80));
+                    Args.Logger!.LogInformation("{Content}", string.Empty);
                 }
             }
 
-            /// <summary>
-            /// Cleans (deletes) all <see cref="IsGenerated"/> directories.
-            /// </summary>
-            /// <param name="logger">The <see cref="ILogger"/></param>
-            public void Clean(ILogger logger)
+            if (IsRefDataSupported)
             {
-                // Where generated then delete.
-                if (IsGenerated)
-                {
-                    logger.LogWarning("  Deleted: {Directory} [{FileCount} files]", Directory.FullName, TotalFileCount);
-                    Directory.Delete(true);
-                    return;
-                }
-
-                // Where not generated then clean children.
-                foreach (var dcs in Children)
-                {
-                    dcs.Clean(logger);
-                }
+                var root = await LoadConfigAsync(CodeGenFileManager.GetConfigFilename(exedir!, CommandType.RefData, company, appName)).ConfigureAwait(false);
+                endpoints = new EndPointStatistics();
+                endpoints.AddRefDataEndPoints(root);
+                endpoints.WriteTabulated(Args.Logger!, root.CodeGenArgs!.ConfigFileName!);
             }
+
+            if (!IsEntitySupported && !IsRefDataSupported)
+                Args.Logger?.LogInformation("{Content}", "No EndPoints have been configured.");
+
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogInformation("{Content}", $"{AppName} Complete. [{sw.Elapsed.TotalMilliseconds}ms]");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+        }
+
+        /// <summary>
+        /// Load the configuration.
+        /// </summary>
+        private async Task<Config.Entity.CodeGenConfig> LoadConfigAsync(string filename)
+        {
+            // Load the configuration.
+            var args = new CodeGeneratorArgs();
+            args.CopyFrom(Args);
+            args.ScriptFileName ??= _entityScript;
+            args.ConfigFileName ??= filename;
+
+            var cg = await OnRamp.CodeGenerator.CreateAsync<CodeGenerator>(args).ConfigureAwait(false);
+            return (Config.Entity.CodeGenConfig)await cg.LoadConfigAsync().ConfigureAwait(false);
         }
     }
 }

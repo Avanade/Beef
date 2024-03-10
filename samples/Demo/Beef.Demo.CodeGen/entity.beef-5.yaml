@@ -11,7 +11,7 @@ managerCleanUp: true
 withResult: false
 preprocessorDirectives: true
 entities:
-- { name: Person, text: Person, collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config',
+- { name: Person, text: Person, collection: true, collectionResult: true, grpc: true, validator: PersonValidator, identifierGenerator: true, webApiAuthorize: AllowAnonymous, webApiRoutePrefix: api/v1/persons, webApiAutoLocation: true, create: true, delete: true, autoImplement: Database, databaseSchema: Demo, entityFrameworkModel: EfModel.Person, dataCtorParams: [ 'Microsoft.Extensions.Logging.ILogger<PersonData>^Logger',  Common.Agents.IPersonAgent ], managerExtensions: true, dataSvcExtensions: true, dataExtensions: true, eventTransaction: true, TestCodeGen: true, TestExtra: 'Unknown-Config', webApiTags: [ person, bananas ],
     properties: [
       { name: Id, text: '{{Person}} identifier', type: Guid, grpcFieldNo: 1, primaryKey: true, dataName: PersonId, annotation1: '[System.Xml.Serialization.XmlElement("Id")]' },
       { name: FirstName, type: string, grpcFieldNo: 2 },
@@ -31,7 +31,7 @@ entities:
       { name: Update, type: Update, validator: PersonValidator, primaryKey: true, webApiRoute: '{id}', dataSvcTransaction: true, managerExtensions: true, dataSvcExtensions: false, dataExtensions: false },
       { name: UpdateWithRollback, type: Update, validator: PersonValidator, primaryKey: true, webApiRoute: 'withRollback/{id}', dataSvcTransaction: true, databaseStoredProc: spPersonUpdate },
       { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },
-      { name: GetAll, type: GetColl, paging: true, webApiRoute: all },
+      { name: GetAll, type: GetColl, paging: true, webApiRoute: all, webApiTags: [ apples, oranges ] },
       { name: GetAll2, type: GetColl, paging: false, webApiRoute: allnopaging, databaseStoredProc: spPersonGetAll },
       { name: GetByArgs, type: GetColl, paging: true,
         parameters: [
