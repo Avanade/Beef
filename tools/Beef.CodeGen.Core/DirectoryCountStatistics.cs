@@ -149,7 +149,13 @@ namespace Beef.CodeGen
             var totgenLines = string.Format("{0, " + columnLength + "}", GeneratedTotalLineCount);
             var totgenLinesPerc = string.Format("{0, " + 3 + "}", GeneratedTotalLineCount == 0 ? 0 : Math.Round((double)GeneratedTotalLineCount / (double)TotalLineCount * 100.0, 0));
 
-            logger.LogInformation("{Content}", $"{totfiles}   {totlines}   {totgenFiles} {totgenFilesPerc}%   {totgenLines} {totgenLinesPerc}%   {new string(' ', indent * 2)}{Directory.FullName[remove..]}");
+            string spacer;
+            if (indent == 0)
+                spacer = string.Empty;
+            else
+                spacer = new string(' ', (indent - 1) * 2) + "- ";
+
+            logger.LogInformation("{Content}", $"{totfiles}   {totlines}   {totgenFiles} {totgenFilesPerc}%   {totgenLines} {totgenLinesPerc}%   {spacer}{Directory.FullName[remove..]}");
 
             foreach (var dcs in Children)
             {
