@@ -5,11 +5,11 @@ using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -415,10 +415,18 @@ namespace Beef.CodeGen
             EndPointStatistics endpoints;
             if (IsEntitySupported)
             {
+                // Writer header.
+                var filename = CodeGenFileManager.GetConfigFilename(exedir!, CommandType.Entity, company, appName);
+                Logger?.LogInformation("{Content}", $"Config: {filename}");
+
                 var root = await LoadConfigAsync(CodeGenFileManager.GetConfigFilename(exedir!, CommandType.Entity, company, appName)).ConfigureAwait(false);
                 endpoints = new EndPointStatistics();
                 endpoints.AddEntityEndPoints(root);
-                endpoints.WriteTabulated(Args.Logger!, root.CodeGenArgs!.ConfigFileName!);
+
+                Logger?.LogInformation("{Content}", $"Endpoints: {(endpoints.Count == 0 ? "none" : endpoints.Count)}");
+                Logger?.LogInformation("{Content}", string.Empty);
+
+                endpoints.WriteTabulated(Args.Logger!);
 
                 if (IsRefDataSupported)
                 {
@@ -429,10 +437,17 @@ namespace Beef.CodeGen
 
             if (IsRefDataSupported)
             {
+                var filename = CodeGenFileManager.GetConfigFilename(exedir!, CommandType.RefData, company, appName);
+                Logger?.LogInformation("{Content}", $"Config: {filename}");
+
                 var root = await LoadConfigAsync(CodeGenFileManager.GetConfigFilename(exedir!, CommandType.RefData, company, appName)).ConfigureAwait(false);
                 endpoints = new EndPointStatistics();
                 endpoints.AddRefDataEndPoints(root);
-                endpoints.WriteTabulated(Args.Logger!, root.CodeGenArgs!.ConfigFileName!);
+
+                Logger?.LogInformation("{Content}", $"Endpoints: {(endpoints.Count == 0 ? "none" : endpoints.Count)}");
+                Logger?.LogInformation("{Content}", string.Empty);
+
+                endpoints.WriteTabulated(Args.Logger!);
             }
 
             if (!IsEntitySupported && !IsRefDataSupported)

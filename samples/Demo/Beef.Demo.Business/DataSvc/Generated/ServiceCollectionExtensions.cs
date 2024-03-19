@@ -21,8 +21,8 @@ public static partial class ServiceCollectionsExtension
     {
         return services.AddScoped<IPersonDataSvc, PersonDataSvc>()
                        .AddScoped<IRobotDataSvc, RobotDataSvc>()
-                       .AddScoped<IContactDataSvc, ContactDataSvc>()
-                       .AddScoped<IPostalInfoDataSvc, PostalInfoDataSvc>();
+                       .AddScoped<IPostalInfoDataSvc, PostalInfoDataSvc>()
+                       .AddScoped<IContactDataSvc, ContactDataSvc>();
     }
 }
 

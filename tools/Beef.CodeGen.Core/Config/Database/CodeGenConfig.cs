@@ -456,7 +456,8 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         private async Task LoadDbTablesConfigAsync()
         {
-            CodeGenArgs!.Logger?.Log(LogLevel.Information, "{Content}", $"  Querying database to infer table(s)/column(s) schema configuration...");
+            CodeGenArgs!.Logger?.Log(LogLevel.Information, "{Content}", string.Empty);
+            CodeGenArgs.Logger?.Log(LogLevel.Information, "{Content}", $"Querying database to infer table(s)/column(s) schema configuration...");
 
             _ = CodeGenArgs.ConnectionString ?? throw new CodeGenException("Connection string must be specified via an environment variable or as a command-line option.");
 
@@ -466,8 +467,7 @@ namespace Beef.CodeGen.Config.Database
             DbTables = await db.SelectSchemaAsync(Migrator).ConfigureAwait(false);
 
             sw.Stop();
-            CodeGenArgs.Logger?.Log(LogLevel.Information, "{Content}", $"    Database schema query complete [{sw.ElapsedMilliseconds}ms]");
-            CodeGenArgs.Logger?.Log(LogLevel.Information, "{Content}", string.Empty);
+            CodeGenArgs.Logger?.Log(LogLevel.Information, "{Content}", $"  Database schema query complete [{sw.ElapsedMilliseconds}ms]");
         }
 
         /// <summary>

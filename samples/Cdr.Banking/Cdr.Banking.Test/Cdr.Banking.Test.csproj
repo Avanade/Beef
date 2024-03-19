@@ -34,12 +34,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NUnit.Analyzers" Version="4.0.1">
+    <PackageReference Include="NUnit.Analyzers" Version="4.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="3.14.0" />
+    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="3.14.1" />
   </ItemGroup>
 
   <ItemGroup>

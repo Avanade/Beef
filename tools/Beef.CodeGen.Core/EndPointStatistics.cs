@@ -15,6 +15,11 @@ namespace Beef.CodeGen
         private readonly List<EndPointData> _endPoints = [];
 
         /// <summary>
+        /// Gets the endpoint count.
+        /// </summary>
+        public int Count => _endPoints.Count;
+
+        /// <summary>
         /// Adds the <see cref="CommandType.Entity"/> endpoints.
         /// </summary>
         public void AddEntityEndPoints(Config.Entity.CodeGenConfig root)
@@ -79,14 +84,8 @@ namespace Beef.CodeGen
         /// Write as tabulated data to the <paramref name="logger"/>.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        /// <param name="title">The title.</param>
-        public void WriteTabulated(ILogger logger, string title)
+        public void WriteTabulated(ILogger logger)
         {
-            // Writer header.
-            logger.LogInformation("{Content}", $"Config: {title}");
-            logger.LogInformation("{Content}", $"Count:  {(_endPoints.Count == 0 ? "none" : _endPoints.Count)}");
-            logger.LogInformation("{Content}", string.Empty);
-
             if (_endPoints.Count == 0)
                 return;
 

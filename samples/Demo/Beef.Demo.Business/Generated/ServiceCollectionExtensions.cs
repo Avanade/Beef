@@ -21,9 +21,9 @@ public static partial class ServiceCollectionsExtension
     {
         return services.AddScoped<IPersonManager, PersonManager>()
                        .AddScoped<IRobotManager, RobotManager>()
-                       .AddScoped<IContactManager, ContactManager>()
                        .AddScoped<IConfigManager, ConfigManager>()
-                       .AddScoped<IPostalInfoManager, PostalInfoManager>();
+                       .AddScoped<IPostalInfoManager, PostalInfoManager>()
+                       .AddScoped<IContactManager, ContactManager>();
     }
 }
 
