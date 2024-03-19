@@ -181,7 +181,7 @@ public partial interface IPersonManager
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="string"/>.</returns>
-    Task<string?> InvokeApiViaAgentAsync(Guid id);
+    Task<string> InvokeApiViaAgentAsync(Guid id);
 
     /// <summary>
     /// Param Coll.

@@ -120,7 +120,7 @@ public partial class PersonManager : IPersonManager
     private Func<Guid, Task>? _invokeApiViaAgentOnPreValidateAsync;
     private Action<MultiValidator, Guid>? _invokeApiViaAgentOnValidate;
     private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
-    private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
+    private Func<string, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
 
     private Func<AddressCollection?, Task>? _paramCollOnPreValidateAsync;
     private Action<MultiValidator, AddressCollection?>? _paramCollOnValidate;
@@ -510,7 +510,7 @@ public partial class PersonManager : IPersonManager
     }, new InvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified });
 
     /// <inheritdoc/>
-    public Task<string?> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
+    public Task<string> InvokeApiViaAgentAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);

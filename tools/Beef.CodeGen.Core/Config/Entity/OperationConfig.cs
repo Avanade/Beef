@@ -1038,17 +1038,6 @@ operations: [
                 ReturnTypeNullable = true;
             }
 
-            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => false);
-            if (ReturnType == "void")
-                ReturnTypeNullable = false;
-            else if (Type == "Get")
-                ReturnTypeNullable = true;
-            else if (Type != "Custom")
-                ReturnTypeNullable = false;
-
-            if (ReturnType == "string")
-                ReturnTypeNullable = true;
-
             if (ReturnType != null && Type == "GetColl")
                 ReturnType += "CollectionResult";
 
@@ -1062,6 +1051,26 @@ operations: [
                 "Delete" => "void",
                 _ => "void"
             });
+
+            if (ReturnType != null && ReturnType!.EndsWith("?", StringComparison.InvariantCulture))
+            {
+                ReturnType = ReturnType[0..^1];
+                ReturnTypeNullable = true;
+            }
+
+            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () =>
+            {
+                if (Type != "Custom")
+                    ReturnTypeNullable = false;
+
+                return false;
+            });
+
+            if (ReturnType == "void")
+                ReturnTypeNullable = false;
+            
+            if (Type == "Get")
+                ReturnTypeNullable = true;
 
             ValueType = DefaultWhereNull(ValueType, () => Type switch
             {

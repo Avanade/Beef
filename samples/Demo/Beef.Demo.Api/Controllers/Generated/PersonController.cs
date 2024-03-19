@@ -313,7 +313,7 @@ public partial class PersonController : ControllerBase
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> InvokeApiViaAgent(Guid id)
-        => _webApi.PostAsync<string?>(Request, p => _manager.InvokeApiViaAgentAsync(id), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
+        => _webApi.PostAsync<string>(Request, p => _manager.InvokeApiViaAgentAsync(id), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 
     /// <summary>
     /// Param Coll.

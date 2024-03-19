@@ -99,7 +99,7 @@ entities:
         parameters: [
           { name: Id, text: '{{Person}} identifier', type: Guid, isMandatory: true }
         ]},
-      { name: SimulateWork, type: Custom, withResult: true, returnType: string, webApiRoute: simulate, webApiMethod: HttpGet, webApiStatus: OK, primaryKey: true }
+      { name: SimulateWork, type: Custom, withResult: true, returnType: string?, webApiRoute: simulate, webApiMethod: HttpGet, webApiStatus: OK, primaryKey: true }
     ]
   }
 
