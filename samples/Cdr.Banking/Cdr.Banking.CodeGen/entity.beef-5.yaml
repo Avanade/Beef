@@ -4,7 +4,7 @@ entities:
   # API route prefixed defined.
   # Auto-implementing data access using Cosmos with Container 'Account', leveraging auto-mapping to a 'Model.Account'.
   # 
-- { name: Account, text: Account, collection: true, collectionResult: true, webApiRoutePrefix: api/v1/banking/accounts, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Accounts,
+- { name: Account, text: Account, collection: true, collectionResult: true, webApiRoutePrefix: api/v1/banking/accounts, autoImplement: Cosmos, cosmosModel: Model.Account, cosmosContainerId: Accounts, webApiTags: [ Banking ],
     properties: [
       # Convention of Id property within entity.
       # Reference as accountId otherwise (ArgumentName and JsonName).
@@ -32,7 +32,7 @@ entities:
       # Supports paging.
       # Data access will be auto-implemented for Cosmos as defined for the entity.
       # 
-      { name: GetAccounts, text: Get all accounts, type: GetColl, paging: true,
+      { name: GetAccounts, text: Get all accounts, type: GetColl, paging: true, webApiTags: [ ^, Accounts ],
         parameters: [
           { name: Args, type: AccountArgs, validator: AccountArgsValidator }
         ]

@@ -83,13 +83,19 @@ Configuration details for each of the above are as follows:
 - `Operation` - [YAML/JSON](../../docs/Entity-Operation-Config.md)
 - `Parameter` - [YAML/JSON](../../docs/Entity-Parameter-Config.md)
 
-The Entity configuration supported filenames are, in the order in which they are searched by the code generator: `entity.beef-5.yaml` and `entity.beef-5.json`.
+The Entity configuration supported filenames are, in the order in which they are searched by the code generator:
+- `entity.beef-5.yaml` and `entity.beef-5.json`.
 
 The Entity configuration is defined by a schema, YAML/JSON-based [entity.beef.json](../../tools/Beef.CodeGen.Core/Schema/entity.beef.json). This schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
 
 There are two additional configuration files that share the same schema:
-- [Reference Data](./../../docs/Reference-Data.md) - used to define (configure) the _Beef_-specific Reference Data. Supported filenames are in the order in which they are searched by the code generator: `refdata.beef-5.yaml` and `refdata.beef-5.json`.
-- Data Model - used to define (configure) basic data model .NET classes typically used to represent internal/backend contracts that do not require the full funcionality of a _Beef_ entity. Supported filenames are in the order in which they are searched by the code generator: `datamodel.beef-5.yaml` and `datamodel.beef-5.json`.
+- [Reference Data](./../../docs/Reference-Data.md) - used to define (configure) the _Beef_-specific Reference Data. Supported filenames are in the order in which they are searched by the code generator:
+    - `refdata.beef-5.yaml` and `refdata.beef-5.json`.
+
+- Data Model - used to define (configure) basic data model .NET classes typically used to represent internal/backend contracts that do not require the full funcionality of a _Beef_ entity. Supported filenames are in the order in which they are searched by the code generator:
+    - `datamodel.beef-5.yaml` and `datamodel.beef-5.json`.
+
+Additionally, secondary configuration files `*.entity.beef-5.yaml`, `*.refdata.beef-5.yaml`, `*.datamodel.beef-5.yaml` can be added to the project (including within subfolders) that will be automatically merged into the corresponding primary `entity.beef-5.yaml`, `refdata.beef-5.yaml`, `datamodel.beef-5.yaml` files respectively. The secondary files only support a single root `entities` property/node that merges into the primary's equivalent. This allows the configuration to be broken up logically to minimize challenges related to overall file size and complexity, and minimize potential developer merge conflicts, etc.
 
 <br/>
 
@@ -129,7 +135,8 @@ Configuration details for each of the above are as follows:
 - Relationship (EF) - [YAML/JSON](../../docs/Database-Relationship-Config.md)
 
 
-The Database configuration supported filenames are, in the order in which they are searched by the code generator: `database.beef-5.yaml` and `database.beef-5.json`.
+The Database configuration supported filenames are, in the order in which they are searched by the code generator:
+- `database.beef-5.yaml` and `database.beef-5.json`.
 
 The Database configuration is defined by a schema, YAML/JSON-based [database.beef-5.json](../../tools/Beef.CodeGen.Core/Schema/database.beef-5.json). The schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
 
@@ -153,8 +160,8 @@ Command | Description
 -|-
 `Entity` | Performs code generation using the _entity_ configuration and [`EntityWebApiCoreAgent.yaml`](./Scripts/EntityWebApiCoreAgent.yaml) script.
 `RefData` | Performs code generation using the _refdata_ configuration and [`RefDataCoreCrud.yaml`](./Scripts/RefDataCoreCrud.yaml) script.
-`Database` | Performs code generation using the _database_ configuration and [`Database.yaml`](../Beef.Database.SqlServer/Scripts/Database.yaml) script.
 `DataModel` | Performs code generation using the _data model_ configuration and [`DataModelOnly.yaml`](./Scripts/DataModelOnly.yaml) script.
+`Database` | Performs code generation using the _database_ configuration and [`Database.yaml`](../Beef.Database.SqlServer/Scripts/Database.yaml) script.
 `All` | Performs all of the above (where each is supported as per set up).
 
 Additionally, there are a number of command line options that can be used.
@@ -166,7 +173,7 @@ Usage: Beef.CodeGen.Core [options] <command>
 
 Arguments:
   command                   Execution command type.
-                            Allowed values are: Entity, Database, RefData, DataModel, All, Clean, Count.
+                            Allowed values are: Entity, Database, RefData, DataModel, All, Clean, Count, EndPoints.
 
 Options:
   -?|-h|--help              Show help information.
@@ -181,11 +188,13 @@ Options:
   -sim|--simulation         Indicates whether the code-generation is a simulation (i.e. does not create/update any artefacts).
 
 Extended commands and argument(s):
-  clean   Cleans (removes) all related directories named 'Generated'.
-          - Use --param exclude=name[,name] to exclude named directory(s) from the clean.
+  clean       Cleans (removes) all related directories named 'Generated'.
+              - Use --param exclude=name[,name] to exclude named directory(s) from the clean.
 
-  count   Counts and reports the number of files and lines (All and Generated) within all related directories.
-          - Use --param exclude=name[,name] to exclude named directory(s) from the count.
+  count       Counts and reports the number of files and lines (All and Generated) within all related directories.
+              - Use --param exclude=name[,name] to exclude named directory(s) from the count.
+
+  endpoints   Lists (audits) the code-generated endpoints and related configuration.
 ```
 
 <br/>

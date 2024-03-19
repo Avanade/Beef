@@ -525,6 +525,14 @@ operations: [
             Description = "Defaults to the _Common_ type. A value of `None`, `none` or `` will ensure no type is emitted.")]
         public string? WebApiProducesResponseType { get; set; }
 
+        /// <summary>
+        /// The list of tags to add for the generated `WebApi`.
+        /// </summary>
+        [JsonPropertyName("webApiTags")]
+        [CodeGenPropertyCollection("WebApi", Title = "The list of tags to add for the generated `WebApi` operation.",
+            Description = "Overrides the `Entity.WebApiTags`; unless, if the first tag value is a `^` then this indicates that the `Entity.WebApiTags` are to be included (inherited) as a replacement. Otherwise, defaults to `Entity.WebApiTags`.")]
+        public List<string>? WebApiTags { get; set; }
+
         #endregion
 
         #region Auth
@@ -992,6 +1000,11 @@ operations: [
         public string? WebApiProducesContentType => WebApiProduces is not null && WebApiProduces.Count > 0 ? string.Join(", ", WebApiProduces.Select(x => $"\"{x}\"")) : null;
 
         /// <summary>
+        /// Gets the Tags for reporting.
+        /// </summary>
+        public List<string> ReportTags => WebApiTags!.Count >= 1 ? WebApiTags : Parent!.WebApiTags!;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override async Task PrepareAsync()
@@ -1025,17 +1038,6 @@ operations: [
                 ReturnTypeNullable = true;
             }
 
-            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => false);
-            if (ReturnType == "void")
-                ReturnTypeNullable = false;
-            else if (Type == "Get")
-                ReturnTypeNullable = true;
-            else if (Type != "Custom")
-                ReturnTypeNullable = false;
-
-            if (ReturnType == "string")
-                ReturnTypeNullable = true;
-
             if (ReturnType != null && Type == "GetColl")
                 ReturnType += "CollectionResult";
 
@@ -1049,6 +1051,26 @@ operations: [
                 "Delete" => "void",
                 _ => "void"
             });
+
+            if (ReturnType != null && ReturnType!.EndsWith("?", StringComparison.InvariantCulture))
+            {
+                ReturnType = ReturnType[0..^1];
+                ReturnTypeNullable = true;
+            }
+
+            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () =>
+            {
+                if (Type != "Custom")
+                    ReturnTypeNullable = false;
+
+                return false;
+            });
+
+            if (ReturnType == "void")
+                ReturnTypeNullable = false;
+            
+            if (Type == "Get")
+                ReturnTypeNullable = true;
 
             ValueType = DefaultWhereNull(ValueType, () => Type switch
             {
@@ -1184,6 +1206,23 @@ operations: [
             ExcludeWebApi = DefaultWhereNull(ExcludeWebApi, () => CompareValue(ExcludeAll, true));
             ExcludeWebApiAgent = DefaultWhereNull(ExcludeWebApiAgent, () => CompareValue(ExcludeAll, true));
             ExcludeGrpcAgent = DefaultWhereNull(ExcludeGrpcAgent, () => CompareValue(ExcludeAll, true));
+
+            // Ensure the WebApiTags are set correctly.
+            if (WebApiTags is not null && WebApiTags.Any())
+            {
+                var list = new List<string>();
+                foreach (var tag in WebApiTags)
+                {
+                    if (tag == "^")
+                        list.AddRange(Parent!.WebApiTags!);
+                    else
+                        list.Add(tag);
+                }
+
+                WebApiTags = list;
+            }
+            else
+                WebApiTags ??= [];
 
             if (Type == "Patch")
                 ExcludeIData = ExcludeData = ExcludeIDataSvc = ExcludeDataSvc = ExcludeIManager = ExcludeManager = true;

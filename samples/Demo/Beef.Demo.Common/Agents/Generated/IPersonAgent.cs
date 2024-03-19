@@ -255,7 +255,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<string?>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+        Task<HttpResult<string>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Param Coll.

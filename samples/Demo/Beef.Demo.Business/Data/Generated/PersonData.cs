@@ -181,7 +181,7 @@ public partial class PersonData : IPersonData
     public Task ThrowErrorAsync() => ThrowErrorOnImplementationAsync();
 
     /// <inheritdoc/>
-    public Task<string?> InvokeApiViaAgentAsync(Guid id) => InvokeApiViaAgentOnImplementationAsync(id);
+    public Task<string> InvokeApiViaAgentAsync(Guid id) => InvokeApiViaAgentOnImplementationAsync(id);
 
     /// <inheritdoc/>
     public Task<Person?> GetWithEfAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 

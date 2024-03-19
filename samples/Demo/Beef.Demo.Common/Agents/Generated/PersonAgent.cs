@@ -133,8 +133,8 @@ namespace Beef.Demo.Common.Agents
             => PostAsync("api/v1/persons/error", requestOptions: requestOptions, cancellationToken: cancellationToken);
 
         /// <inheritdoc/>
-        public Task<HttpResult<string?>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => PostAsync<string?>("api/v1/persons/invokeApi", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        public Task<HttpResult<string>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<string>("api/v1/persons/invokeApi", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
 
         /// <inheritdoc/>
         public Task<HttpResult> ParamCollAsync(AddressCollection? addresses, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

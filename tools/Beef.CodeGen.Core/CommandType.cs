@@ -43,6 +43,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// Counts the files and lines of code for child directories distinguising between 'Generated' and non-generated.
         /// </summary>
-        Count = 4096
+        Count = 4096,
+
+        /// <summary>
+        /// Reports all the endpoints.
+        /// </summary>
+        EndPoints = 8192
     }
 }

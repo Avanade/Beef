@@ -115,6 +115,7 @@ Property | Description
 `webApiUpdateOperation` | The corresponding `Update` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.<br/>&dagger; Defaults to `Update`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.
 `webApiProduces` | The value(s) for the optional `[Produces()]` attribute for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.
 `webApiProducesResponseType` | The `[ProducesResponseType()]` attribute `typeof` for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.<br/>&dagger; Defaults to the _Common_ type. A value of `None`, `none` or `` will ensure no type is emitted.
+`webApiTags` | The list of tags to add for the generated `WebApi` operation.<br/>&dagger; Overrides the `Entity.WebApiTags`; unless, if the first tag value is a `^` then this indicates that the `Entity.WebApiTags` are to be included (inherited) as a replacement. Otherwise, defaults to `Entity.WebApiTags`.
 
 <br/>
 

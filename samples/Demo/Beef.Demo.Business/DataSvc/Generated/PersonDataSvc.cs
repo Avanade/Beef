@@ -35,7 +35,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
     private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
     private Func<Task>? _throwErrorOnAfterAsync;
-    private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
+    private Func<string, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
     private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
     private Func<Person, Task>? _createWithEfOnAfterAsync;
     private Func<Person, Task>? _updateWithEfOnAfterAsync;
@@ -225,7 +225,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     }
 
     /// <inheritdoc/>
-    public async Task<string?> InvokeApiViaAgentAsync(Guid id)
+    public async Task<string> InvokeApiViaAgentAsync(Guid id)
     {
         var r = await _data.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
         await Invoker.InvokeAsync(_invokeApiViaAgentOnAfterAsync?.Invoke(r, id)).ConfigureAwait(false);

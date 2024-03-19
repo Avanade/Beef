@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.0
+- *Enhancement:* Added `WebApiTags` code-generation property to enable the specification of `Tags` for the Web API Controller class.
+- *Enhancement:* Added `dotnet run endpoints` option to report all configured endpoints providing a means to audit the generated API surface.
+- *Enhancement:* Secondary (additional) configuration files `*.entity.beef-5.yaml`, `*.refdata.beef-5.yaml`, `*.datamodel.beef-5.yaml` can be added to the project (including within subfolders) that will be automatically merged into the corresponding primary `entity.beef-5.yaml`, `refdata.beef-5.yaml`, `datamodel.beef-5.yaml` files respectively. The secondary files only support a single root `entities` property/node that merges into the primary's equivalent. This allows the configuration to be broken up logically to minimize challenges related to overall file size and complexity, and minimize potential developer merge conflicts, etc.
+- *Fixed:* The `Operation.ReturnType` was incorrectly determining and overridding nullability (`Operation.ReturnTypeNullability`) which has been corrected.
+
 ## v5.11.0
 - *Enhancement:* Added `dotnet new beef ... --services AzFunction` to enable the templating of a corresponding `Company.AppName.Services` project as an Azure Functions project. This will provide an example of leveraging the shared `Company.AppName.Business` logic and consuming the published events using an `EventSubscriberOrchestrator`.
 - *Enhancement:* The `DatabaseMapper` (stored procedures) code-generation logic has been updated to leverage the new extended `DatabaseMapperEx`. This avoids the existing reflection and expression compilation, using explicit code to perform the mapping. Can offer up to 40%+ improvement in some scenarios. Where existing behavior is required then set YAML `databaseMapperEx: false` in the `entity.beef-5.yaml` file (root and/or entity within hierarchy).

@@ -105,6 +105,14 @@
           "type": "string",
           "title": "The base (prefix) \u0060URI\u0060 prepended to all \u0060Operation.WebApiRoute\u0060 values."
         },
+        "webApiTags": {
+          "type": "array",
+          "title": "The list of tags to add for the generated \u0060WebApi\u0060.",
+          "description": "This can be overridden within the \u0060Entity\u0060(s) and/or their corresponding \u0060Operation\u0060(s).",
+          "items": {
+            "type": "string"
+          }
+        },
         "managerCleanUp": {
           "type": "boolean",
           "title": "Indicates whether a \u0060Cleaner.Cleanup\u0060 is performed for the operation parameters within the Manager-layer.",
@@ -868,6 +876,13 @@
           "title": "The corresponding \u0060Get\u0060 method name (in the \u0060XxxManager\u0060) where the \u0060Operation.Type\u0060 is \u0060Update\u0060 and \u0060SimulateConcurrency\u0060 is \u0060true\u0060.",
           "description": "Defaults to \u0060Get\u0060. Specify either just the method name (e.g. \u0060OperationName\u0060) or, interface and method name (e.g. \u0060IXxxManager.OperationName\u0060) to be invoked where in a different \u0060YyyManager.OperationName\u0060."
         },
+        "webApiTags": {
+          "type": "array",
+          "title": "The list of tags to add for the generated \u0060WebApi\u0060 controller.",
+          "items": {
+            "type": "string"
+          }
+        },
         "dataModel": {
           "type": "boolean",
           "title": "Indicates whether a data \u0060model\u0060 version of the entity should also be generated (output to \u0060.\\Business\\Data\\Model\u0060).",
@@ -1588,6 +1603,14 @@
           "type": "string",
           "title": "The \u0060[ProducesResponseType()]\u0060 attribute \u0060typeof\u0060 for the operation within the Web Api Controller for the Swagger/OpenAPI documentation.",
           "description": "Defaults to the _Common_ type. A value of \u0060None\u0060, \u0060none\u0060 or \u0060\u0060 will ensure no type is emitted."
+        },
+        "webApiTags": {
+          "type": "array",
+          "title": "The list of tags to add for the generated \u0060WebApi\u0060 operation.",
+          "description": "Overrides the \u0060Entity.WebApiTags\u0060; unless, if the first tag value is a \u0060^\u0060 then this indicates that the \u0060Entity.WebApiTags\u0060 are to be included (inherited) as a replacement. Otherwise, defaults to \u0060Entity.WebApiTags\u0060.",
+          "items": {
+            "type": "string"
+          }
         },
         "authPermission": {
           "type": "string",
