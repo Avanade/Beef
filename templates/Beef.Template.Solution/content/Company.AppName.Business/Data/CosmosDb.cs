@@ -16,13 +16,7 @@ public interface ICosmos : CoreEx.Cosmos.ICosmosDb
 /// <summary>
 /// Provides the <b>Company.AppName</b> CosmosDb client.
 /// </summary>
-public class CosmosDb : CoreEx.Cosmos.CosmosDb, ICosmos
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CosmosDb"/> class.
-    /// </summary>
-    /// <param name="database">The <see cref="Database"/>.</param>
-    /// <param name="mapper">The <see cref="IMapper"/>.</param>
-    /// <param name="invoker">The optional <see cref="CosmosDbInvoker"/>.</param>
-    public CosmosDb(Database database, IMapper mapper, CosmosDbInvoker? invoker = null) : base(database, mapper, invoker) { }
-}
+/// <param name="database">The <see cref="Database"/>.</param>
+/// <param name="mapper">The <see cref="IMapper"/>.</param>
+/// <param name="invoker">The optional <see cref="CosmosDbInvoker"/>.</param>
+public class CosmosDb(Database database, IMapper mapper, CosmosDbInvoker? invoker = null) : CoreEx.Cosmos.CosmosDb(database, mapper, invoker), ICosmos { }

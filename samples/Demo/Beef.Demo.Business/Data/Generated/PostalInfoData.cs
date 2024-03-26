@@ -25,19 +25,19 @@ public partial class PostalInfoData : IPostalInfoData
 
     /// <inheritdoc/>
     public async Task<Result<PostalInfo?>> GetPostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
-        => (await _httpAgent.WithRetry().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
+        => (await _httpAgent.ThrowKnownException().Reset().GetMappedAsync<PostalInfo?, Model.PostalInfo?>($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
 
     /// <inheritdoc/>
     public async Task<Result<PostalInfo>> CreatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
-        => (await _httpAgent.WithRetry().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
+        => (await _httpAgent.ThrowKnownException().PostMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
 
     /// <inheritdoc/>
     public async Task<Result<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, RefDataNamespace.Country? country, string? state, string? city)
-        => (await _httpAgent.WithRetry().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
+        => (await _httpAgent.ThrowKnownException().PutMappedAsync<PostalInfo, Model.PostalInfo, PostalInfo, Model.PostalInfo>($"{country.Code}/{state}/{city}", value).ConfigureAwait(false)).ToResult();
 
     /// <inheritdoc/>
     public async Task<Result> DeletePostCodesAsync(RefDataNamespace.Country? country, string? state, string? city)
-        => (await _httpAgent.WithRetry().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
+        => (await _httpAgent.ThrowKnownException().DeleteAsync($"{country.Code}/{state}/{city}").ConfigureAwait(false)).ToResult();
 
     /// <summary>
     /// Provides the <see cref="PostalInfo"/> to Entity Framework <see cref="Model.PostalInfo"/> mapping.

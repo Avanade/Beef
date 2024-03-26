@@ -10,11 +10,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreEx.Configuration;
 using CoreEx.Entities;
 using CoreEx.Http;
 using CoreEx.Json;
-using Microsoft.Extensions.Logging;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
@@ -31,10 +29,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
         /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
         /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
-        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
-        /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public ContactAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<ContactAgent> logger) 
-            : base(client, jsonSerializer, executionContext, settings, logger) { }
+        public ContactAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
         public Task<HttpResult<ContactCollectionResult>> GetAllAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

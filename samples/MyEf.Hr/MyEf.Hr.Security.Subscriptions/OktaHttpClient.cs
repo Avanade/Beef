@@ -2,8 +2,8 @@
 
 public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
 {
-    public OktaHttpClient(HttpClient client, SecuritySettings settings, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null, ILogger<OktaHttpClient>? logger = null) 
-        : base(client, jsonSerializer, executionContext, settings, logger)
+    public OktaHttpClient(HttpClient client, SecuritySettings settings, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) 
+        : base(client, jsonSerializer, executionContext)
     {
         Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
         DefaultOptions.EnsureSuccess().ThrowKnownException();
@@ -31,8 +31,10 @@ public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
     /// </summary>
     public class OktaUser
     {
+        private static readonly string[] _statuses = ["STAGED", "PROVISIONED", "ACTIVE", "RECOVERY", "LOCKED_OUT", "PASSWORD_EXPIRED", "SUSPENDED"];
+
         public string? Id { get; set; }
         public string? Status { get; set; }
-        public bool IsDeactivatable => new string[] { "STAGED", "PROVISIONED", "ACTIVE", "RECOVERY", "LOCKED_OUT", "PASSWORD_EXPIRED", "SUSPENDED" }.Contains(Status?.ToUpperInvariant());
+        public bool IsDeactivatable => _statuses.Contains(Status, StringComparer.OrdinalIgnoreCase);
     }
 }

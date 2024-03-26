@@ -90,7 +90,7 @@ public class EmployeeTerminatedSubscriberTest
 
         test.ReplaceHttpClientFactory(mcf)
             .ServiceBusTrigger<SecuritySubscriberFunction>()
-            .ExpectLogContains("Retry - Service Bus message", "[AuthenticationError]")
+            .ExpectLogContains("Retry - Service Bus message", "[AuthorizationError]")
             .Run(f => f.RunAsync(message, actions, default))
             .AssertSuccess();
 

@@ -1,5 +1,6 @@
 ﻿global using CoreEx;
 global using CoreEx.AspNetCore.WebApis;
+global using CoreEx.Database.HealthChecks;
 global using CoreEx.Entities;
 global using CoreEx.Http;
 global using CoreEx.RefData;

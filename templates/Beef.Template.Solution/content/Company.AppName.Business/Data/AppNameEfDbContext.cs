@@ -5,19 +5,14 @@ namespace Company.AppName.Business.Data;
 /// <summary>
 /// Represents the Entity Framework <see cref="DbContext"/>.
 /// </summary>
-public class AppNameEfDbContext : DbContext, IEfDbContext
+/// <param name="options">The <see cref="DbContextOptions{AppNameEfDbContext}"/>.</param>
+/// <param name="db">The base <see cref="IDatabase"/>.</param>
+public class AppNameEfDbContext(DbContextOptions<AppNameEfDbContext> options, IDatabase db) : DbContext(options), IEfDbContext
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AppNameEfDbContext"/> class.
-    /// </summary>
-    /// <param name="options">The <see cref="DbContextOptions{AppNameEfDbContext}"/>.</param>
-    /// <param name="db">The base <see cref="IDatabase"/>.</param>
-    public AppNameEfDbContext(DbContextOptions<AppNameEfDbContext> options, IDatabase db) : base(options) => BaseDatabase = db ?? throw new ArgumentNullException(nameof(db));
-
     /// <summary>
     /// Gets the base <see cref="IDatabase"/>.
     /// </summary>
-    public IDatabase BaseDatabase { get; }
+    public IDatabase BaseDatabase { get; } = db ?? throw new ArgumentNullException(nameof(db));
 
     /// <summary>
     /// Overrides the <see cref="DbContext.OnConfiguring(DbContextOptionsBuilder)"/> to leverage the <see cref="Company.AppName.Business.Data.Database"/> connection management.

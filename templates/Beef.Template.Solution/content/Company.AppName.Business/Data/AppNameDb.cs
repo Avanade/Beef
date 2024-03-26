@@ -4,14 +4,10 @@
 /// Represents the <b>Company.AppName</b> database.
 /// </summary>
 #if (implement_database || implement_sqlserver)
-public class AppNameDb : SqlServerDatabase
+/// <param name="create">The factory to create the <see cref="SqlConnection"/>.</param>
+/// <param name="logger">The optional <see cref="ILogger"/>.</param>
+public class AppNameDb(Func<SqlConnection> create, ILogger<AppNameDb>? logger = null) : SqlServerDatabase(create, logger)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AppNameDb"/> class.
-    /// </summary>
-    /// <param name="create">The factory to create the <see cref="SqlConnection"/>.</param>
-    /// <param name="logger">The optional <see cref="ILogger"/>.</param>
-    public AppNameDb(Func<SqlConnection> create, ILogger<AppNameDb>? logger = null) : base(create, logger) { }
 #if (implement_database)
 
     /// <inheritdoc/>
@@ -20,24 +16,12 @@ public class AppNameDb : SqlServerDatabase
 }
 #endif
 #if (implement_mysql)
-public class AppNameDb : MySqlDatabase
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AppNameDb"/> class.
-    /// </summary>
-    /// <param name="create">The factory to create the <see cref="MySqlConnection"/>.</param>
-    /// <param name="logger">The optional <see cref="ILogger"/>.</param>
-    public AppNameDb(Func<MySqlConnection> create, ILogger<AppNameDb>? logger = null) : base(create, logger) { }
-}
+/// <param name="create">The factory to create the <see cref="MySqlConnection"/>.</param>
+/// <param name="logger">The optional <see cref="ILogger"/>.</param>
+public class AppNameDb(Func<MySqlConnection> create, ILogger<AppNameDb>? logger = null) : MySqlDatabase(create, logger) { }
 #endif
 #if (implement_postgres)
-public class AppNameDb : PostgresDatabase
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AppNameDb"/> class.
-    /// </summary>
-    /// <param name="create">The factory to create the <see cref="NpgsqlConnection"/>.</param>
-    /// <param name="logger">The optional <see cref="ILogger"/>.</param>
-    public AppNameDb(Func<NpgsqlConnection> create, ILogger<AppNameDb>? logger = null) : base(create, logger) { }
-}
+/// <param name="create">The factory to create the <see cref="NpgsqlConnection"/>.</param>
+/// <param name="logger">The optional <see cref="ILogger"/>.</param>
+public class AppNameDb(Func<NpgsqlConnection> create, ILogger<AppNameDb>? logger = null) : PostgresDatabase(create, logger) { }
 #endif

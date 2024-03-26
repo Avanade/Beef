@@ -15,8 +15,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.Azure" Version="3.14.1" />
-    <PackageReference Include="CoreEx.Validation" Version="3.14.1" />
+    <PackageReference Include="CoreEx.Azure" Version="3.15.0" />
+    <PackageReference Include="CoreEx.Validation" Version="3.15.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.17.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" />

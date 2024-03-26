@@ -1,11 +1,12 @@
 ﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
+using CoreEx.AspNetCore.HealthChecks;
 using CoreEx.Azure.ServiceBus;
 using CoreEx.Azure.Storage;
 using CoreEx.Database;
 using CoreEx.Events;
 using CoreEx.Hosting;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using OpenTelemetry.Instrumentation.EntityFrameworkCore;
-using OpenTelemetry.Trace;
 using Az = Azure.Messaging.ServiceBus;
 
 namespace MyEf.Hr.Api
@@ -74,13 +75,13 @@ namespace MyEf.Hr.Api
 
             // Add additional services.
             services.AddControllers();
+
+            // Add health checks.
             services.AddHealthChecks();
-            services.AddHttpClient();
 
             // Add Azure monitor open telemetry.
             services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
             services.Configure<EntityFrameworkInstrumentationOptions>(options => options.SetDbStatementForText = true);
-            //services.ConfigureOpenTelemetryTracerProvider((sp, builder) => builder.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 
             // Add Swagger services.
             services.AddSwaggerGen(options =>
@@ -116,6 +117,7 @@ namespace MyEf.Hr.Api
 
             // Add health checks.
             app.UseHealthChecks("/health");
+            app.UseHealthChecks("/health/detailed", new HealthCheckOptions { ResponseWriter = HealthReportStatusWriter.WriteJsonResults });
 
             // Use controllers.
             app.UseRouting();

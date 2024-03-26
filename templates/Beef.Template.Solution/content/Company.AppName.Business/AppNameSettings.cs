@@ -3,18 +3,9 @@
 /// <summary>
 /// Provides the <see cref="IConfiguration"/> settings.
 /// </summary>
-public class AppNameSettings : SettingsBase
+/// <param name="configuration">The <see cref="IConfiguration"/>.</param>
+public class AppNameSettings(IConfiguration configuration) : SettingsBase(configuration, ["AppName/", "Common/"])
 {
-    /// <summary>
-    /// Gets the setting prefixes in order of precedence.
-    /// </summary>
-    public static string[] Prefixes { get; } = { "AppName/", "Common/" };
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AppNameSettings"/> class.
-    /// </summary>
-    /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
-    public AppNameSettings(IConfiguration configuration) : base(configuration, Prefixes) => ValidationArgs.DefaultUseJsonNames = true;
 #if (implement_database || implement_entityframework)
 
     /// <summary>

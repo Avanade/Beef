@@ -16,9 +16,9 @@ public class Startup
                 .AddExecutionContext()
                 .AddJsonSerializer()
                 .AddReferenceDataOrchestrator()
+                .AddReferenceDataContentWebApi()
                 .AddWebApi()
                 .AddJsonMergePatch()
-                .AddReferenceDataContentWebApi()
                 .AddRequestCache()
                 .AddValidationTextProvider()
                 .AddValidators<AppNameSettings>()
@@ -103,10 +103,11 @@ public class Startup
                 .AddNullEventPublisher();
 #endif
 
-        // Add additional services.
+        // Add controllers.
         services.AddControllers();
+
+        // Add health checks.
         services.AddHealthChecks();
-        services.AddHttpClient();
 
         // Add Azure monitor open telemetry.
         services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
@@ -139,6 +140,7 @@ public class Startup
 
         // Add health checks.
         app.UseHealthChecks("/health");
+        app.UseHealthChecks("/health/detail"); // Secure with permissions / or remove given data returned.
 
         // Use controllers.
         app.UseRouting();

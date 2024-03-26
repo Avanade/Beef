@@ -7,11 +7,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreEx.Configuration;
 using CoreEx.Entities;
 using CoreEx.Http;
 using CoreEx.Json;
-using Microsoft.Extensions.Logging;
 using My.Hr.Common.Entities;
 using RefDataNamespace = My.Hr.Common.Entities;
 
@@ -28,10 +26,7 @@ namespace My.Hr.Common.Agents
         /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
         /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
         /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
-        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
-        /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public PerformanceReviewAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<PerformanceReviewAgent> logger) 
-            : base(client, jsonSerializer, executionContext, settings, logger) { }
+        public PerformanceReviewAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
         public Task<HttpResult<PerformanceReview?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
