@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.1
+- *Fixed:* Upgraded `CoreEx` (`v3.15.0`) to include all related fixes and improvements.
+- *Fixed:* The API Agent templates have been updated to account for the changes to the `TypedHttpClientBase` constructor signature in `CoreEx` (`v3.15.0`).
+
 ## v5.12.0
 - *Enhancement:* Added `WebApiTags` code-generation property to enable the specification of `Tags` for the Web API Controller class.
 - *Enhancement:* Added `dotnet run endpoints` option to report all configured endpoints providing a means to audit the generated API surface.

@@ -220,7 +220,7 @@ entities:
     ]
   }
 
-- { name: PostalInfo, dataModel: true, autoImplement: HttpAgent, webApiRoutePrefix: api/v1/postal, httpAgentName: ZippoAgent, httpAgentModel: Model.PostalInfo, httpAgentCode: WithRetry(), webApiConcurrency: true, webApiGetOperation: GetPostCodes, withResult: true,
+- { name: PostalInfo, dataModel: true, autoImplement: HttpAgent, webApiRoutePrefix: api/v1/postal, httpAgentName: ZippoAgent, httpAgentModel: Model.PostalInfo, httpAgentCode: ThrowKnownException(), webApiConcurrency: true, webApiGetOperation: GetPostCodes, withResult: true,
     properties: [
       { name: Country, type: ^Country, jsonDataModelName: country abbreviation },
       { name: City, jsonDataModelName: place name },

@@ -1,11 +1,13 @@
 ﻿global using Azure.Monitor.OpenTelemetry.AspNetCore;
 global using CoreEx;
 global using CoreEx.AspNetCore.WebApis;
+global using CoreEx.AspNetCore.HealthChecks;
 #if (implement_services)
 #if (implement_database || implement_sqlserver)
 global using CoreEx.Azure.ServiceBus;
 global using CoreEx.Azure.Storage;
 global using CoreEx.Database;
+global using CoreEx.Database.HealthChecks;
 #endif
 #endif
 global using CoreEx.Entities;
@@ -18,6 +20,7 @@ global using CoreEx.Hosting;
 global using CoreEx.Http;
 global using CoreEx.RefData;
 global using CoreEx.Validation;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using Microsoft.AspNetCore.Mvc;
 #if (implement_database || implement_sqlserver)
 global using Microsoft.Data.SqlClient;

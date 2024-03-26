@@ -7,11 +7,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CoreEx.Configuration;
 using CoreEx.Entities;
 using CoreEx.Http;
 using CoreEx.Json;
-using Microsoft.Extensions.Logging;
 using Cdr.Banking.Common.Entities;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
@@ -28,10 +26,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
         /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
         /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
-        /// <param name="settings">The <see cref="SettingsBase"/>.</param>
-        /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public TransactionAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<TransactionAgent> logger) 
-            : base(client, jsonSerializer, executionContext, settings, logger) { }
+        public TransactionAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
         public Task<HttpResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

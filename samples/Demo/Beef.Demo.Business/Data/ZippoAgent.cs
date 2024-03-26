@@ -7,7 +7,6 @@ namespace Beef.Demo.Business.Data
     /// </summary>
     public class ZippoAgent : TypedMappedHttpClientCore<ZippoAgent>
     {
-        public ZippoAgent(HttpClient client, IMapper mapper, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext, SettingsBase settings, ILogger<ZippoAgent> logger)
-            : base(client, mapper, jsonSerializer, executionContext, settings, logger) { }
+        public ZippoAgent(HttpClient client, IMapper mapper, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, mapper, jsonSerializer, executionContext) { }
     }
 }
