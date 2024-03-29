@@ -2,7 +2,7 @@
 
 namespace Beef.Demo.Business.Validation
 {
-    public class RobotValidator : AbstractValidator<Robot>
+    public class RobotValidator : FluentValidation.AbstractValidator<Robot>
     {
         public RobotValidator()
         {

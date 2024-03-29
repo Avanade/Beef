@@ -85,7 +85,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "3.15.0"
+        "value": "3.16.0"
       },
       "replaces": "CoreExVersion"
     },
@@ -93,7 +93,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "5.12.1"
+        "value": "5.12.2"
       },
       "replaces": "BeefVersion"
     },
@@ -172,7 +172,7 @@
       "modifiers": [
         {
           "condition": "(implement_none)",
-          "exclude": [ "Company.AppName.Business/Validation/**/*", "Company.AppName.Business/Data/PersonData.cs" ]
+          "exclude": [ "Company.AppName.Business/Validation/**/*", "Company.AppName.Business/Data/PersonData.cs", "Company.AppName.Test/Apis/PersonTest.cs", "Company.AppName.Test/Resources/*", "Company.AppName.Test/Validators/*" ]
         },
         {
           "condition": "(implement_cosmos || implement_httpagent || implement_none)",
@@ -208,7 +208,7 @@
         },
         {
           "condition": "!(implement_services)",
-          "exclude": [ "Company.AppName.Services/**/*", "Company.AppName.ServicesTest/**/*" ]
+          "exclude": [ "Company.AppName.Services/**/*", "Company.AppName.Services.Test/**/*" ]
         }
       ]
     }

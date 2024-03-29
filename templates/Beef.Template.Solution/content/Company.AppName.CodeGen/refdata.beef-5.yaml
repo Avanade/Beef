@@ -44,3 +44,6 @@ entities:
   # The following is an example read-only reference data Entity accessing data with no auto implementation.
   - { name: Gender }
 //#endif
+//#if (implement_none)
+refDataType: Guid
+//#endif

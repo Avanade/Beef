@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.2
+- *Fixed:* Fixes to the Template solution to improve the initial `dotnet new beef` experience.
+
 ## v5.12.1
 - *Fixed:* Upgraded `CoreEx` (`v3.15.0`) to include all related fixes and improvements.
 - *Fixed:* The API Agent templates have been updated to account for the changes to the `TypedHttpClientBase` constructor signature in `CoreEx` (`v3.15.0`).

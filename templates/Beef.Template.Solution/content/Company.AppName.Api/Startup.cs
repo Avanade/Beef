@@ -107,7 +107,16 @@ public class Startup
         services.AddControllers();
 
         // Add health checks.
-        services.AddHealthChecks();
+        services.AddHealthChecks()
+#if (implement_services)
+#if (implement_database || implement_sqlserver)
+                .AddEventPublisherHealthCheck("ServiceBus", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IServiceBusSender>()));
+#else
+                .AddEventPublisherHealthCheck("EventSender", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
+#endif
+#else
+                .AddEventPublisherHealthCheck("EventSender", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
+#endif
 
         // Add Azure monitor open telemetry.
         services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
@@ -140,7 +149,7 @@ public class Startup
 
         // Add health checks.
         app.UseHealthChecks("/health");
-        app.UseHealthChecks("/health/detail"); // Secure with permissions / or remove given data returned.
+        app.UseHealthChecks("/health/detailed", new HealthCheckOptions { ResponseWriter = HealthReportStatusWriter.WriteJsonResults }); // Secure with permissions / or remove given data returned.
 
         // Use controllers.
         app.UseRouting();
