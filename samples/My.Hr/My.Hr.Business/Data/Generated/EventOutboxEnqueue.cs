@@ -7,15 +7,10 @@ namespace My.Hr.Business.Data;
 /// <summary>
 /// Provides the <see cref="EventSendData"/> <see cref="IDatabase">database</see> <i>outbox enqueue</i> <see cref="SendAsync(EventSendData[])"/>. 
 /// </summary>
-public sealed class EventOutboxEnqueue : EventOutboxEnqueueBase
+/// <param name="database">The <see cref="IDatabase"/>.</param>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+public sealed class EventOutboxEnqueue(IDatabase database, ILogger<EventOutboxEnqueue> logger) : EventOutboxEnqueueBase(database, logger)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EventOutboxEnqueue"/> class.
-    /// </summary>
-    /// <param name="database">The <see cref="IDatabase"/>.</param>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    public EventOutboxEnqueue(IDatabase database, ILogger<EventOutboxEnqueue> logger) : base(database, logger) { }
-
     /// <inheritdoc/>
     protected override string DbTvpTypeName => "[Outbox].[udtEventOutboxList]";
 
