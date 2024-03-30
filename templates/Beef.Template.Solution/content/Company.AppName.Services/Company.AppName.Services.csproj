@@ -5,6 +5,7 @@
     <ImplicitUsings>true</ImplicitUsings>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json">
