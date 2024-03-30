@@ -7,16 +7,11 @@ namespace My.Hr.Business.Data;
 /// <summary>
 /// Provides the <see cref="EventSendData"/> <see cref="IDatabase">database</see> <i>outbox enqueue</i> <see cref="SendAsync(EventSendData[])"/>. 
 /// </summary>
-public sealed class EventOutboxDequeue : EventOutboxDequeueBase
+/// <param name="database">The <see cref="IDatabase"/>.</param>
+/// <param name="eventSender">The <see cref="IEventSender"/>.</param>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+public sealed class EventOutboxDequeue(IDatabase database, IEventSender eventSender, ILogger<EventOutboxDequeue> logger) : EventOutboxDequeueBase(database, eventSender, logger)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EventOutboxDequeue"/> class.
-    /// </summary>
-    /// <param name="database">The <see cref="IDatabase"/>.</param>
-    /// <param name="eventSender">The <see cref="IEventSender"/>.</param>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    public EventOutboxDequeue(IDatabase database, IEventSender eventSender, ILogger<EventOutboxDequeue> logger) : base(database, eventSender, logger) { }
-
     /// <inheritdoc/>
     protected override string DequeueStoredProcedure => "[Outbox].[spEventOutboxDequeue]";
 }

@@ -152,32 +152,5 @@ eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 webApiAutoLocation: true
 refDataText: true
-entities:
-  # The following is an example Entity with CRUD operations with no auto implementation.
-- { name: Person, text: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupd,
-    properties: [
-      { name: Id, type: Guid, primaryKey: true },
-      { name: FirstName },
-      { name: LastName },
-      { name: Gender, type: ^Gender },
-      { name: Birthday, type: DateTime, dateTimeTransform: DateOnly },
-      { name: ETag, type: string },
-      { name: ChangeLog, type: ChangeLog }
-    ],
-    operations: [
-      { name: GetByArgs, type: GetColl, paging: true,
-        parameters: [
-          { name: Args, type: PersonArgs, validator: PersonArgsValidator }
-        ]
-      }
-    ]
-  }
-
-- { name: PersonArgs,
-    properties: [
-      { name: FirstName },
-      { name: LastName },
-      { name: Genders, type: ^Gender, refDataList: true }
-    ]
-  }
+//entities:
 //#endif

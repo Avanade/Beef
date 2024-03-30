@@ -91,13 +91,13 @@ namespace Beef.Template.Solution.UnitTest
             }
 
             // Build Beef and package (nuget) - only local package, no deployment.
-            Assert.That(ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} -configuration 'Debug' -IncludeSymbols -IncludeSource").exitCode, Is.AtLeast(0), "nuget publish");
+            Assert.That(ExecuteCommand("powershell", $"{Path.Combine(_rootDir.FullName, "nuget-publish.ps1")} -configuration 'Release' -IncludeSymbols -IncludeSource").exitCode, Is.AtLeast(0), "nuget publish");
 
             // Uninstall any previous beef templates (failure is ok here)
             ExecuteCommand("dotnet", "new uninstall beef.template.solution");
 
             // Determine the "actual" version to publish so we are explicit.
-            var pf = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish"), "Beef.Template.Solution.*.nupkg").FirstOrDefault();
+            var pf = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "nuget-publish"), "Beef.Template.Solution.*.nupkg").LastOrDefault();
             Assert.That(pf, Is.Not.Null, "Beef.Template.Solution.*.nupkg could not be found.");
 
             // Install the Beef template solution from local package.

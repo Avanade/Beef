@@ -38,6 +38,11 @@ public class AppNameSettings(IConfiguration configuration) : SettingsBase(config
     /// Gets the Azure Service Bus connection string.
     /// </summary>
     public string ServiceBusConnectionString => GetRequiredValue<string>("ConnectionStrings__ServiceBus");
+
+    /// <summary>
+    /// Gets the Azure Service Bus queue or topic name for the sender.
+    /// </summary>
+    public string ServiceBusQueueOrTopicName => GetRequiredValue<string>("ServiceBusSender__QueueOrTopicName");
 #if (implement_database || implement_sqlserver)
 
     /// <summary>
