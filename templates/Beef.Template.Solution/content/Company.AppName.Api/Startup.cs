@@ -27,17 +27,17 @@ public class Startup
 
 #if (implement_database || implement_sqlserver)
         // Add the database services (scoped per request/connection).
-        services.AddDatabase(sp => new AppNameDb(() => new SqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
+        services.AddDatabase(sp => new AppNameDb(() => new SqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()), healthCheckName: "sql-server");
 
 #endif
 #if (implement_mysql)
         // Add the database services (scoped per request/connection).
-        services.AddDatabase(sp => new AppNameDb(() => new MySqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
+        services.AddDatabase(sp => new AppNameDb(() => new MySqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()), healthCheckName: "my-sql");
 
 #endif
 #if (implement_postgres)
         // Add the database services (scoped per request/connection).
-        services.AddDatabase(sp => new AppNameDb(() => new NpgsqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()));
+        services.AddDatabase(sp => new AppNameDb(() => new NpgsqlConnection(sp.GetRequiredService<AppNameSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<AppNameDb>>()), healthCheckName: "postgres");
 
 #endif
 #if (implement_entityframework)
@@ -83,14 +83,12 @@ public class Startup
 
         // Add transactional event outbox dequeue dependencies.
         services.AddSingleton(sp => new AzServiceBus.ServiceBusClient(sp.GetRequiredService<AppNameSettings>().ServiceBusConnectionString))
-                .AddSingleton<IServiceSynchronizer>(sp => new BlobLeaseSynchronizer(new AzBlobs.BlobContainerClient(sp.GetRequiredService<AppNameSettings>().StorageConnectionString, "event-synchronizer")));
+                .AddSingleton(sp => new AzBlobs.BlobContainerClient(sp.GetRequiredService<AppNameSettings>().StorageConnectionString, "event-synchronizer"))
+                .AddSingleton<IServiceSynchronizer, BlobLeaseSynchronizer>();
 
         // Add transactional event outbox dequeue hosted service (_must_ be explicit with the IServiceBusSender).
         services.AddScoped<IServiceBusSender, ServiceBusSender>()
-                .AddSqlServerEventOutboxHostedService(sp =>
-                {
-                    return new EventOutboxDequeue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<IServiceBusSender>(), sp.GetRequiredService<ILogger<EventOutboxDequeue>>());
-                });
+                .AddSqlServerEventOutboxHostedService(sp => new EventOutboxDequeue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<IServiceBusSender>(), sp.GetRequiredService<ILogger<EventOutboxDequeue>>()));
 #else
         // Add service bus event sender.
         services.AddSingleton(sp => new AzServiceBus.ServiceBusClient(sp.GetRequiredService<AppNameSettings>().ServiceBusConnectionString))
@@ -110,12 +108,13 @@ public class Startup
         services.AddHealthChecks()
 #if (implement_services)
 #if (implement_database || implement_sqlserver)
-                .AddEventPublisherHealthCheck("ServiceBus", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IServiceBusSender>()));
+                .AddAzureBlobStorage(sp => new AzBlobs.BlobServiceClient(sp.GetRequiredService<AppNameSettings>().StorageConnectionString), name: "azure-blob-storage")
+                .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IServiceBusSender>()));
 #else
-                .AddEventPublisherHealthCheck("EventSender", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
+                .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
 #endif
 #else
-                .AddEventPublisherHealthCheck("EventSender", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
+                .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
 #endif
 
         // Add Azure monitor open telemetry.

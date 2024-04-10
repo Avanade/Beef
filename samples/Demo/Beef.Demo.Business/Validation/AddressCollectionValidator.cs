@@ -1,12 +1,7 @@
 ﻿namespace Beef.Demo.Business.Validation
 {
-    public class AddressCollectionValidator : CollectionValidator<AddressCollection, Address>
+    public class AddressCollectionValidator : CommonValidator<AddressCollection>
     {
-        public AddressCollectionValidator()
-        {
-            MinCount = 1;
-            MaxCount = 2;
-            Item = CollectionRuleItem.Create(PersonValidator._addressValidator).DuplicateCheck(x => x.Street);
-        }
+        public AddressCollectionValidator() => this.Collection(1, 2, CollectionRuleItem.Create(PersonValidator._addressValidator).DuplicateCheck(x => x.Street));
     }
 }

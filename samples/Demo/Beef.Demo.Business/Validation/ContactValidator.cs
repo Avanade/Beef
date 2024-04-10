@@ -5,7 +5,7 @@
     /// </summary>
     public class ContactValidator : Validator<Contact>
     {
-        private readonly CommonValidator<string> _commsKey = Validator.CreateCommon<string>(r => r.Text(nameof(CommunicationType).ToSentenceCase()).Mandatory().RefDataCode().As<CommunicationType>());
+        private readonly CommonValidator<string> _commsKey = Validator.CreateFor<string>(r => r.Text(nameof(CommunicationType).ToSentenceCase()).Mandatory().RefDataCode().As<CommunicationType>());
         private readonly Validator<ContactComm> _commsValue = Validator.Create<ContactComm>().HasProperty(p => p.Value, r => r.Mandatory().String(100));
 
         public ContactValidator()
