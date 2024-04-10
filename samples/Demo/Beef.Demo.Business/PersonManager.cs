@@ -23,6 +23,7 @@
         private async Task UpdateOnPreValidateAsync(Person value, Guid id)
         {
             var curr = await GetAsync(id).ConfigureAwait(false);
+            // Actually not true; they can have same reference for a patch as a get is performed first.
             //if (ReferenceEquals(value, curr))
             //    throw new InvalidOperationException("The Get and Update person should not have the same reference!");
         }

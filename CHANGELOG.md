@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.3
+- *Fixed:* Fixes to the Template solution to improve the initial `dotnet new beef` experience with respect to API health endpoint.
+
 ## v5.12.2
 - *Fixed:* Fixes to the Template solution to improve the initial `dotnet new beef` experience.
 

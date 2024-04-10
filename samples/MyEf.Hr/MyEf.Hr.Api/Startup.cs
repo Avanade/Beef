@@ -35,7 +35,7 @@ namespace MyEf.Hr.Api
                     .AddValidators<EmployeeManager>();
 
             // Add the beef database services (scoped per request/connection).
-            services.AddDatabase(sp => new HrDb(() => new SqlConnection(sp.GetRequiredService<HrSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<HrDb>>()));
+            services.AddDatabase(sp => new HrDb(() => new SqlConnection(sp.GetRequiredService<HrSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<HrDb>>()), healthCheckName: "sql-server");
 
             // Add the beef entity framework services (scoped per request/connection).
             services.AddDbContext<HrEfDbContext>();
@@ -60,9 +60,9 @@ namespace MyEf.Hr.Api
             services.AddScoped<IEventSender, EventOutboxEnqueue>();
 
             // Add transactional event outbox dequeue dependencies.
-            services.AddSingleton(sp => new Az.ServiceBusClient(sp.GetRequiredService<HrSettings>().ServiceBusConnectionString));
-            services.AddSingleton<IServiceSynchronizer>(sp => new BlobLeaseSynchronizer(new Azure.Storage.Blobs.BlobContainerClient(sp.GetRequiredService<HrSettings>().StorageConnectionString, "event-synchronizer")));
-            services.AddScoped<IServiceBusSender, ServiceBusSender>();
+            services.AddSingleton(sp => new Az.ServiceBusClient(sp.GetRequiredService<HrSettings>().ServiceBusConnectionString))
+                    .AddSingleton<IServiceSynchronizer>(sp => new BlobLeaseSynchronizer(new Azure.Storage.Blobs.BlobContainerClient(sp.GetRequiredService<HrSettings>().StorageConnectionString, "event-synchronizer")))
+                    .AddScoped<IServiceBusSender, ServiceBusSender>();
 
             // Add transactional event outbox dequeue hosted service (_must_ be explicit with the IServiceBusSender as the IEventSender).
             services.AddSqlServerEventOutboxHostedService(sp =>
@@ -77,7 +77,10 @@ namespace MyEf.Hr.Api
             services.AddControllers();
 
             // Add health checks.
-            services.AddHealthChecks();
+            services.AddHealthChecks()
+                    .AddAzureBlobStorage(sp => new Azure.Storage.Blobs.BlobServiceClient(sp.GetRequiredService<HrSettings>().StorageConnectionString), name: "azure-blob-storage")
+                    .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IServiceBusSender>()));
+
 
             // Add Azure monitor open telemetry.
             services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
@@ -117,7 +120,7 @@ namespace MyEf.Hr.Api
 
             // Add health checks.
             app.UseHealthChecks("/health");
-            app.UseHealthChecks("/health/detailed", new HealthCheckOptions { ResponseWriter = HealthReportStatusWriter.WriteJsonResults });
+            app.UseHealthChecks("/health/detailed", new HealthCheckOptions { ResponseWriter = HealthReportStatusWriter.WriteJsonResults }); // Secure with permissions / or remove given data returned.
 
             // Use controllers.
             app.UseRouting();
