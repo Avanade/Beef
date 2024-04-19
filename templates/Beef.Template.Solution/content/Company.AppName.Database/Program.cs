@@ -15,6 +15,7 @@ namespace Company.AppName.Database;
 /// <summary>
 /// Represents the <b>database migration</b> program (capability).
 /// </summary>
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class Program
 {
     /// <summary>

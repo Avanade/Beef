@@ -176,7 +176,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_createOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonValidator>()))
             .Additional(mv => _createOnValidate?.Invoke(mv, value))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -192,7 +192,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_deleteOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _deleteOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -206,7 +206,7 @@ public partial class PersonManager : IPersonManager
     {
         Cleaner.CleanUp(id);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .ValidateAsync(true).ConfigureAwait(false);
 
         return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
@@ -218,7 +218,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getExOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _getExOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -235,8 +235,8 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
-            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonValidator>()))
             .Additional(mv => _updateOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -253,8 +253,8 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateWithRollbackOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
-            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonValidator>()))
             .Additional(mv => _updateWithRollbackOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -298,7 +298,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_getByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(args.Validate().Entity().With<PersonArgsValidator>())
+            .Add(args.Validate().Configure(vc => vc.Entity().With<PersonArgsValidator>()))
             .Additional(mv => _getByArgsOnValidate?.Invoke(mv, args, paging))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -314,7 +314,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_getDetailByArgsOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(args.Validate().Entity().With<PersonArgsValidator>())
+            .Add(args.Validate().Configure(vc => vc.Entity().With<PersonArgsValidator>()))
             .Additional(mv => _getDetailByArgsOnValidate?.Invoke(mv, args, paging))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -330,8 +330,8 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(fromId, toId);
         await Invoker.InvokeAsync(_mergeOnPreValidateAsync?.Invoke(fromId, toId)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(fromId.Validate().Mandatory())
-            .Add(toId.Validate().Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!))
+            .Add(fromId.Validate().Configure(vc => vc.Mandatory()))
+            .Add(toId.Validate().Configure(vc => vc.Mandatory().CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!)))
             .Additional(mv => _mergeOnValidate?.Invoke(mv, fromId, toId))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -389,7 +389,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getDetailOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _getDetailOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -406,8 +406,8 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateDetailOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
-            .Add(value.Validate().Mandatory().Entity().With<PersonDetailValidator>())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonDetailValidator>()))
             .Additional(mv => _updateDetailOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -470,7 +470,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value.Required());
         await Invoker.InvokeAsync(_eventPublishNoSendOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonValidator>()))
             .Additional(mv => _eventPublishNoSendOnValidate?.Invoke(mv, value))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -486,7 +486,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(args);
         await Invoker.InvokeAsync(_getByArgsWithEfOnPreValidateAsync?.Invoke(args, paging)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(args.Validate().Entity().With<PersonArgsValidator>())
+            .Add(args.Validate().Configure(vc => vc.Entity().With<PersonArgsValidator>()))
             .Additional(mv => _getByArgsWithEfOnValidate?.Invoke(mv, args, paging))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -515,7 +515,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_invokeApiViaAgentOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _invokeApiViaAgentOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -531,7 +531,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(addresses);
         await Invoker.InvokeAsync(_paramCollOnPreValidateAsync?.Invoke(addresses)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(addresses.Validate().Entity().With<AddressCollectionValidator>())
+            .Add(addresses.Validate().Configure(vc => vc.Entity().With<AddressCollectionValidator>()))
             .Additional(mv => _paramCollOnValidate?.Invoke(mv, addresses))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -546,7 +546,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _getWithEfOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -563,7 +563,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_createWithEfOnPreValidateAsync?.Invoke(value)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonValidator>()))
             .Additional(mv => _createWithEfOnValidate?.Invoke(mv, value))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -580,8 +580,8 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(value);
         await Invoker.InvokeAsync(_updateWithEfOnPreValidateAsync?.Invoke(value, id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
-            .Add(value.Validate().Mandatory().Entity().With<PersonValidator>())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<PersonValidator>()))
             .Additional(mv => _updateWithEfOnValidate?.Invoke(mv, value, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -597,7 +597,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_deleteWithEfOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _deleteWithEfOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 
@@ -612,7 +612,7 @@ public partial class PersonManager : IPersonManager
         Cleaner.CleanUp(id);
         await Invoker.InvokeAsync(_getDocumentationOnPreValidateAsync?.Invoke(id)).ConfigureAwait(false);
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
             .Additional(mv => _getDocumentationOnValidate?.Invoke(mv, id))
             .ValidateAsync(true).ConfigureAwait(false);
 

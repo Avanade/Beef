@@ -32,14 +32,14 @@ public partial class ContactManager : IContactManager
     /// <inheritdoc/>
     public Task<Contact?> GetAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
-        await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
+        await id.Validate().Configure(vc => vc.Mandatory()).ValidateAsync(true).ConfigureAwait(false);
         return await _dataService.GetAsync(id).ConfigureAwait(false);
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
     public Task<Contact> CreateAsync(Contact value) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
-        await value.Validate().Mandatory().Entity().With<ContactValidator>().ValidateAsync(true).ConfigureAwait(false);
+        await value.Validate().Configure(vc => vc.Mandatory().Entity().With<ContactValidator>()).ValidateAsync(true).ConfigureAwait(false);
         return await _dataService.CreateAsync(value).ConfigureAwait(false);
     }, InvokerArgs.Create);
 
@@ -48,8 +48,8 @@ public partial class ContactManager : IContactManager
     {
         value.Required().Id = id;
         await MultiValidator.Create()
-            .Add(id.Validate().Mandatory())
-            .Add(value.Validate().Mandatory().Entity().With<ContactValidator>())
+            .Add(id.Validate().Configure(vc => vc.Mandatory()))
+            .Add(value.Validate().Configure(vc => vc.Mandatory().Entity().With<ContactValidator>()))
             .ValidateAsync(true).ConfigureAwait(false);
 
         return await _dataService.UpdateAsync(value).ConfigureAwait(false);
@@ -58,7 +58,7 @@ public partial class ContactManager : IContactManager
     /// <inheritdoc/>
     public Task DeleteAsync(Guid id) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
-        await id.Validate().Mandatory().ValidateAsync(true).ConfigureAwait(false);
+        await id.Validate().Configure(vc => vc.Mandatory()).ValidateAsync(true).ConfigureAwait(false);
         await _dataService.DeleteAsync(id).ConfigureAwait(false);
     }, InvokerArgs.Delete);
 

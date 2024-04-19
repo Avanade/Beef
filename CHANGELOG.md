@@ -2,11 +2,16 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.4
+- *Fixed:* Fixes to the `Template` solution to improve the initial `dotnet new beef` experience, including sample Reference Data API tests.
+- *Fixed:* Upgraded `CoreEx` (`v3.18.0`) to include all related fixes and improvements.
+- *Fixed:* The `EntityManager_cs.hbs` template has been updated to account for the `CoreEx.Validation.ValueValidator<T>` fixes.
+
 ## v5.12.3
-- *Fixed:* Fixes to the Template solution to improve the initial `dotnet new beef` experience with respect to API health endpoint.
+- *Fixed:* Fixes to the `Template` solution to improve the initial `dotnet new beef` experience with respect to API health endpoint.
 
 ## v5.12.2
-- *Fixed:* Fixes to the Template solution to improve the initial `dotnet new beef` experience.
+- *Fixed:* Fixes to the `Template` solution to improve the initial `dotnet new beef` experience.
 
 ## v5.12.1
 - *Fixed:* Upgraded `CoreEx` (`v3.15.0`) to include all related fixes and improvements.
@@ -25,7 +30,7 @@ Represents the **NuGet** versions.
 ## v5.10.0
 - *Enhancement:* Added [PostgreSQL](https://www.postgresql.org/) database support: 
   - Leverages both `CoreEx.Database.Postgres` (runtime) and `DbEx.Postgres` (migration) packages; encapsulates the `Npgsql` package.
-  - The `Npgsql.EntityFrameworkCore.PostgreSQL` packages is used for the entity framework provider.
+  - The `Npgsql.EntityFrameworkCore.PostgreSQL` package is used for the entity framework provider.
   - The `dotnet new beef` template updated to support new `datasource` option of `postgres`.
 - *Enhancement:* Additional improvements for data migration and code-generation, including `SqlServer` and `MySql`, as a result of `DbEx` (`v2.5.0`) enhancements.
 

@@ -25,8 +25,8 @@ public partial class TransactionManager : ITransactionManager
     {
         return Result.Go().Requires(accountId)
                      .ValidateAsync(() => MultiValidator.Create()
-                         .Add(accountId.Validate().Common(Validators.AccountId))
-                         .Add(args.Validate().Entity().With<TransactionArgsValidator>()))
+                         .Add(accountId.Validate().Configure(vc => vc.Common(Validators.AccountId)))
+                         .Add(args.Validate().Configure(vc => vc.Entity().With<TransactionArgsValidator>())), cancellationToken: ct)
                      .ThenAsAsync(() => _dataService.GetTransactionsAsync(accountId, args, paging));
     }, InvokerArgs.Read);
 }

@@ -3,6 +3,7 @@
 /// <summary>
 /// Represents the <b>code generation</b> program (capability).
 /// </summary>
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public static class Program
 {
     /// <summary>

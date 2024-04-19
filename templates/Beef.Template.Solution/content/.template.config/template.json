@@ -85,7 +85,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "3.17.0"
+        "value": "3.18.0"
       },
       "replaces": "CoreExVersion"
     },
@@ -93,7 +93,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "5.12.3"
+        "value": "5.12.4"
       },
       "replaces": "BeefVersion"
     },

@@ -34,8 +34,11 @@
     <None Remove="content\Company.AppName.Services\Program.cs" />
     <None Remove="content\Company.AppName.Services\Startup.cs" />
     <None Remove="content\Company.AppName.Services\Subscribers\PersonUpsertSubscriber.cs" />
+    <None Remove="content\Company.AppName.Test\Apis\ReferenceDataTest.cs" />
     <None Remove="content\Company.AppName.Test\appsettings.unittest.json" />
     <None Remove="content\Company.AppName.Services.Test\Subscribers\PersonUpsertSubscriberTest.cs" />
+    <None Remove="content\Company.AppName.Test\Resources\ReferenceData_A110_Genders_Response.json" />
+    <None Remove="content\Company.AppName.Test\Resources\ReferenceData_B110_GetNamed_Response.json" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,5 +6,5 @@ AppName:
 lowerapp:
   - $gender:
 //#endif
-    - M: Male
     - F: Female
+    - M: Male

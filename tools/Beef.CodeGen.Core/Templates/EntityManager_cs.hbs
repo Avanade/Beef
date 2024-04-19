@@ -150,12 +150,12 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{#if WithResult}}
       {{#if SingleValidatorParameters}}
         {{#each ValidatorParameters}}
-                     .Validate{{#if IsValueArg}}Async({{else}}sAsync({{ArgumentName}}, {{/if}}v => v{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}, cancellationToken: ct)
+                     .Validate{{#if IsValueArg}}Async({{else}}sAsync({{ArgumentName}}, {{/if}}vc => vc{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}, cancellationToken: ct)
         {{/each}}
       {{else}}
                      .ValidateAsync({{#if HasValue}}v{{else}}(){{/if}} => MultiValidator.Create()
         {{#each ValidatorParameters}}
-                         .Add({{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}.Validate(){{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}){{#if @last}}{{#unless Parent.ManagerExtensions}}){{/unless}}{{/if}}
+                         .Add({{#if IsValueArg}}v{{else}}{{ArgumentName}}{{/if}}.Validate().Configure(vc => vc{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})){{#if @last}}, cancellationToken: ct{{#unless Parent.ManagerExtensions}}){{/unless}}{{/if}}
         {{/each}}
         {{#if ManagerExtensions}}
                          .Additional(mv => {{PrivateName}}OnValidate?.Invoke(mv{{#each Parameters}}, {{ArgumentName}}{{/each}})), cancellationToken: ct)
@@ -164,12 +164,12 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{else}}
       {{#if SingleValidateParameters}}
         {{#each ValidateParameters}}
-        await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}{{/ifne}}){{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{else}}{{#if IsMandatory}}.Mandatory(){{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
+        await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}{{/ifne}}).Configure(vc => vc{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{else}}{{#if IsMandatory}}.Mandatory(){{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}).ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
         {{/each}}
       {{else}}
         await MultiValidator.Create()
         {{#each ValidateParameters}}
-            .Add({{ArgumentName}}.Validate(){{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
+            .Add({{ArgumentName}}.Validate().Configure(vc => vc{{#if IsMandatory}}.Mandatory(){{else}}{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}))
         {{/each}}
         {{#if ManagerExtensions}}
           {{#unless SingleValidateParameters}}

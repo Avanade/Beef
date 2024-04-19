@@ -78,8 +78,8 @@ public class Startup
                 .AddEventPublisher();
 
 #if (implement_database || implement_sqlserver)
-        // Add sql server transactional event outbox enqueue services.
-        services.AddScoped<IEventSender, EventOutboxEnqueue>();
+        // Add sql server transactional event outbox enqueue services; AfterSend used to trigger the hosted service to dequeue within 5 seconds.
+        services.AddEventSender<EventOutboxEnqueue>((sp, es) => es.AfterSend += (sender, e) => EventOutboxHostedService.OneOffTrigger(sp, TimeSpan.FromSeconds(5)));
 
         // Add transactional event outbox dequeue dependencies.
         services.AddSingleton(sp => new AzServiceBus.ServiceBusClient(sp.GetRequiredService<AppNameSettings>().ServiceBusConnectionString))
@@ -105,20 +105,20 @@ public class Startup
         services.AddControllers();
 
         // Add health checks.
-        services.AddHealthChecks()
 #if (implement_services)
+        services.AddHealthChecks()
 #if (implement_database || implement_sqlserver)
                 .AddAzureBlobStorage(sp => new AzBlobs.BlobServiceClient(sp.GetRequiredService<AppNameSettings>().StorageConnectionString), name: "azure-blob-storage")
-                .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IServiceBusSender>()));
+                .AddEventPublisherHealthCheck("azure-service-bus", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IServiceBusSender>()));
 #else
-                .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
+                .AddEventPublisherHealthCheck("azure-service-bus", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
 #endif
 #else
-                .AddEventPublisherHealthCheck("event-publisher", sp => new EventPublisher(sp.GetRequiredService<EventDataFormatter>(), sp.GetRequiredService<IEventSerializer>(), sp.GetRequiredService<IEventSender>()));
+        services.AddHealthChecks();
 #endif
 
         // Add Azure monitor open telemetry.
-        services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
+        services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "Company.AppName.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 
         // Add the swagger capabilities.
         services.AddSwaggerGen(options =>
@@ -138,9 +138,16 @@ public class Startup
         // Handle any unhandled exceptions.
         app.UseWebApiExceptionHandler();
 
+        // Authenticate the user.
+        //app.UseAuthentication();
+
         // Add Swagger as an endpoint and to serve the swagger-ui to the pipeline.
         app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName"));
+        app.UseSwaggerUI(c =>
+        {
+            c.RoutePrefix = ""; // Default as the root/home page.
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName");
+        });
 
         // Add execution context set up to the pipeline.
         app.UseExecutionContext();
@@ -152,9 +159,7 @@ public class Startup
 
         // Use controllers.
         app.UseRouting();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+        //app.UseAuthorization();
+        app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 }

@@ -24,7 +24,7 @@
     <!--#endif -->
     <PackageReference Include="CoreEx.Validation" Version="CoreExVersion" />
     <!--#if (implement_sqlserver) -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
     <!--#endif -->
     <!--#if (implement_mysql) -->
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />

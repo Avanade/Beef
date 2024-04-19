@@ -28,7 +28,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     {
         return Result.Go().Requires(country).Requires(state).Requires(city)
                      .Then(() => Cleaner.CleanUp(country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
+                     .ValidatesAsync(country, vc => vc.IsValid(), cancellationToken: ct)
                      .ThenAsAsync(() => _dataService.GetPostCodesAsync(country, state, city));
     }, InvokerArgs.Read);
 
@@ -37,7 +37,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     {
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
+                     .ValidatesAsync(country, vc => vc.IsValid(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.CreatePostCodesAsync(value, country, state, city));
     }, InvokerArgs.Create);
 
@@ -46,7 +46,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     {
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
+                     .ValidatesAsync(country, vc => vc.IsValid(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.UpdatePostCodesAsync(value, country, state, city));
     }, InvokerArgs.Update);
 
@@ -55,7 +55,7 @@ public partial class PostalInfoManager : IPostalInfoManager
     {
         return Result.Go().Requires(country).Requires(state).Requires(city)
                      .Then(() => Cleaner.CleanUp(country, state, city))
-                     .ValidatesAsync(country, v => v.IsValid(), cancellationToken: ct)
+                     .ValidatesAsync(country, vc => vc.IsValid(), cancellationToken: ct)
                      .ThenAsync(() => _dataService.DeletePostCodesAsync(country, state, city));
     }, InvokerArgs.Delete);
 }

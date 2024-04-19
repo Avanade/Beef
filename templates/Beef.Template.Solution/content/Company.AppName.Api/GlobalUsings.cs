@@ -8,6 +8,7 @@ global using CoreEx.Azure.ServiceBus;
 global using CoreEx.Azure.Storage;
 global using CoreEx.Database;
 global using CoreEx.Database.HealthChecks;
+global using CoreEx.Database.SqlServer.Outbox;
 #endif
 #endif
 global using CoreEx.Entities;

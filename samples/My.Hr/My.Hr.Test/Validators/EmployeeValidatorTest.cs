@@ -231,7 +231,7 @@ public class EmployeeValidatorTest
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
             .ExpectException().Type<CoreEx.NotFoundException>()
-            .Validation().With(async () => await EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()));
+            .Validation().With(async () => await 1.ToGuid().Validate(EmployeeValidator.CanDelete).ValidateAsync());
     }
 
     [Test]
@@ -245,6 +245,6 @@ public class EmployeeValidatorTest
         test.ConfigureServices(_testSetup!)
             .MockScoped(eds)
             .ExpectException().Type<CoreEx.ValidationException>("An employee cannot be deleted after they have started their employment.")
-            .Validation().With(() => EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()).Result);
+            .Validation().With(() => 1.ToGuid().Validate(EmployeeValidator.CanDelete).ValidateAsync().Result);
     }
 }

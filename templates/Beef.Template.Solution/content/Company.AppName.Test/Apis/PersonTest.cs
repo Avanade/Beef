@@ -8,8 +8,8 @@ public class PersonTest : UsingApiTester<Startup>
 #if (!implement_httpagent)
     [OneTimeSetUp]
     public void OneTimeSetUp() => Assert.That(TestSetUp.Default.SetUp(), Is.True);
-#endif
 
+#endif
     #region Get
 
     [Test]
@@ -200,7 +200,7 @@ public class PersonTest : UsingApiTester<Startup>
         var r = Agent<PersonAgent, PersonCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.OK)
             .Run(a => a.GetByArgsAsync(new PersonArgs { Genders = ["F"] }, requestOptions: new HttpRequestOptions { IncludeText = true }))
-            .AssertJsonFromResource("A280_GetByArgs_RefDataText-Response.json", "etag", "changeLog");
+            .AssertJsonFromResource("Person_A280_GetByArgs_Response.json", "etag", "changeLog");
     }
 
     #endregion
