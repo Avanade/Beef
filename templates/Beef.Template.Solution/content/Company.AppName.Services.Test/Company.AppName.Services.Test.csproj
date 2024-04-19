@@ -34,6 +34,10 @@
     <PackageReference Include="NUnit.Analyzers" Version="4.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="CoreExVersion" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" >
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>    
   </ItemGroup>
 
   <ItemGroup>

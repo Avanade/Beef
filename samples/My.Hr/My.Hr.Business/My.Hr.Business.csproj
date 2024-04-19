@@ -6,10 +6,10 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.17.0" />
-    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.17.0" />
-    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="3.17.0" />
-    <PackageReference Include="CoreEx.Validation" Version="3.17.0" />
+    <PackageReference Include="CoreEx" Version="3.18.0" />
+    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.18.0" />
+    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="3.18.0" />
+    <PackageReference Include="CoreEx.Validation" Version="3.18.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
   </ItemGroup>
 </Project>

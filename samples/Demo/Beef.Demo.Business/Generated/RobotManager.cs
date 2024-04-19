@@ -41,7 +41,7 @@ public partial class RobotManager : IRobotManager
         return Result.Go(value).Required()
                      .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
                      .Then(v => Cleaner.CleanUp(v))
-                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
+                     .ValidateAsync(vc => vc.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.CreateAsync(value));
     }, InvokerArgs.Create);
 
@@ -50,7 +50,7 @@ public partial class RobotManager : IRobotManager
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .Then(v => Cleaner.CleanUp(v))
-                     .ValidateAsync(v => v.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
+                     .ValidateAsync(vc => vc.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.UpdateAsync(value));
     }, InvokerArgs.Update);
 
@@ -67,7 +67,7 @@ public partial class RobotManager : IRobotManager
     {
         return Result.Go()
                      .Then(() => Cleaner.CleanUp(args))
-                     .ValidatesAsync(args, v => v.Entity().With<RobotArgsValidator>(), cancellationToken: ct)
+                     .ValidatesAsync(args, vc => vc.Entity().With<RobotArgsValidator>(), cancellationToken: ct)
                      .ThenAsAsync(() => _dataService.GetByArgsAsync(args, paging));
     }, InvokerArgs.Read);
 

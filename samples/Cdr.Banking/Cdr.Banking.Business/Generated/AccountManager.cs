@@ -24,7 +24,7 @@ public partial class AccountManager : IAccountManager
     public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go()
-                     .ValidatesAsync(args, v => v.Entity().With<AccountArgsValidator>(), cancellationToken: ct)
+                     .ValidatesAsync(args, vc => vc.Entity().With<AccountArgsValidator>(), cancellationToken: ct)
                      .ThenAsAsync(() => _dataService.GetAccountsAsync(args, paging));
     }, InvokerArgs.Read);
 

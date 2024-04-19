@@ -1,0 +1,16 @@
+﻿{
+  "gender": [
+    {
+      "code": "F",
+      "text": "Female",
+      "sortOrder": 1,
+      "isActive": true
+    },
+    {
+      "code": "M",
+      "text": "Male",
+      "sortOrder": 2,
+      "isActive": true
+    }
+  ]
+}
