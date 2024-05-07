@@ -11,6 +11,7 @@ namespace Beef.Demo.Api.Controllers;
 /// Provides the <see cref="Contact"/> Web API functionality.
 /// </summary>
 [AllowAnonymous]
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class ContactController : ControllerBase
 {
@@ -33,7 +34,7 @@ public partial class ContactController : ControllerBase
     /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
     /// </summary>
     /// <returns>The <see cref="ContactCollection"/></returns>
-    [HttpGet("api/v1/contacts")]
+    [HttpGet("api/v1/contacts", Name="Contact_GetAll")]
     [ProducesResponseType(typeof(Common.Entities.ContactCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> GetAll()
@@ -44,7 +45,7 @@ public partial class ContactController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Contact"/> identifier.</param>
     /// <returns>The selected <see cref="Contact"/> where found.</returns>
-    [HttpGet("api/v1/contacts/{id}")]
+    [HttpGet("api/v1/contacts/{id}", Name="Contact_Get")]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -54,7 +55,7 @@ public partial class ContactController : ControllerBase
     /// Creates a new <see cref="Contact"/>.
     /// </summary>
     /// <returns>The created <see cref="Contact"/>.</returns>
-    [HttpPost("api/v1/contacts")]
+    [HttpPost("api/v1/contacts", Name="Contact_Create")]
     [AcceptsBody(typeof(Common.Entities.Contact))]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create()
@@ -65,9 +66,10 @@ public partial class ContactController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Contact"/> identifier.</param>
     /// <returns>The updated <see cref="Contact"/>.</returns>
-    [HttpPut("api/v1/contacts/{id}")]
+    [HttpPut("api/v1/contacts/{id}", Name="Contact_Update")]
     [AcceptsBody(typeof(Common.Entities.Contact))]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Update(Guid id)
         => _webApi.PutAsync<Contact, Contact>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
@@ -76,9 +78,10 @@ public partial class ContactController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Contact"/> identifier.</param>
     /// <returns>The patched <see cref="Contact"/>.</returns>
-    [HttpPatch("api/v1/contacts/{id}")]
+    [HttpPatch("api/v1/contacts/{id}", Name="Contact_Patch")]
     [AcceptsBody(typeof(Common.Entities.Contact), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Patch(Guid id)
         => _webApi.PatchAsync<Contact>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -86,7 +89,7 @@ public partial class ContactController : ControllerBase
     /// Deletes the specified <see cref="Contact"/>.
     /// </summary>
     /// <param name="id">The <see cref="Contact"/> identifier.</param>
-    [HttpDelete("api/v1/contacts/{id}")]
+    [HttpDelete("api/v1/contacts/{id}", Name="Contact_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
@@ -95,7 +98,7 @@ public partial class ContactController : ControllerBase
     /// Raise Event.
     /// </summary>
     /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
-    [HttpPost("api/v1/contacts/raise")]
+    [HttpPost("api/v1/contacts/raise", Name="Contact_RaiseEvent")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> RaiseEvent(bool throwError)
         => _webApi.PostAsync(Request, p => _manager.RaiseEventAsync(throwError), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);

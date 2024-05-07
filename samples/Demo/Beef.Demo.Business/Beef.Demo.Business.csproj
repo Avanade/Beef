@@ -16,14 +16,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.18.0" />
-    <PackageReference Include="CoreEx.AspNetCore" Version="3.18.0" />
-    <PackageReference Include="CoreEx.Cosmos" Version="3.18.0" />
-    <PackageReference Include="CoreEx.Database" Version="3.18.0" />
-    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.18.0" />
-    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="3.18.0" />
-    <PackageReference Include="CoreEx.Validation" Version="3.18.0" />
-    <PackageReference Include="CoreEx.FluentValidation" Version="3.18.0" />
+    <PackageReference Include="CoreEx" Version="3.18.1" />
+    <PackageReference Include="CoreEx.AspNetCore" Version="3.18.1" />
+    <PackageReference Include="CoreEx.Cosmos" Version="3.18.1" />
+    <PackageReference Include="CoreEx.Database" Version="3.18.1" />
+    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.18.1" />
+    <PackageReference Include="CoreEx.EntityFrameworkCore" Version="3.18.1" />
+    <PackageReference Include="CoreEx.Validation" Version="3.18.1" />
+    <PackageReference Include="CoreEx.FluentValidation" Version="3.18.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
   </ItemGroup>
 

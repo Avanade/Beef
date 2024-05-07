@@ -10,6 +10,7 @@ namespace Beef.Demo.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="PostalInfo"/> Web API functionality.
 /// </summary>
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class PostalInfoController : ControllerBase
 {
@@ -33,7 +34,7 @@ public partial class PostalInfoController : ControllerBase
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
-    [HttpGet("api/v1/postal/{country}/{state}/{city}")]
+    [HttpGet("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_GetPostCodes")]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetPostCodes(string? country, string? state, string? city)
@@ -46,7 +47,7 @@ public partial class PostalInfoController : ControllerBase
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The created <see cref="PostalInfo"/>.</returns>
-    [HttpPost("api/v1/postal/{country}/{state}/{city}")]
+    [HttpPost("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_CreatePostCodes")]
     [AcceptsBody(typeof(Common.Entities.PostalInfo))]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.Created)]
     public Task<IActionResult> CreatePostCodes(string? country, string? state, string? city)
@@ -59,9 +60,10 @@ public partial class PostalInfoController : ControllerBase
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The updated <see cref="PostalInfo"/>.</returns>
-    [HttpPut("api/v1/postal/{country}/{state}/{city}")]
+    [HttpPut("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_UpdatePostCodes")]
     [AcceptsBody(typeof(Common.Entities.PostalInfo))]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> UpdatePostCodes(string? country, string? state, string? city)
         => _webApi.PutWithResultAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
@@ -72,9 +74,10 @@ public partial class PostalInfoController : ControllerBase
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     /// <returns>The patched <see cref="PostalInfo"/>.</returns>
-    [HttpPatch("api/v1/postal/{country}/{state}/{city}")]
+    [HttpPatch("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_PatchPostCodes")]
     [AcceptsBody(typeof(Common.Entities.PostalInfo), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> PatchPostCodes(string? country, string? state, string? city)
         => _webApi.PatchWithResultAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
@@ -84,7 +87,7 @@ public partial class PostalInfoController : ControllerBase
     /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
-    [HttpDelete("api/v1/postal/{country}/{state}/{city}")]
+    [HttpDelete("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_DeletePostCodes")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> DeletePostCodes(string? country, string? state, string? city)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeletePostCodesAsync(country, state, city));

@@ -81,7 +81,7 @@ entities:
         ]
       },
       { name: ThrowError, type: Custom, returnType: void, webApiRoute: error, autoImplement: None, managerTransaction: true },
-      { name: InvokeApiViaAgent, type: Custom, returnType: string, primaryKey: true, webApiRoute: invokeApi, autoImplement: None },
+      { name: InvokeApiViaAgent, type: Custom, returnType: string, primaryKey: true, webApiRoute: invokeApi, autoImplement: None, webApiAlternateStatus: NotFound },
       { name: ParamColl, type: Custom, returnType: void, webApiRoute: paramcoll, dataSvcCustom: true, excludeIData: true, excludeData: true,
         parameters: [
           { name: Addresses, type: AddressCollection, validator: AddressCollectionValidator, webApiFrom: FromBody }

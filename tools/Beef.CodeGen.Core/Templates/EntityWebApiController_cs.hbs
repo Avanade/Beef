@@ -19,6 +19,7 @@ namespace {{Root.NamespaceApi}}.Controllers;
 {{#ifval WebApiAuthorize}}
 [{{{WebApiAuthorize}}}]
 {{/ifval}}
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class {{Name}}Controller : ControllerBase
 {
@@ -73,7 +74,7 @@ public partial class {{Name}}Controller : ControllerBase
   {{#ifval WebApiAuthorize}}
     [{{{WebApiAuthorize}}}]
   {{/ifval}}
-    [{{WebApiMethod}}("{{WebApiRoute}}")]
+    [{{WebApiMethod}}("{{WebApiRoute}}", Name="{{Parent.Name}}_{{Name}}")]
   {{#if Paging}}
     [Paging]
   {{/if}}
@@ -84,11 +85,9 @@ public partial class {{Name}}Controller : ControllerBase
     [Produces({{WebApiProducesContentType}})]
   {{/if}}
     [ProducesResponseType({{#if WebApiProducesResponseType}}{{#if IsWebApiProducesResponseTypeNone}}{{else}}typeof({{WebApiProducesResponseType}}), {{/if}}{{else}}{{#if HasReturnValue}}typeof({{#if IsReturnTypeEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}{{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
-  {{#if HasReturnValue}}
-    {{#ifne WebApiAlternateStatus 'null'}}
+  {{#ifne WebApiAlternateStatus 'none'}}
     [ProducesResponseType((int)HttpStatusCode.{{WebApiAlternateStatus}})]
-    {{/ifne}}
-  {{/if}}
+  {{/ifne}}
     public Task<IActionResult> {{Name}}({{#each CoreParameters}}{{#unless @first}}, {{/unless}}{{#ifeq WebApiFrom 'FromEntityProperties'}}{{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{#ifval JsonName}}[FromQuery(Name="{{JsonName}}")] {{/ifval}}{{{WebApiParameterType}}} {{ArgumentName}} = {{#ifval Default}}{{Default}}{{else}}default{{/ifval}}{{/each}}{{else}}{{#ifne WebApiFrom 'FromQuery'}}[{{WebApiFrom}}] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}}{{#ifval Default}} = {{Default}}{{/ifval}}{{/ifeq}}{{/each}})
   {{#if HasFromEntityPropertiesParameters}} 
     {
@@ -102,13 +101,13 @@ public partial class {{Name}}Controller : ControllerBase
         {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'NotFound'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Read'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}});
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPost'}}
-        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'null'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Create'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#ifval WebApiLocation}}, locationUri: {{#if HasReturnValue}}r{{else}}(){{/if}} => new Uri($"{{WebApiLocation}}", UriKind.Relative){{/ifval}});
+        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'none'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Create'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#ifval WebApiLocation}}, locationUri: {{#if HasReturnValue}}r{{else}}(){{/if}} => new Uri($"{{WebApiLocation}}", UriKind.Relative){{/ifval}});
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPut'}}
-        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, {{#if WebApiConcurrency}}get: _ => {{WebApiGetVariable}}.{{WebApiGetOperation}}Async({{#each ValueLessParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), put: {{/if}}p => {{WebApiUpdateVariable}}.{{#if WebApiConcurrency}}{{WebApiUpdateOperation}}{{else}}{{Name}}{{/if}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{ArgumentName}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'null'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Update'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#if WebApiConcurrency}}, simulatedConcurrency: {{lower WebApiConcurrency}}{{/if}});
+        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, {{#if WebApiConcurrency}}get: _ => {{WebApiGetVariable}}.{{WebApiGetOperation}}Async({{#each ValueLessParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), put: {{/if}}p => {{WebApiUpdateVariable}}.{{#if WebApiConcurrency}}{{WebApiUpdateOperation}}{{else}}{{Name}}{{/if}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{ArgumentName}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{/if}}{{#ifne ManagerOperationType 'Update'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#if WebApiConcurrency}}, simulatedConcurrency: {{lower WebApiConcurrency}}{{/if}});
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPatch'}}
-        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, get: _ => {{WebApiGetVariable}}.{{WebApiGetOperation}}Async({{#each ValueLessParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), put: p => {{WebApiUpdateVariable}}.{{WebApiUpdateOperation}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{ArgumentName}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'null'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Update'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#if WebApiConcurrency}}, simulatedConcurrency: {{lower WebApiConcurrency}}{{/if}});
+        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, get: _ => {{WebApiGetVariable}}.{{WebApiGetOperation}}Async({{#each ValueLessParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}), put: p => {{WebApiUpdateVariable}}.{{WebApiUpdateOperation}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{ArgumentName}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{/if}}{{#ifne ManagerOperationType 'Update'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#if WebApiConcurrency}}, simulatedConcurrency: {{lower WebApiConcurrency}}{{/if}});
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpDelete'}}
         {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'NoContent'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#ifne ManagerOperationType 'Delete'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}});
