@@ -8,6 +8,7 @@ namespace Cdr.Banking.Api.Controllers;
 /// Provides the <see cref="Account"/> Web API functionality.
 /// </summary>
 [Tags("Banking")]
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class AccountController : ControllerBase
 {
@@ -32,7 +33,7 @@ public partial class AccountController : ControllerBase
     /// <param name="isOwned">Indicates whether Is Owned.</param>
     /// <returns>The <see cref="AccountCollection"/></returns>
     [Tags("Banking", "Accounts")]
-    [HttpGet("api/v1/banking/accounts")]
+    [HttpGet("api/v1/banking/accounts", Name="Account_GetAccounts")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.AccountCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -47,7 +48,7 @@ public partial class AccountController : ControllerBase
     /// </summary>
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>
     /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-    [HttpGet("api/v1/banking/accounts/{accountId}")]
+    [HttpGet("api/v1/banking/accounts/{accountId}", Name="Account_GetDetail")]
     [ProducesResponseType(typeof(Common.Entities.AccountDetail), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetDetail(string? accountId)
@@ -58,7 +59,7 @@ public partial class AccountController : ControllerBase
     /// </summary>
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>
     /// <returns>The selected <see cref="Balance"/> where found.</returns>
-    [HttpGet("api/v1/banking/accounts/{accountId}/balance")]
+    [HttpGet("api/v1/banking/accounts/{accountId}/balance", Name="Account_GetBalance")]
     [ProducesResponseType(typeof(Common.Entities.Balance), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetBalance(string? accountId)
@@ -69,7 +70,7 @@ public partial class AccountController : ControllerBase
     /// </summary>
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>
     /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
-    [HttpGet("api/v1/banking/accounts/{accountId}/statement")]
+    [HttpGet("api/v1/banking/accounts/{accountId}/statement", Name="Account_GetStatement")]
     [Produces("text/plain")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]

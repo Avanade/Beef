@@ -7,6 +7,7 @@ namespace My.Hr.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Employee"/> Web API functionality.
 /// </summary>
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class EmployeeController : ControllerBase
 {
@@ -28,7 +29,7 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The selected <see cref="Employee"/> where found.</returns>
-    [HttpGet("employees/{id}")]
+    [HttpGet("employees/{id}", Name="Employee_Get")]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -38,7 +39,7 @@ public partial class EmployeeController : ControllerBase
     /// Creates a new <see cref="Employee"/>.
     /// </summary>
     /// <returns>The created <see cref="Employee"/>.</returns>
-    [HttpPost("employees")]
+    [HttpPost("employees", Name="Employee_Create")]
     [AcceptsBody(typeof(Common.Entities.Employee))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create()
@@ -49,9 +50,10 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The updated <see cref="Employee"/>.</returns>
-    [HttpPut("employees/{id}")]
+    [HttpPut("employees/{id}", Name="Employee_Update")]
     [AcceptsBody(typeof(Common.Entities.Employee))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Update(Guid id)
         => _webApi.PutWithResultAsync<Employee, Employee>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
@@ -60,9 +62,10 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The patched <see cref="Employee"/>.</returns>
-    [HttpPatch("employees/{id}")]
+    [HttpPatch("employees/{id}", Name="Employee_Patch")]
     [AcceptsBody(typeof(Common.Entities.Employee), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Patch(Guid id)
         => _webApi.PatchWithResultAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -70,7 +73,7 @@ public partial class EmployeeController : ControllerBase
     /// Deletes the specified <see cref="Employee"/>.
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    [HttpDelete("employees/{id}")]
+    [HttpDelete("employees/{id}", Name="Employee_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
@@ -85,7 +88,7 @@ public partial class EmployeeController : ControllerBase
     /// <param name="startTo">The Start To.</param>
     /// <param name="isIncludeTerminated">Indicates whether Is Include Terminated.</param>
     /// <returns>The <see cref="EmployeeBaseCollection"/></returns>
-    [HttpGet("employees")]
+    [HttpGet("employees", Name="Employee_GetByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.EmployeeBaseCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -100,9 +103,10 @@ public partial class EmployeeController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The updated <see cref="Employee"/>.</returns>
-    [HttpPost("employees/{id}/terminate")]
+    [HttpPost("employees/{id}/terminate", Name="Employee_Terminate")]
     [AcceptsBody(typeof(Common.Entities.TerminationDetail))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Terminate(Guid id)
-        => _webApi.PostWithResultAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), operationType: CoreEx.OperationType.Update);
+        => _webApi.PostWithResultAsync<TerminationDetail, Employee>(Request, p => _manager.TerminateAsync(p.Value!, id), alternateStatusCode: HttpStatusCode.NotFound, operationType: CoreEx.OperationType.Update);
 }

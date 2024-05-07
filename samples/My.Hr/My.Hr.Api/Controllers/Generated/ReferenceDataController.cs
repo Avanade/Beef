@@ -9,6 +9,8 @@ namespace My.Hr.Api.Controllers;
 /// <summary>
 /// Provides the <b>ReferenceData</b> Web API functionality.
 /// </summary>
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
+[Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class ReferenceDataController : ControllerBase
 {
     private readonly ReferenceDataContentWebApi _webApi;
@@ -28,8 +30,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.Gender collection.</returns>
-    [HttpGet()]
-    [Route("ref/genders")]
+    [HttpGet("ref/genders", Name="ReferenceData_GenderGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> GenderGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
@@ -40,8 +41,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.TerminationReason collection.</returns>
-    [HttpGet()]
-    [Route("ref/terminationReasons")]
+    [HttpGet("ref/terminationReasons", Name="ReferenceData_TerminationReasonGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> TerminationReasonGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TerminationReason>(codes, text, p.RequestOptions.IncludeInactive));
@@ -52,8 +52,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.RelationshipType collection.</returns>
-    [HttpGet()]
-    [Route("ref/relationshipTypes")]
+    [HttpGet("ref/relationshipTypes", Name="ReferenceData_RelationshipTypeGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> RelationshipTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.RelationshipType>(codes, text, p.RequestOptions.IncludeInactive));
@@ -64,8 +63,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.USState collection.</returns>
-    [HttpGet()]
-    [Route("ref/usStates")]
+    [HttpGet("ref/usStates", Name="ReferenceData_USStateGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
@@ -76,8 +74,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
     /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
-    [HttpGet()]
-    [Route("ref/performanceOutcomes")]
+    [HttpGet("ref/performanceOutcomes", Name="ReferenceData_PerformanceOutcomeGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> PerformanceOutcomeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PerformanceOutcome>(codes, text, p.RequestOptions.IncludeInactive));
@@ -86,9 +83,7 @@ public partial class ReferenceDataController : ControllerBase
     /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
     /// </summary>
     /// <returns>A <see cref="ReferenceDataMultiDictionary"/>.</returns>
-    [HttpGet()]
-    [Route("ref")]
-    [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiDictionary>), (int)HttpStatusCode.OK)]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [HttpGet("ref", Name="ReferenceData_GetNamed")]
+    [ProducesResponseType(typeof(CoreEx.RefData.ReferenceDataMultiDictionary), (int)HttpStatusCode.OK)]
     public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
 }

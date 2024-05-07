@@ -12,6 +12,7 @@ namespace Beef.Demo.Api.Controllers;
 /// </summary>
 [Tags("person", "bananas")]
 [AllowAnonymous]
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class PersonController : ControllerBase
 {
@@ -34,7 +35,7 @@ public partial class PersonController : ControllerBase
     /// Creates a new <see cref="Person"/>.
     /// </summary>
     /// <returns>The created <see cref="Person"/>.</returns>
-    [HttpPost("api/v1/persons")]
+    [HttpPost("api/v1/persons", Name="Person_Create")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create()
@@ -44,7 +45,7 @@ public partial class PersonController : ControllerBase
     /// Deletes the specified <see cref="Person"/>.
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
-    [HttpDelete("api/v1/persons/{id}")]
+    [HttpDelete("api/v1/persons/{id}", Name="Person_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
@@ -54,7 +55,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The selected <see cref="Person"/> where found.</returns>
-    [HttpGet("api/v1/persons/{id}")]
+    [HttpGet("api/v1/persons/{id}", Name="Person_Get")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -65,7 +66,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The selected <see cref="Person"/> where found.</returns>
-    [HttpGet("api/v1/persons/ex/{id}")]
+    [HttpGet("api/v1/persons/ex/{id}", Name="Person_GetEx")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetEx(Guid id)
@@ -76,9 +77,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The updated <see cref="Person"/>.</returns>
-    [HttpPut("api/v1/persons/{id}")]
+    [HttpPut("api/v1/persons/{id}", Name="Person_Update")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Update(Guid id)
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
@@ -87,9 +89,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The updated <see cref="Person"/>.</returns>
-    [HttpPut("api/v1/persons/withRollback/{id}")]
+    [HttpPut("api/v1/persons/withRollback/{id}", Name="Person_UpdateWithRollback")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> UpdateWithRollback(Guid id)
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateWithRollbackAsync(p.Value!, id));
 
@@ -98,9 +101,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The patched <see cref="Person"/>.</returns>
-    [HttpPatch("api/v1/persons/{id}")]
+    [HttpPatch("api/v1/persons/{id}", Name="Person_Patch")]
     [AcceptsBody(typeof(Common.Entities.Person), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Patch(Guid id)
         => _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -109,7 +113,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <returns>The <see cref="PersonCollection"/></returns>
     [Tags("apples", "oranges")]
-    [HttpGet("api/v1/persons/all")]
+    [HttpGet("api/v1/persons/all", Name="Person_GetAll")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -120,7 +124,7 @@ public partial class PersonController : ControllerBase
     /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
     /// </summary>
     /// <returns>The <see cref="PersonCollection"/></returns>
-    [HttpGet("api/v1/persons/allnopaging")]
+    [HttpGet("api/v1/persons/allnopaging", Name="Person_GetAll2")]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> GetAll2()
@@ -134,7 +138,7 @@ public partial class PersonController : ControllerBase
     /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
     /// <param name="orderBy">The Order By.</param>
     /// <returns>The <see cref="PersonCollection"/></returns>
-    [HttpGet("api/v1/persons")]
+    [HttpGet("api/v1/persons", Name="Person_GetByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -152,7 +156,7 @@ public partial class PersonController : ControllerBase
     /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
     /// <param name="orderBy">The Order By.</param>
     /// <returns>The <see cref="PersonDetailCollection"/></returns>
-    [HttpGet("api/v1/persons/argsdetail")]
+    [HttpGet("api/v1/persons/argsdetail", Name="Person_GetDetailByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonDetailCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -168,7 +172,7 @@ public partial class PersonController : ControllerBase
     /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
     /// <param name="toId">The to <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="Person"/>.</returns>
-    [HttpPost("api/v1/persons/merge")]
+    [HttpPost("api/v1/persons/merge", Name="Person_Merge")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Merge(Guid fromId, Guid toId)
@@ -177,7 +181,7 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Mark <see cref="Person"/>.
     /// </summary>
-    [HttpPost("api/v1/persons/mark")]
+    [HttpPost("api/v1/persons/mark", Name="Person_Mark")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     public Task<IActionResult> Mark()
         => _webApi.PostAsync(Request, p => _manager.MarkAsync(), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Update);
@@ -187,7 +191,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="coordinates">The Coordinates (see <see cref="Business.Entities.MapCoordinates"/>).</param>
     /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-    [HttpPost("api/v1/persons/map")]
+    [HttpPost("api/v1/persons/map", Name="Person_Map")]
     [ProducesResponseType(typeof(Common.Entities.MapCoordinates), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Map(MapCoordinates? coordinates = default)
@@ -200,7 +204,7 @@ public partial class PersonController : ControllerBase
     /// Get no arguments.
     /// </summary>
     /// <returns>The selected <see cref="Person"/> where found.</returns>
-    [HttpGet("api/v1/persons/noargsforme")]
+    [HttpGet("api/v1/persons/noargsforme", Name="Person_GetNoArgs")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetNoArgs()
@@ -211,7 +215,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
-    [HttpGet("api/v1/persons/{id}/detail")]
+    [HttpGet("api/v1/persons/{id}/detail", Name="Person_GetDetail")]
     [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetDetail(Guid id)
@@ -222,9 +226,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-    [HttpPut("api/v1/persons/{id}/detail")]
+    [HttpPut("api/v1/persons/{id}/detail", Name="Person_UpdateDetail")]
     [AcceptsBody(typeof(Common.Entities.PersonDetail))]
     [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> UpdateDetail(Guid id)
         => _webApi.PutAsync<PersonDetail, PersonDetail>(Request, p => _manager.UpdateDetailAsync(p.Value!, id));
 
@@ -233,9 +238,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The patched <see cref="PersonDetail"/>.</returns>
-    [HttpPatch("api/v1/persons/{id}/detail")]
+    [HttpPatch("api/v1/persons/{id}/detail", Name="Person_PatchDetail")]
     [AcceptsBody(typeof(Common.Entities.PersonDetail), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> PatchDetail(Guid id)
         => _webApi.PatchAsync<PersonDetail>(Request, get: _ => _manager.GetDetailAsync(id), put: p => _personManager.UpdateDetailAsync(p.Value!, id));
 
@@ -243,7 +249,7 @@ public partial class PersonController : ControllerBase
     /// Actually validating the FromBody parameter generation.
     /// </summary>
     /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
-    [HttpPost("api/v1/persons/fromBody")]
+    [HttpPost("api/v1/persons/fromBody", Name="Person_Add")]
     [ProducesResponseType((int)HttpStatusCode.Created)]
     public Task<IActionResult> Add([FromBody] Person person)
         => _webApi.PostAsync(Request, p => _manager.AddAsync(person), statusCode: HttpStatusCode.Created, operationType: CoreEx.OperationType.Unspecified);
@@ -251,7 +257,7 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Validate CustomManagerOnly.
     /// </summary>
-    [HttpPost("api/v1/persons/cmo")]
+    [HttpPost("api/v1/persons/cmo", Name="Person_CustomManagerOnly")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> CustomManagerOnly()
         => _webApi.PostAsync(Request, p => _manager.CustomManagerOnlyAsync(), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
@@ -262,7 +268,7 @@ public partial class PersonController : ControllerBase
     /// <param name="name">The Name.</param>
     /// <param name="names">The Names.</param>
     /// <returns>A resultant <see cref="Person"/>.</returns>
-    [HttpGet("api/v1/persons/null")]
+    [HttpGet("api/v1/persons/null", Name="Person_GetNull")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetNull(string? name, List<string>? names = default)
@@ -272,9 +278,10 @@ public partial class PersonController : ControllerBase
     /// Validate when an Event is published but not sent.
     /// </summary>
     /// <returns>The updated <see cref="Person"/>.</returns>
-    [HttpPut("api/v1/persons/publishnosend")]
+    [HttpPut("api/v1/persons/publishnosend", Name="Person_EventPublishNoSend")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> EventPublishNoSend()
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.EventPublishNoSendAsync(p.Value!));
 
@@ -286,7 +293,7 @@ public partial class PersonController : ControllerBase
     /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
     /// <param name="orderBy">The Order By.</param>
     /// <returns>The <see cref="PersonCollection"/></returns>
-    [HttpGet("api/v1/persons/args")]
+    [HttpGet("api/v1/persons/args", Name="Person_GetByArgsWithEf")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -299,7 +306,7 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Throw Error.
     /// </summary>
-    [HttpPost("api/v1/persons/error")]
+    [HttpPost("api/v1/persons/error", Name="Person_ThrowError")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> ThrowError()
         => _webApi.PostAsync(Request, p => _manager.ThrowErrorAsync(), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
@@ -309,17 +316,17 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="string"/>.</returns>
-    [HttpPost("api/v1/persons/invokeApi")]
+    [HttpPost("api/v1/persons/invokeApi", Name="Person_InvokeApiViaAgent")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> InvokeApiViaAgent(Guid id)
-        => _webApi.PostAsync<string>(Request, p => _manager.InvokeApiViaAgentAsync(id), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
+        => _webApi.PostAsync<string>(Request, p => _manager.InvokeApiViaAgentAsync(id), alternateStatusCode: HttpStatusCode.NotFound, operationType: CoreEx.OperationType.Unspecified);
 
     /// <summary>
     /// Param Coll.
     /// </summary>
     /// <param name="addresses">The Addresses.</param>
-    [HttpPost("api/v1/persons/paramcoll")]
+    [HttpPost("api/v1/persons/paramcoll", Name="Person_ParamColl")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> ParamColl([FromBody] AddressCollection? addresses)
         => _webApi.PostAsync(Request, p => _manager.ParamCollAsync(addresses), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
@@ -329,7 +336,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The selected <see cref="Person"/> where found.</returns>
-    [HttpGet("api/v1/persons/ef/{id}")]
+    [HttpGet("api/v1/persons/ef/{id}", Name="Person_GetWithEf")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> GetWithEf(Guid id)
@@ -339,7 +346,7 @@ public partial class PersonController : ControllerBase
     /// Creates a new <see cref="Person"/>.
     /// </summary>
     /// <returns>The created <see cref="Person"/>.</returns>
-    [HttpPost("api/v1/persons/ef")]
+    [HttpPost("api/v1/persons/ef", Name="Person_CreateWithEf")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.Created)]
     public Task<IActionResult> CreateWithEf()
@@ -350,9 +357,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The updated <see cref="Person"/>.</returns>
-    [HttpPut("api/v1/persons/ef/{id}")]
+    [HttpPut("api/v1/persons/ef/{id}", Name="Person_UpdateWithEf")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> UpdateWithEf(Guid id)
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateWithEfAsync(p.Value!, id));
 
@@ -360,7 +368,7 @@ public partial class PersonController : ControllerBase
     /// Deletes the specified <see cref="Person"/>.
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
-    [HttpDelete("api/v1/persons/ef/{id}")]
+    [HttpDelete("api/v1/persons/ef/{id}", Name="Person_DeleteWithEf")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> DeleteWithEf(Guid id)
         => _webApi.DeleteAsync(Request, p => _manager.DeleteWithEfAsync(id));
@@ -370,9 +378,10 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>The patched <see cref="Person"/>.</returns>
-    [HttpPatch("api/v1/persons/ef/{id}")]
+    [HttpPatch("api/v1/persons/ef/{id}", Name="Person_PatchWithEf")]
     [AcceptsBody(typeof(Common.Entities.Person), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> PatchWithEf(Guid id)
         => _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -381,7 +390,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
-    [HttpGet("api/v1/persons/{id}/documentation")]
+    [HttpGet("api/v1/persons/{id}/documentation", Name="Person_GetDocumentation")]
     [Produces("text/plain")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -393,7 +402,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="string"/>.</returns>
-    [HttpGet("api/v1/persons/simulate")]
+    [HttpGet("api/v1/persons/simulate", Name="Person_SimulateWork")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> SimulateWork(Guid id)

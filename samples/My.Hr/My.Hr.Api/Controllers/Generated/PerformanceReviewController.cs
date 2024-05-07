@@ -7,6 +7,7 @@ namespace My.Hr.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="PerformanceReview"/> Web API functionality.
 /// </summary>
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class PerformanceReviewController : ControllerBase
 {
@@ -28,7 +29,7 @@ public partial class PerformanceReviewController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-    [HttpGet("reviews/{id}")]
+    [HttpGet("reviews/{id}", Name="PerformanceReview_Get")]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -39,7 +40,7 @@ public partial class PerformanceReviewController : ControllerBase
     /// </summary>
     /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
     /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
-    [HttpGet("employees/{employeeId}/reviews")]
+    [HttpGet("employees/{employeeId}/reviews", Name="PerformanceReview_GetByEmployeeId")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReviewCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -51,7 +52,7 @@ public partial class PerformanceReviewController : ControllerBase
     /// </summary>
     /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
     /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-    [HttpPost("employees/{employeeId}/reviews")]
+    [HttpPost("employees/{employeeId}/reviews", Name="PerformanceReview_Create")]
     [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create(Guid employeeId)
@@ -62,9 +63,10 @@ public partial class PerformanceReviewController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-    [HttpPut("reviews/{id}")]
+    [HttpPut("reviews/{id}", Name="PerformanceReview_Update")]
     [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Update(Guid id)
         => _webApi.PutWithResultAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
@@ -73,9 +75,10 @@ public partial class PerformanceReviewController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
     /// <returns>The patched <see cref="PerformanceReview"/>.</returns>
-    [HttpPatch("reviews/{id}")]
+    [HttpPatch("reviews/{id}", Name="PerformanceReview_Patch")]
     [AcceptsBody(typeof(Common.Entities.PerformanceReview), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Patch(Guid id)
         => _webApi.PatchWithResultAsync<PerformanceReview>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -83,7 +86,7 @@ public partial class PerformanceReviewController : ControllerBase
     /// Deletes the specified <see cref="PerformanceReview"/>.
     /// </summary>
     /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    [HttpDelete("reviews/{id}")]
+    [HttpDelete("reviews/{id}", Name="PerformanceReview_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));

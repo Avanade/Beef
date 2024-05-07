@@ -20,6 +20,8 @@ namespace {{Root.NamespaceApi}}.Controllers;
 {{#ifval WebApiAuthorize}}
 [{{{WebApiAuthorize}}}]
 {{/ifval}}
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
+[Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class ReferenceDataController : ControllerBase
 {
     private readonly ReferenceDataContentWebApi _webApi;
@@ -46,10 +48,7 @@ public partial class ReferenceDataController : ControllerBase
   {{#ifval WebApiAuthorize}}
     [{{{WebApiAuthorize}}}]
   {{/ifval}}
-    [HttpGet()]
-  {{#ifval WebApiRoutePrefix}}
-    [Route("{{WebApiRoutePrefix}}")]
-  {{/ifval}}
+    [HttpGet({{#ifval WebApiRoutePrefix}}"{{WebApiRoutePrefix}}"{{/ifval}}, Name="ReferenceData_{{Name}}GetAll")]
     [ProducesResponseType(typeof(IEnumerable<Common{{RefDataQualifiedEntityName}}>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> {{Name}}GetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<{{RefDataQualifiedEntityName}}>(codes, text, p.RequestOptions.IncludeInactive));
@@ -62,10 +61,8 @@ public partial class ReferenceDataController : ControllerBase
 {{#ifval WebApiAuthorize}}
     [{{{WebApiAuthorize}}}]
 {{/ifval}}
-    [HttpGet()]
-    [Route("{{RefDataWebApiRoute}}")]
-    [ProducesResponseType(typeof(IEnumerable<CoreEx.RefData.ReferenceDataMultiDictionary>), (int)HttpStatusCode.OK)]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [HttpGet("{{RefDataWebApiRoute}}", Name="ReferenceData_GetNamed")]
+    [ProducesResponseType(typeof(CoreEx.RefData.ReferenceDataMultiDictionary), (int)HttpStatusCode.OK)]
     public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));
 }{{#if Root.PreprocessorDirectives}}
 

@@ -10,6 +10,7 @@ namespace Beef.Demo.Api.Controllers;
 /// <summary>
 /// Provides the <see cref="Robot"/> Web API functionality.
 /// </summary>
+[Consumes(System.Net.Mime.MediaTypeNames.Application.Json)]
 [Produces(System.Net.Mime.MediaTypeNames.Application.Json)]
 public partial class RobotController : ControllerBase
 {
@@ -31,7 +32,7 @@ public partial class RobotController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
     /// <returns>The selected <see cref="Robot"/> where found.</returns>
-    [HttpGet("api/v1/robots/{id}")]
+    [HttpGet("api/v1/robots/{id}", Name="Robot_Get")]
     [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Get(Guid id)
@@ -41,7 +42,7 @@ public partial class RobotController : ControllerBase
     /// Creates a new <see cref="Robot"/>.
     /// </summary>
     /// <returns>The created <see cref="Robot"/>.</returns>
-    [HttpPost("api/v1/robots")]
+    [HttpPost("api/v1/robots", Name="Robot_Create")]
     [AcceptsBody(typeof(Common.Entities.Robot))]
     [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.Created)]
     public Task<IActionResult> Create()
@@ -52,9 +53,10 @@ public partial class RobotController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
     /// <returns>The updated <see cref="Robot"/>.</returns>
-    [HttpPut("api/v1/robots/{id}")]
+    [HttpPut("api/v1/robots/{id}", Name="Robot_Update")]
     [AcceptsBody(typeof(Common.Entities.Robot))]
     [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Update(Guid id)
         => _webApi.PutWithResultAsync<Robot, Robot>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
@@ -63,9 +65,10 @@ public partial class RobotController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
     /// <returns>The patched <see cref="Robot"/>.</returns>
-    [HttpPatch("api/v1/robots/{id}")]
+    [HttpPatch("api/v1/robots/{id}", Name="Robot_Patch")]
     [AcceptsBody(typeof(Common.Entities.Robot), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Robot), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public Task<IActionResult> Patch(Guid id)
         => _webApi.PatchWithResultAsync<Robot>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
@@ -73,7 +76,7 @@ public partial class RobotController : ControllerBase
     /// Deletes the specified <see cref="Robot"/>.
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
-    [HttpDelete("api/v1/robots/{id}")]
+    [HttpDelete("api/v1/robots/{id}", Name="Robot_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
@@ -85,7 +88,7 @@ public partial class RobotController : ControllerBase
     /// <param name="serialNo">The Unique serial number.</param>
     /// <param name="powerSources">The Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).</param>
     /// <returns>The <see cref="RobotCollection"/></returns>
-    [HttpGet("api/v1/robots")]
+    [HttpGet("api/v1/robots", Name="Robot_GetByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.RobotCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -100,7 +103,7 @@ public partial class RobotController : ControllerBase
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
     /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
-    [HttpPost("api/v1/robots/{id}/powerSource/{powerSource}")]
+    [HttpPost("api/v1/robots/{id}/powerSource/{powerSource}", Name="Robot_RaisePowerSourceChange")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     public Task<IActionResult> RaisePowerSourceChange(Guid id, string? powerSource)
         => _webApi.PostWithResultAsync(Request, p => _manager.RaisePowerSourceChangeAsync(id, powerSource), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Unspecified);

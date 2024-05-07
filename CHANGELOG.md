@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.5
+- *[Issue 243](https://github.com/Avanade/Beef/issues/243):* Fixed `[HttpGet("persons/{id}")]` to `[HttpGet("persons/{id}, Name=Entity-Name_Operation-Name)")]` which sets the `OperationId` within the OpenAPI output.
+- *[Issue 244](https://github.com/Avanade/Beef/issues/244):* Fixed `Operation.HttpAgentRoute` where specified as a query string `?foo=bar`; was being generated as `prefix/?foo=bar` versus `prefix?foo=bar`.
+- *Fixed:* Upgraded `CoreEx` (`v3.18.1`) to include all related fixes and improvements.
+
 ## v5.12.4
 - *Fixed:* Fixes to the `Template` solution to improve the initial `dotnet new beef` experience, including sample Reference Data API tests.
 - *Fixed:* Upgraded `CoreEx` (`v3.18.0`) to include all related fixes and improvements.
