@@ -106,7 +106,6 @@ public partial class Table : ILogicallyDeleted, ITenantId
             entity.Property(p => p.IsDeleted).HasColumnName("IsDeleted").HasColumnType("BIT");
             entity.HasQueryFilter(v => v.IsDeleted != true);
             entity.Property(p => p.TenantId).HasColumnName("TenantId").HasColumnType("NVARCHAR(50)");
-            entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
             AddToModel(entity);
         });
     }
