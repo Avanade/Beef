@@ -7,7 +7,7 @@ entities:
       { name: LastName, type: string },
       { name: Status, type: ^Status, dataName: StatusCode, refDataText: Always, refDataTextName: StatusDescription },
       { name: InternalCode, type: string, internalOnly: true, entityFrameworkMapper: Ignore },
-      { name: Communications, type: ContactCommCollection, dataName: Comms, dataConverter: 'ObjectToJsonConverter{T}', entityFrameworkMapper: Set  }
+      { name: Communications, type: ContactCommCollection, dataName: Comms, dataConverter: 'ObjectToJsonConverter{T}', entityFrameworkMapper: Set }
     ],
     operations: [
       { name: RaiseEvent, type: Custom, webApiRoute: raise, eventPublish: Data, eventOutbox: Database,

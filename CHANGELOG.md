@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.6
+- *Fixed*: The EF Model generation has had the `ITenantId.TenantId` filtering removed as out-of-the-box EF caches first and uses resulting in an unexpected side-effect. The `CoreEx.EntityFramework` as of `v3.20.0` automatically includes tenant filtering to achieve the desired behavior.
+- *Fixed:* Upgraded `CoreEx` (`v3.20.0`) to include all related fixes and improvements.
+
 ## v5.12.5
 - *[Issue 243](https://github.com/Avanade/Beef/issues/243):* Fixed `[HttpGet("persons/{id}")]` to `[HttpGet("persons/{id}, Name=Entity-Name_Operation-Name)")]` which sets the `OperationId` within the OpenAPI output.
 - *[Issue 244](https://github.com/Avanade/Beef/issues/244):* Fixed `Operation.HttpAgentRoute` where specified as a query string `?foo=bar`; was being generated as `prefix/?foo=bar` versus `prefix?foo=bar`.

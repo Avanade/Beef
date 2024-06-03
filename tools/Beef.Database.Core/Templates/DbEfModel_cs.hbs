@@ -64,7 +64,6 @@ public partial class {{EfModelName}}{{#ifval ColumnIsDeleted}} : ILogicallyDelet
 {{/ifval}}
 {{#ifval ColumnTenantId}}
             entity.Property(p => p.TenantId).HasColumnName("{{ColumnTenantId.Name}}").HasColumnType("{{ColumnTenantId.EfSqlType}}");
-            entity.HasQueryFilter(v => v.TenantId == CoreEx.ExecutionContext.Current.TenantId);
 {{/ifval}}
 {{#each Relationships}}
   {{#if @first}}
