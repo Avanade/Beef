@@ -92,16 +92,16 @@ namespace Beef.Test.NUnit
         public static AgentTesterServer<TStartup> CreateServer<TStartup>(string? environmentVariablePrefix = null, string environment = TestSetUp.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null)
             where TStartup : class => new AgentTesterServer<TStartup>(environmentVariablePrefix, environment, config, services, configureLocalRefData, includeLoggingScopesInOutput);
 
-        /// <summary>
-        /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against.
-        /// </summary>
-        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="configuration">The <see cref="Action{IWebHostBuilder}"/>.</param>
-        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        /// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
-        /// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
-        public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class
-            => new AgentTesterWaf<TStartup>(configuration, null, null, configureLocalRefData, includeLoggingScopesInOutput);
+        ///// <summary>
+        ///// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against.
+        ///// </summary>
+        ///// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
+        ///// <param name="configuration">The <see cref="Action{IWebHostBuilder}"/>.</param>
+        ///// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
+        ///// <param name="includeLoggingScopesInOutput">Indicates whether to include scopes in log output.</param>
+        ///// <returns>An <see cref="AgentTesterWaf{TStartup}"/> instance.</returns>
+        //public static AgentTesterWaf<TStartup> CreateWaf<TStartup>(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true, bool? includeLoggingScopesInOutput = null) where TStartup : class
+        //    => new AgentTesterWaf<TStartup>(configuration, null, null, configureLocalRefData, includeLoggingScopesInOutput);
 
         /// <summary>
         /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against enabling specific

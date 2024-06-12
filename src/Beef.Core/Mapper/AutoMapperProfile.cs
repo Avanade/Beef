@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using AutoMapper;
+using AutoMapper.Internal;
 using Beef.Entities;
 using System.Reflection;
 
@@ -22,7 +23,7 @@ namespace Beef.Mapper
         public AutoMapperProfile()
         {
             // Never map property EntityBasicBase.NotifyChangesWhenSameValue.
-            ForAllPropertyMaps(pm => pm.SourceMember.Name == nameof(EntityBasicBase.NotifyChangesWhenSameValue)
+            this.Internal().ForAllPropertyMaps(pm => pm.SourceMember.Name == nameof(EntityBasicBase.NotifyChangesWhenSameValue)
                 && (pm.TypeMap.SourceType == typeof(EntityBase) || typeof(EntityBasicBase).IsAssignableFrom(pm.TypeMap.SourceType) 
                 || pm.TypeMap.DestinationType == typeof(EntityBase) || typeof(EntityBasicBase).IsAssignableFrom(pm.TypeMap.DestinationType)), (pm, opt) => opt.Ignore());
 

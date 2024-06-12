@@ -18,7 +18,7 @@ namespace Beef
         /// </summary>
         /// <param name="key">The <see cref="LText"/>.</param>
         /// <returns>The corresponding text where found; otherwise <c>null</c>.</returns>
-        protected override string GetTextForKey(LText key)
+       protected override string GetTextForKey(LText key)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));

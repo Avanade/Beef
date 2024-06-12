@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Enhancement:* Added `net8.0` support to existing `netstandard2.1` and `net6.0`.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+  - The underlying `Polly` dependency has been removed for `net8.0`; see guidance [here](https://learn.microsoft.com/en-us/sql/connect/ado-net/configurable-retry-logic-sqlclient-introduction?view=sql-server-ver16) for native equivalent.
+
 ## v4.2.7
 - *Fixed:* Removed redundant package dependencies.
 

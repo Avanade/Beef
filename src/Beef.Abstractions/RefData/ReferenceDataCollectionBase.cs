@@ -64,20 +64,20 @@ namespace Beef.RefData
         /// <summary>
         /// Internal <see cref="KeyedCollection{Object, TItem}"/> for <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
-        private class ReferenceDataIdCollection : KeyedCollection<object?, TItem>
+        private class ReferenceDataIdCollection : KeyedCollection<object, TItem>
         {
             /// <summary>
             /// Gets the key (<see cref="ReferenceDataBase.Id"/>) for the <see cref="ReferenceDataBase"/> item.
             /// </summary>
             /// <param name="item">The <see cref="ReferenceDataBase"/> item.</param>
             /// <returns>The corresponding <see cref="ReferenceDataBase.Id"/>.</returns>
-            protected override object? GetKeyForItem(TItem item) => Check.NotNull(item, nameof(item)).Id;
+            protected override object GetKeyForItem(TItem item) => Check.NotNull(item, nameof(item)).Id!;
         }
 
         /// <summary>
         /// Internal <see cref="KeyedCollection{String, TItem}"/> for <see cref="ReferenceDataBase.Code"/>.
         /// </summary>
-        private class ReferenceDataCodeCollection : KeyedCollection<string?, TItem>
+        private class ReferenceDataCodeCollection : KeyedCollection<string, TItem>
         {
             private readonly ReferenceDataCollectionBase<TItem> _owner;
 
@@ -92,7 +92,7 @@ namespace Beef.RefData
             /// </summary>
             /// <param name="item">The <see cref="ReferenceDataBase"/> item.</param>
             /// <returns>The corresponding <see cref="ReferenceDataBase.Code"/>.</returns>
-            protected override string? GetKeyForItem(TItem item) => _owner.ConvertCode(Check.NotNull(item, nameof(item)).Code!);
+            protected override string GetKeyForItem(TItem item) => _owner.ConvertCode(Check.NotNull(item, nameof(item)).Code!)!;
         }
 
         /// <summary>
@@ -449,8 +449,8 @@ namespace Beef.RefData
             {
                 ReferenceDataSortOrder.Id => list.OrderBy(x => x.Id),
                 ReferenceDataSortOrder.Code => list.OrderBy(x => x.Code),
-                ReferenceDataSortOrder.Text => list.OrderBy(x => x.Text),
-                _ => list.OrderBy(x => x.SortOrder),
+                ReferenceDataSortOrder.Text => list.OrderBy(x => x.Text).ThenBy(x => x.Code),
+                _ => list.OrderBy(x => x.SortOrder).ThenBy(x => x.Text).ThenBy(x => x.Code),
             };
 
             return list.ToList();

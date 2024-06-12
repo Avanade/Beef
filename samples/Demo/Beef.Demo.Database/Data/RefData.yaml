@@ -1,5 +1,4 @@
-﻿^Type: Beef.Database.Core.DefaultIdentifierGenerators
-Ref:
+﻿Ref:
   - $Country:
     - NZ: New Zealand
     - AU: Australia

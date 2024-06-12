@@ -8,7 +8,7 @@ namespace Beef
     /// <summary>
     /// Enables a concurrent key-only dictionary.
     /// </summary>
-    public class KeyOnlyDictionary<T> : ConcurrentDictionary<T, object>
+    public class KeyOnlyDictionary<T> : ConcurrentDictionary<T, object> where T : notnull
     {
         /// <summary>
         /// Returns a string with the concatenation of all the keys.

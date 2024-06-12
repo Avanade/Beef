@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Enhancement:* Added `net8.0` and `net6.0` support to existing `netstandard2.1`.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+
 ## v4.2.5
 - *Fixed:* Updated project type type to be `netstandard2.1` versus `netcoreapp3.1` to enable multiple version support.
 - *Fixed:* Updated internal _Beef_ dependencies to latest.

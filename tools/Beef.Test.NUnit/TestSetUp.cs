@@ -42,7 +42,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Static constructor; override the default JSON Serializer.
         /// </summary>
-        static TestSetUp() => CoreEx.Json.JsonSerializer.Default = new CoreEx.Newtonsoft.Json.JsonSerializer();
+        static TestSetUp() => UnitTestEx.Json.JsonSerializer.Default = new NewtonsoftJsonSerializer();
 
         #region Setup
 

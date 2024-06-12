@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>4.2.5</Version>
+    <TargetFrameworks>net6.0;net8.0;netstandard2.1</TargetFrameworks>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) CosmosDB / DocumentDB Core extensions.</Description>
@@ -25,15 +24,25 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.26.1" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.40.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.18" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.32" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,5 +52,7 @@
   <ItemGroup>
     <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <Import Project="..\..\Common.targets" />
 
 </Project>

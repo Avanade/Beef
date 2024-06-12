@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Enhancement:* Added `net8.0` support to existing `netstandard2.1` and `net6.0`.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+
 ## v4.2.7
 - *Fixed:* Issue [200](https://github.com/Avanade/Beef/issues/200). Added `reloadOnChange` parameter to `WebApiStartup.ConfigurationBuilder<TStartup>`; defaults to `true` to keep current behaviour. 
 

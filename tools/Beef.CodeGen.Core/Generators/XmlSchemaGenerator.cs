@@ -2,7 +2,7 @@
 
 using Beef.CodeGen.Config;
 using Beef.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
@@ -85,11 +85,11 @@ namespace Beef.CodeGen.Generators
             // Add properties as xs:attribute's.
             foreach (var pi in type.GetProperties())
             {
-                var jpa = pi.GetCustomAttribute<JsonPropertyAttribute>();
+                var jpa = pi.GetCustomAttribute<JsonPropertyNameAttribute>();
                 if (jpa == null)
                     continue;
 
-                var name = jpa.PropertyName ?? StringConverter.ToCamelCase(pi.Name)!;
+                var name = jpa.Name ?? StringConverter.ToCamelCase(pi.Name)!;
                 var xmlName = XmlYamlTranslate.GetXmlName(ct, ce, name);
                 var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ct, ce, xmlName);
 

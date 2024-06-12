@@ -92,6 +92,7 @@ namespace Beef.Database.Core
                 cga.Assemblies.Add(typeof(Beef.CodeGen.CodeGenConsole).Assembly);
                 cga.ConfigFileName ??= CodeGenFileManager.GetConfigFilename(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CommandType.Database, _args.GetCompany(), _args.GetAppName());
                 cga.ValidateCompanyAndAppName();
+                cga.AddDatabaseMigrator(this);
 
                 _args.Logger?.LogInformation(string.Empty);
                 OnRamp.Console.CodeGenConsole.WriteStandardizedArgs(cga);

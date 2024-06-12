@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+
 ## v4.2.5
 - *Fixed:* Updated internal _Beef_ dependencies to latest.
 

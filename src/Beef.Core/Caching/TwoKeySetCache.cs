@@ -12,7 +12,7 @@ namespace Beef.Caching
     /// </summary>
     /// <typeparam name="TKey1">The first key <see cref="Type"/> that is being cache managed.</typeparam>
     /// <typeparam name="TKey2">The second key <see cref="Type"/> that is being cache managed.</typeparam>
-    public class TwoKeySetCache<TKey1, TKey2> : CacheCoreBase
+    public class TwoKeySetCache<TKey1, TKey2> : CacheCoreBase where TKey1 : notnull where TKey2 : notnull
     {
         private Dictionary<TKey1, TKey2>? _dict1;
         private Dictionary<TKey2, TKey1>? _dict2;

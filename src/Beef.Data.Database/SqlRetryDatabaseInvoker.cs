@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+#if !NET8_0_OR_GREATER
+
 using Beef.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -156,3 +158,5 @@ namespace Beef.Data.Database
         public SqlException Exception { get; set; }
     }
 }
+
+#endif
