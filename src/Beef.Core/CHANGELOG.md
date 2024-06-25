@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Enhancement:* Added `net6.0` and `net8.0` support to existing `netstandard2.1`.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+  - The underlying `AutoMapper` dependency updated to `v12.0.1` (not latest).
+
 ## v4.2.9
 - *Fixed:* Removed redundant package dependencies.
 

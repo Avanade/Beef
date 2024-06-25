@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using DbEx.Migration;
+using DbEx.SqlServer.Migration;
 using OnRamp;
 using System;
 using System.Collections.Generic;
@@ -36,5 +38,20 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty((args ?? throw new ArgumentNullException(nameof(args))).GetCompany()) || string.IsNullOrEmpty(args.GetAppName()))
                 throw new CodeGenException($"Parameters '{CodeGen.CodeGenConsole.CompanyParamName}' and {CodeGen.CodeGenConsole.AppNameParamName} must be specified.");
         }
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseMigrationBase"/> from the connection details within the <see cref="ICodeGeneratorDbArgs"/>.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns>The <see cref="DatabaseMigrationBase"/> instance.</returns>
+        public static SqlServerMigration GetDatabaseMigrator(this ICodeGeneratorArgs args) => (args ?? throw new ArgumentNullException(nameof(args))).GetParameter<SqlServerMigration>(CodeGenConsole.DatabaseMigratorParamName, true)!;
+
+        /// <summary>
+        /// Adds the <paramref name="migrator"/> as the <see cref="CodeGenConsole.DatabaseMigratorParamName"/> <see cref="ICodeGeneratorArgs.Parameters"/> value.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <param name="migrator">The <see cref="DatabaseMigrationBase"/> instance.</param>
+        public static void AddDatabaseMigrator(this ICodeGeneratorArgs args, DatabaseMigrationBase migrator) => args.AddParameter(CodeGenConsole.DatabaseMigratorParamName, migrator ?? throw new ArgumentNullException(nameof(args)));
+
     }
 }

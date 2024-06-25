@@ -2,7 +2,7 @@
 
 using Beef.Caching;
 using Beef.Entities;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
@@ -15,7 +15,6 @@ namespace Beef.CodeGen.Config.Entity
     /// <summary>
     /// Represents the <b>Entity</b> code-generation configuration.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Entity", Title = "'Entity' object (entity-driven)",
         Description = "The `Entity` is used as the primary configuration for driving the entity-driven code generation.",
         ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
@@ -64,14 +63,14 @@ entities:
         /// <summary>
         /// Gets or sets the unique entity name.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("name")]
         [CodeGenProperty("Key", Title = "The unique entity name.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the overriding text for use in comments.
         /// </summary>
-        [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("text")]
         [CodeGenProperty("Key", Title = "The overriding text for use in comments.",
             Description = "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
         public string? Text { get; set; }
@@ -79,7 +78,7 @@ entities:
         /// <summary>
         /// Gets or sets the overriding file name.
         /// </summary>
-        [JsonProperty("fileName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("fileName")]
         [CodeGenProperty("Key", Title = "The overriding file name.",
             Description = "Overrides the Name as the code-generated file name.")]
         public string? FileName { get; set; }
@@ -87,7 +86,7 @@ entities:
         /// <summary>
         /// Gets or sets the entity scope option.
         /// </summary>
-        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityScope")]
         [CodeGenProperty("Key", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
             Description = "Defaults to the `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible). Additionally, there is a special case of `Autonomous` " +
             "where both a `Common` and `Business` entity are generated (where only the latter inherits from `EntityBase`, etc).")]
@@ -96,7 +95,7 @@ entities:
         /// <summary>
         /// Gets or sets the namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).
         /// </summary>
-        [JsonProperty("entityUsing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityUsing")]
         [CodeGenProperty("Entity", Title = "The namespace for the non Reference Data entities (adds as a c# <c>using</c> statement).", Options = new string[] { "Common", "Business", "All", "None" },
             Description = "Defaults to `EntityScope` (`Autonomous` will result in `Business`). A value of `Common` will add `.Common.Entities`, `Business` will add `.Business.Entities`, `All` to add both, and `None` to exclude any.")]
         public string? EntityUsing { get; set; }
@@ -104,7 +103,7 @@ entities:
         /// <summary>
         /// Gets or sets the overriding private name.
         /// </summary>
-        [JsonProperty("privateName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("privateName")]
         [CodeGenProperty("Key", Title = "The overriding private name.",
             Description = "Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.")]
         public string? PrivateName { get; set; }
@@ -112,7 +111,7 @@ entities:
         /// <summary>
         /// Gets or sets the overriding argument name.
         /// </summary>
-        [JsonProperty("argumentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("argumentName")]
         [CodeGenProperty("Key", Title = "The overriding argument name.",
             Description = "Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.")]
         public string? ArgumentName { get; set; }
@@ -120,7 +119,7 @@ entities:
         /// <summary>
         /// Gets or sets the Const Type option.
         /// </summary>
-        [JsonProperty("constType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("constType")]
         [CodeGenProperty("Key", Title = "The Const .NET Type option.", Options = new string[] { "int", "long", "Guid", "string" },
             Description = "The .NET Type to be used for the `const` values. Defaults to `string`.")]
         public string? ConstType { get; set; }
@@ -128,7 +127,7 @@ entities:
         /// <summary>
         /// Indicates whether to override the <see cref="ICleanUp.IsInitial"/> property.
         /// </summary>
-        [JsonProperty("isInitialOverride", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isInitialOverride")]
         [CodeGenProperty("Key", Title = "Indicates whether to override the `ICleanup.IsInitial` property.",
             Description = "Set to either `true` or `false` to override as specified; otherwise, `null` to check each property. Defaults to `null`.")]
         public bool? IsInitialOverride { get; set; }
@@ -140,7 +139,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data identifier Type option.
         /// </summary>
-        [JsonProperty("refDataType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataType")]
         [CodeGenProperty("RefData", Title = "The Reference Data identifier Type option.", IsImportant = true, Options = new string[] { "int", "long", "Guid", "string" },
             Description = "Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier.")]
         public string? RefDataType { get; set; }
@@ -148,7 +147,7 @@ entities:
         /// <summary>
         /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overriding the <c>CodeGeneration.RefDataText</c> selection.
         /// </summary>
-        [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataText")]
         [CodeGenProperty("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.",
             Description = "This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
         public bool? RefDataText { get; set; }
@@ -156,7 +155,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data sort order option.
         /// </summary>
-        [JsonProperty("refDataSortOrder", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataSortOrder")]
         [CodeGenProperty("RefData", Title = "The Reference Data sort order option.", Options = new string[] { "SortOrder", "Id", "Code", "Text" },
             Description = "Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.")]
         public string? RefDataSortOrder { get; set; }
@@ -164,7 +163,7 @@ entities:
         /// <summary>
         /// Gets or sets the Reference Data <c>ToString</c> composite <see cref="Beef.RefData.ReferenceDataBase.StringFormat"/>.
         /// </summary>
-        [JsonProperty("refDataStringFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("refDataStringFormat")]
         [CodeGenProperty("RefData", Title = "The Reference Data `ToString` composite format.",
             Description = "The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.")]
         public string? RefDataStringFormat { get; set; }
@@ -176,7 +175,7 @@ entities:
         /// <summary>
         /// Gets or sets the base class that the entity inherits from.
         /// </summary>
-        [JsonProperty("inherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("inherits")]
         [CodeGenProperty("Entity", Title = "The base class that the entity inherits from.",
             Description = "Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseXxx` depending on the corresponding `RefDataType` value. " +
                           "See `OmitEntityBase` if the desired outcome is to not inherit from any of the aforementioned base classes.")]
@@ -185,14 +184,14 @@ entities:
         /// <summary>
         /// Gets or sets the list of comma separated interfaces that are to be declared for the entity class.
         /// </summary>
-        [JsonProperty("implements", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("implements")]
         [CodeGenProperty("Entity", Title = "The list of comma separated interfaces that are to be declared for the entity class.")]
         public string? Implements { get; set; }
 
         /// <summary>
         /// Indicates whether to automatically infer the interface implements for the entity from the properties declared.
         /// </summary>
-        [JsonProperty("implementsAutoInfer", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("implementsAutoInfer")]
         [CodeGenProperty("Entity", Title = "Indicates whether to automatically infer the interface implements for the entity from the properties declared.",
             Description = "Will attempt to infer the following: `IGuidIdentifier`, `IInt32Identifier`, `IInt64Identifier`, `IStringIdentifier`, `IETag` and `IChangeLog`. Defaults to `true`.")]
         public bool? ImplementsAutoInfer { get; set; }
@@ -200,21 +199,21 @@ entities:
         /// <summary>
         /// Indicates whether the class should be defined as abstract.
         /// </summary>
-        [JsonProperty("abstract", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("abstract")]
         [CodeGenProperty("Entity", Title = "Indicates whether the class should be defined as abstract.")]
         public bool? Abstract { get; set; }
 
         /// <summary>
         /// Indicates whether the class should be defined as a generic with a single parameter <c>T</c>.
         /// </summary>
-        [JsonProperty("genericWithT", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("genericWithT")]
         [CodeGenProperty("Entity", Title = "Indicates whether the class should be defined as a generic with a single parameter `T`.")]
         public bool? GenericWithT { get; set; }
 
         /// <summary>
         /// Gets or sets the entity namespace to be appended.
         /// </summary>
-        [JsonProperty("namespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("namespace")]
         [CodeGenProperty("Entity", Title = "The entity namespace to be appended.",
             Description = "Appended to the end of the standard structure as follows: `{Company}.{AppName}.Common.Entities.{Namespace}`.")]
         public string? Namespace { get; set; }
@@ -222,7 +221,7 @@ entities:
         /// <summary>
         /// Indicates that the entity should not inherit from `EntityBase`.
         /// </summary>
-        [JsonProperty("omitEntityBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("omitEntityBase")]
         [CodeGenProperty("Entity", Title = "Indicates that the entity should not inherit from `EntityBase`.",
             Description = "As such any of the `EntityBase` related capabilites are not supported (are omitted from generation). The intention for this is more for the generation of simple internal entities.")]
         public bool? OmitEntityBase { get; set; }
@@ -230,7 +229,7 @@ entities:
         /// <summary>
         /// Get or sets the JSON Serializer to use for JSON property attribution.
         /// </summary>
-        [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("jsonSerializer")]
         [CodeGenProperty("Entity", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
             Description = "Defaults to the `CodeGeneration.JsonSerializer` configuration property where specified; otherwise, `Newtonsoft`.")]
         public string? JsonSerializer { get; set; }
@@ -242,14 +241,14 @@ entities:
         /// <summary>
         /// Indicates whether a corresponding entity collection class should be created.
         /// </summary>
-        [JsonProperty("collection", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collection")]
         [CodeGenProperty("Collection", Title = "Indicates whether a corresponding entity collection class should be created.", IsImportant = true)]
         public bool? Collection { get; set; }
 
         /// <summary>
         /// Indicates whether a corresponding entity collection result class should be created
         /// </summary>
-        [JsonProperty("collectionResult", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collectionResult")]
         [CodeGenProperty("Collection", Title = "Indicates whether a corresponding entity collection result class should be created", IsImportant = true,
             Description = "Enables the likes of additional paging state to be stored with the underlying collection.")]
         public bool? CollectionResult { get; set; }
@@ -257,14 +256,14 @@ entities:
         /// <summary>
         /// Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key.
         /// </summary>
-        [JsonProperty("collectionKeyed", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collectionKeyed")]
         [CodeGenProperty("Collection", Title = "Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key.")]
         public bool? CollectionKeyed { get; set; }
 
         /// <summary>
         /// Gets or sets the base class that a <see cref="Collection"/> inherits from.
         /// </summary>
-        [JsonProperty("collectionInherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collectionInherits")]
         [CodeGenProperty("Collection", Title = "The base class that a `Collection` inherits from.",
             Description = "Defaults to `EntityBaseCollection` or `EntityBaseKeyedCollection` depending on `CollectionKeyed`. For Reference Data it will default to `ReferenceDataCollectionBase`.")]
         public string? CollectionInherits { get; set; }
@@ -272,7 +271,7 @@ entities:
         /// <summary>
         /// Gets or sets the base class that a <see cref="CollectionResult"/> inherits from.
         /// </summary>
-        [JsonProperty("collectionResultInherits", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collectionResultInherits")]
         [CodeGenProperty("Collection", Title = "The base class that a `CollectionResult` inherits from.",
             Description = "Defaults to `EntityCollectionResult`.")]
         public string? CollectionResultInherits { get; set; }
@@ -284,42 +283,42 @@ entities:
         /// <summary>
         /// Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("get", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("get")]
         [CodeGenProperty("Operation", Title = "Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? Get { get; set; }
 
         /// <summary>
         /// Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("getAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("getAll")]
         [CodeGenProperty("Operation", Title = "Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? GetAll { get; set; }
 
         /// <summary>
         /// Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("create", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("create")]
         [CodeGenProperty("Operation", Title = "Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? Create { get; set; }
 
         /// <summary>
         /// Indicates that a `Update` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("update", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("update")]
         [CodeGenProperty("Operation", Title = "Indicates that a `Update` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? Update { get; set; }
 
         /// <summary>
         /// Indicates that a `Update` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("patch", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("patch")]
         [CodeGenProperty("Operation", Title = "Indicates that a `Patch` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? Patch { get; set; }
 
         /// <summary>
         /// Indicates that a `Delete` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("delete", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("delete")]
         [CodeGenProperty("Operation", Title = "Indicates that a `Delete` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? Delete { get; set; }
 
@@ -330,7 +329,7 @@ entities:
         /// <summary>
         /// Gets or sets the data source auto-implementation option. 
         /// </summary>
-        [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("autoImplement")]
         [CodeGenProperty("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "HttpAgent", "None" },
             Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). " +
                           "Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.")]
@@ -339,7 +338,7 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated `Data` constructor.
         /// </summary>
-        [JsonProperty("dataCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataCtor")]
         [CodeGenProperty("Data", Title = "The access modifier for the generated `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? DataCtor { get; set; }
@@ -347,7 +346,7 @@ entities:
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.
         /// </summary>
-        [JsonProperty("dataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataCtorParams")]
         [CodeGenPropertyCollection("Data", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.",
             Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
@@ -356,7 +355,7 @@ entities:
         /// <summary>
         /// Indicates whether the `Data` extensions logic should be generated.
         /// </summary>
-        [JsonProperty("dataExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataExtensions")]
         [CodeGenProperty("Data", Title = "Indicates whether the `Data` extensions logic should be generated.",
             Description = "This can be overridden using `Operation.DataExtensions`.")]
         public bool? DataExtensions { get; set; }
@@ -368,7 +367,7 @@ entities:
         /// <summary>
         /// Gets or sets the .NET database interface name used where `AutoImplement` is `Database`.
         /// </summary>
-        [JsonProperty("databaseName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseName")]
         [CodeGenProperty("Database", Title = "The .NET database interface name (used where `AutoImplement` is `Database`).", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.DatabaseName` configuration property (its default value is `IDatabase`).")]
         public string? DatabaseName { get; set; }
@@ -376,7 +375,7 @@ entities:
         /// <summary>
         /// Gets or sets the database schema name (used where `AutoImplement` is `Database`).
         /// </summary>
-        [JsonProperty("databaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseSchema")]
         [CodeGenProperty("Database", Title = "The database schema name (used where `AutoImplement` is `Database`).", IsImportant = true,
             Description = "Defaults to `dbo`.")]
         public string? DatabaseSchema { get; set; }
@@ -384,14 +383,14 @@ entities:
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated Database <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("databaseMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseMapperInheritsFrom")]
         [CodeGenProperty("Database", Title = "The name of the `Mapper` that the generated Database `Mapper` inherits from.")]
         public string? DatabaseMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom Database <c>Mapper</c> will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("databaseCustomerMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("databaseCustomerMapper")]
         [CodeGenProperty("Database", Title = "Indicates that a custom Database `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? DatabaseCustomMapper { get; set; }
@@ -403,7 +402,7 @@ entities:
         /// <summary>
         /// Gets or sets the .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.
         /// </summary>
-        [JsonProperty("entityFrameworkName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityFrameworkName")]
         [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.EntityFrameworkName` configuration property (its default value is `IEfDb`).")]
         public string? EntityFrameworkName { get; set; }
@@ -411,14 +410,14 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding Entity Framework model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
         /// </summary>
-        [JsonProperty("entityFrameworkModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityFrameworkModel")]
         [CodeGenProperty("EntityFramework", Title = "The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true)]
         public string? EntityFrameworkModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated Entity Framework <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("entityFrameworkMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityFrameworkMapperInheritsFrom")]
         [CodeGenProperty("EntityFramework", Title = "The name of the `Mapper  that the generated Entity Framework `Mapper` inherits from.",
             Description = "Defaults to `Model.{Name}`; i.e. an entity with the same name in the `Model` namespace.")]
         public string? EntityFrameworkMapperInheritsFrom { get; set; }
@@ -426,7 +425,7 @@ entities:
         /// <summary>
         /// Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("entityFrameworkCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityFrameworkCustomMapper")]
         [CodeGenProperty("EntityFramework", Title = "Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? EntityFrameworkCustomMapper { get; set; }
@@ -438,7 +437,7 @@ entities:
         /// <summary>
         /// Gets or sets the .NET Cosmos interface name used where `AutoImplement` is `Cosmos`.
         /// </summary>
-        [JsonProperty("cosmosName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosName")]
         [CodeGenProperty("Cosmos", Title = "The .NET Cosmos interface name used where `AutoImplement` is `Cosmos`.", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.CosmosName` configuration property (its default value is `ICosmosDb`).")]
         public string? CosmosName { get; set; }
@@ -446,21 +445,21 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding Cosmos model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
         /// </summary>
-        [JsonProperty("cosmosModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosModel")]
         [CodeGenProperty("Cosmos", Title = "The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).", IsImportant = true)]
         public string? CosmosModel { get; set; }
 
         /// <summary>
         /// Gets or sets the Cosmos <c>ContainerId</c> required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
         /// </summary>
-        [JsonProperty("cosmosContainerId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosContainerId")]
         [CodeGenProperty("Cosmos", Title = "The Cosmos `ContainerId` required where `AutoImplement` is `Cosmos`.", IsImportant = true)]
         public string? CosmosContainerId { get; set; }
 
         /// <summary>
         /// Gets or sets the C# code to be used for setting the optional Cosmos <c>PartitionKey</c> where <see cref="AutoImplement"/> is <c>Cosmos</c>.
         /// </summary>
-        [JsonProperty("cosmosPartitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosPartitionKey")]
         [CodeGenProperty("Cosmos", Title = "The C# code to be used for setting the optional Cosmos `PartitionKey` where `AutoImplement` is `Cosmos`.",
             Description = "Defaults to `PartitionKey.None`.")]
         public string? CosmosPartitionKey { get; set; }
@@ -468,21 +467,21 @@ entities:
         /// <summary>
         /// Indicates whether the <c>CosmosDbValueContainer</c> is to be used; otherwise, <c>CosmosDbContainer</c>.
         /// </summary>
-        [JsonProperty("cosmosValueContainer", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosValueContainer")]
         [CodeGenProperty("Cosmos", Title = "Indicates whether the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer`.")]
         public bool? CosmosValueContainer { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated Cosmos <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("cosmosMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosMapperInheritsFrom")]
         [CodeGenProperty("Cosmos", Title = "The name of the `Mapper` that the generated Cosmos `Mapper` inherits from.")]
         public string? CosmosMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom Cosmos <c>Mapper</c> will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("cosmosCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("cosmosCustomMapper")]
         [CodeGenProperty("Cosmos", Title = "Indicates that a custom Cosmos `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? CosmosCustomMapper { get; set; }
@@ -494,7 +493,7 @@ entities:
         /// <summary>
         /// Gets or sets the .NET OData interface name used where `AutoImplement` is `OData`.
         /// </summary>
-        [JsonProperty("odataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("odataName")]
         [CodeGenProperty("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).")]
         public string? ODataName { get; set; }
@@ -502,14 +501,14 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding OData model name required where <see cref="AutoImplement"/> is <c>OData</c>.
         /// </summary>
-        [JsonProperty("odataModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("odataModel")]
         [CodeGenProperty("OData", Title = "The corresponding OData model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
         public string? ODataModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the underlying OData collection name where <see cref="AutoImplement"/> is <c>OData</c>.
         /// </summary>
-        [JsonProperty("odataCollectionName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("odataCollectionName")]
         [CodeGenProperty("OData", Title = "The name of the underlying OData collection where `AutoImplement` is `OData`.", IsImportant = true,
             Description = "The underlying `Simple.OData.Client` will attempt to infer.")]
         public string? ODataCollectionName { get; set; }
@@ -517,14 +516,14 @@ entities:
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated OData <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("odataMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("odataMapperInheritsFrom")]
         [CodeGenProperty("OData", Title = "The name of the `Mapper` that the generated OData `Mapper` inherits from.")]
         public string? ODataMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom OData <c>Mapper</c> will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("odataCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("odataCustomMapper")]
         [CodeGenProperty("OData", Title = "Indicates that a custom OData `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? ODataCustomMapper { get; set; }
@@ -536,7 +535,7 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.
         /// </summary>
-        [JsonProperty("httpAgentName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("httpAgentName")]
         [CodeGenProperty("HttpAgent", Title = "The .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
             Description = "Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`).")]
         public string? HttpAgentName { get; set; }
@@ -544,7 +543,7 @@ entities:
         /// <summary>
         /// Gets or sets the HttpAgent API route prefix where `Operation.AutoImplement` is `HttpAgent`.
         /// </summary>
-        [JsonProperty("httpAgentRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("httpAgentRoutePrefix")]
         [CodeGenProperty("HttpAgent", Title = "The base HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`.",
             Description = "This is the base (prefix) `URI` for the HTTP Agent endpoint and can be further extended when defining the underlying `Operation`(s).")]
         public string? HttpAgentRoutePrefix { get; set; }
@@ -552,7 +551,7 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding HTTP Agent model name required where <see cref="AutoImplement"/> is `HttpAgent`.
         /// </summary>
-        [JsonProperty("httpAgentModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("httpAgentModel")]
         [CodeGenProperty("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).", IsImportant = true,
             Description = "This can be overridden within the `Operation`(s).")]
         public string? HttpAgentModel { get; set; }
@@ -560,7 +559,7 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding HTTP Agent model name required where <see cref="AutoImplement"/> is `HttpAgent`.
         /// </summary>
-        [JsonProperty("httpAgentReturnModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("httpAgentReturnModel")]
         [CodeGenProperty("HttpAgent", Title = "The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).",
             Description = "This can be overridden within the `Operation`(s).")]
         public string? HttpAgentReturnModel { get; set; }
@@ -572,7 +571,7 @@ entities:
         /// <summary>
         /// Indicates whether request-based <see cref="IRequestCache"/> caching is to be performed at the <c>DataSvc</c> layer to improve performance (i.e. reduce chattiness).
         /// </summary>
-        [JsonProperty("dataSvcCaching", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataSvcCaching")]
         [CodeGenProperty("DataSvc", Title = "Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness).",
             Description = "Defaults to `true`.")]
         public bool? DataSvcCaching { get; set; }
@@ -580,7 +579,7 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated `DataSvc` constructor.
         /// </summary>
-        [JsonProperty("dataSvcCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataSvcCtor")]
         [CodeGenProperty("DataSvc", Title = "The access modifier for the generated `DataSvc` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? DataSvcCtor { get; set; }
@@ -588,7 +587,7 @@ entities:
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.
         /// </summary>
-        [JsonProperty("dataSvcCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataSvcCtorParams")]
         [CodeGenPropertyCollection("DataSvc", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.",
             Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
@@ -597,7 +596,7 @@ entities:
         /// <summary>
         /// Indicates whether the `DataSvc` extensions logic should be generated.
         /// </summary>
-        [JsonProperty("dataSvcExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataSvcExtensions")]
         [CodeGenProperty("DataSvc", Title = "Indicates whether the `DataSvc` extensions logic should be generated.",
             Description = "This can be overridden using `Operation.DataSvcExtensions`.")]
         public bool? DataSvcExtensions { get; set; }
@@ -609,7 +608,7 @@ entities:
         /// <summary>
         /// Gets or sets the layer to add logic to publish an event for a <c>Create</c>, <c>Update</c> or <c>Delete</c> operation.
         /// </summary>
-        [JsonProperty("eventPublish", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventPublish")]
         [CodeGenProperty("Events", Title = "The layer to add logic to publish an event for a `Create`, `Update` or `Delete` operation.", IsImportant = true, Options = new string[] { "None", "DataSvc", "Data" },
             Description = "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc. This can be overridden within the `Operation`(s).")]
         public string? EventPublish { get; set; }
@@ -617,7 +616,7 @@ entities:
         /// <summary>
         /// Gets or sets the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).
         /// </summary>
-        [JsonProperty("eventOutbox", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventOutbox")]
         [CodeGenProperty("Events", Title = "The the data-tier event outbox persistence technology (where the events will be transactionally persisted in an outbox as part of the data-tier processing).", IsImportant = true, Options = new string[] { "None", "Database" },
             Description = "Defaults to `CodeGeneration.EventOutbox` configuration property (inherits) where not specified. A value of `Database` will result in the `DatabaseEventOutboxInvoker` being used to orchestrate.")]
         public string? EventOutbox { get; set; }
@@ -625,7 +624,7 @@ entities:
         /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
-        [JsonProperty("eventSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventSource")]
         [CodeGenProperty("Events", Title = "The Event Source.",
             Description = "Defaults to `Name` (as lowercase) appended with the `/{$key}` placeholder. Note: when used in code-generation the `CodeGeneration.EventSourceRoot` will be prepended where specified. " +
             "To include the entity id/key include a `{$key}` placeholder (`Create`, `Update` or `Delete` operation only); for example: `person/{$key}`. This can be overridden for the `Operation`.")]
@@ -634,7 +633,7 @@ entities:
         /// <summary>
         /// Gets or sets the default formatting for the Subject when an Event is published.
         /// </summary>
-        [JsonProperty("eventSubjectFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventSubjectFormat")]
         [CodeGenProperty("Events", Title = "The default formatting for the Subject when an Event is published.", Options = new string[] { "NameOnly", "NameAndKey" },
             Description = "Defaults to `CodeGeneration.EventSubjectFormat`.")]
         public string? EventSubjectFormat { get; set; }
@@ -642,7 +641,7 @@ entities:
         /// <summary>
         /// Gets or sets the casing for the Subject and Action (with the exception of the key).
         /// </summary>
-        [JsonProperty("eventCasing", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventCasing")]
         [CodeGenProperty("Event", Title = "The casing for the Subject and Action (with the exception of the key)", Options = new string[] { "None", "Lower", "Upper" }, IsImportant = true,
             Description = "Defaults to `CodeGeneration.EventCasing`.")]
         public string? EventCasing { get; set; }
@@ -650,7 +649,7 @@ entities:
         /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
         /// </summary>
-        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("eventTransaction")]
         [CodeGenProperty("Events", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
             Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
                 "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
@@ -664,7 +663,7 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated `Manager` constructor.
         /// </summary>
-        [JsonProperty("managerCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("managerCtor")]
         [CodeGenProperty("Manager", Title = "The access modifier for the generated `Manager` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? ManagerCtor { get; set; }
@@ -672,7 +671,7 @@ entities:
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.
         /// </summary>
-        [JsonProperty("managerCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("managerCtorParams")]
         [CodeGenPropertyCollection("Manager", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.", IsImportant = true,
             Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
@@ -681,7 +680,7 @@ entities:
         /// <summary>
         /// Indicates whether the `Manager` extensions logic should be generated.
         /// </summary>
-        [JsonProperty("managerExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("managerExtensions")]
         [CodeGenProperty("Manager", Title = "Indicates whether the `Manager` extensions logic should be generated.", 
             Description = "This can be overridden using `Operation.ManagerExtensions`.")]
         public bool? ManagerExtensions { get; set; }
@@ -689,7 +688,7 @@ entities:
         /// <summary>
         /// Gets or sets the name of the .NET Type that will perform the validation.
         /// </summary>
-        [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("validator")]
         [CodeGenProperty("Manager", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true,
             Description = "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
         public string? Validator { get; set; }
@@ -697,7 +696,7 @@ entities:
         /// <summary>
         /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
         /// </summary>
-        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("iValidator")]
         [CodeGenProperty("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
             Description = "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
         public string? IValidator { get; set; }
@@ -709,7 +708,7 @@ entities:
         /// <summary>
         /// Gets or sets the <c>RoutePrefixAtttribute</c> for the corresponding entity Web API controller.
         /// </summary>
-        [JsonProperty("webApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiRoutePrefix")]
         [CodeGenProperty("WebApi", Title = "The `RoutePrefixAtttribute` for the corresponding entity Web API controller.", IsImportant = true,
             Description = "This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s). The `CodeGeneration.WebApiRoutePrefix` will be prepended where specified.")]
         public string? WebApiRoutePrefix { get; set; }
@@ -717,7 +716,7 @@ entities:
         /// <summary>
         /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
         /// </summary>
-        [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiAuthorize")]
         [CodeGenProperty("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.")]
         public string? WebApiAuthorize { get; set; }
@@ -725,7 +724,7 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated Web API `Controller` constructor.
         /// </summary>
-        [JsonProperty("webApiCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiCtor")]
         [CodeGenProperty("WebApi", Title = "The access modifier for the generated Web API `Controller` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? WebApiCtor { get; set; }
@@ -733,7 +732,7 @@ entities:
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.
         /// </summary>
-        [JsonProperty("webApiCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiCtorParams")]
         [CodeGenPropertyCollection("WebApi", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.", IsImportant = true,
             Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
@@ -742,7 +741,7 @@ entities:
         /// <summary>
         /// Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`)` is automatically inferred.
         /// </summary>
-        [JsonProperty("webApiAutoLocation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiAutoLocation")]
         [CodeGenProperty("WebApi", Title = "Indicates whether the HTTP Response Location Header route (`Operation.WebApiLocation`) is automatically inferred.",
             Description = "This will automatically set the `Operation.WebApiLocation` for an `Operation` named `Create` where there is a corresponding named `Get`. This is defaulted from the `CodeGen.WebApiAutoLocation`.")]
         public bool? WebApiAutoLocation { get; set; }
@@ -750,7 +749,7 @@ entities:
         /// <summary>
         /// Indicates whether the Web API is responsible for managing concurrency via auto-generated ETag.
         /// </summary>
-        [JsonProperty("webApiConcurrency", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiConcurrency")]
         [CodeGenProperty("WebApi", Title = "Indicates whether the Web API is responsible for managing (simulating) concurrency via auto-generated ETag.",
             Description = "This provides an alternative where the underlying data source does not natively support optimistic concurrency (native support should always be leveraged as a priority). Where the `Operation.Type` is `Update` or `Patch`, the request ETag will " +
             "be matched against the response for a corresponding `Get` operation to verify no changes have been made prior to updating. For this to function correctly the .NET response Type for the `Get` must be the same as that returned from " +
@@ -760,7 +759,7 @@ entities:
         /// <summary>
         /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) either where, the `Operation.Type` is `Update` and `WebApiConcurrency` is `true`, or the `Operation.Type` is `Patch`.
         /// </summary>
-        [JsonProperty("webApiGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("webApiGetOperation")]
         [CodeGenProperty("WebApi", Title = "The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Update` and `SimulateConcurrency` is `true`.",
             Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
         public string? WebApiGetOperation { get; set; }
@@ -772,7 +771,7 @@ entities:
         /// <summary>
         /// Indicates whether a data <i>model</i> version of the entity should also be generated (output to <c>.\Business\Data\Model</c>).
         /// </summary>
-        [JsonProperty("dataModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("dataModel")]
         [CodeGenProperty("Model", Title = "Indicates whether a data `model` version of the entity should also be generated (output to `.\\Business\\Data\\Model`).",
             Description = "The model will be generated with `OmitEntityBase = true`. Any reference data properties will be defined using their `RefDataType` intrinsic `Type` versus their corresponding (actual) reference data `Type`.")]
         public bool? DataModel { get; set; }
@@ -784,14 +783,14 @@ entities:
         /// <summary>
         /// Indicates whether to exclude the generation of the <c>Entity</c> class (<c>Xxx.cs</c>).
         /// </summary>
-        [JsonProperty("excludeEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeEntity")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the `Entity` class (`Xxx.cs`).", IsImportant = true)]
         public bool? ExcludeEntity { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the generation of <b>all</b> <c>Operation</c> related code; excluding the <c>Entity</c> class.
         /// </summary>
-        [JsonProperty("excludeAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeAll")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class.", IsImportant = true,
             Description = "Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to exclude.")]
         public bool? ExcludeAll { get; set; }
@@ -799,14 +798,14 @@ entities:
         /// <summary>
         /// Indicates whether to exclude the generation of the <c>Data</c> interface (<c>IXxxData.cs</c>).
         /// </summary>
-        [JsonProperty("excludeIData", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeIData")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the `Data` interface (`IXxxData.cs`).")]
         public bool? ExcludeIData { get; set; }
 
         /// <summary>
         /// Gets or sets the option to exclude the generation of the <c>Data</c> class (<c>XxxData.cs</c>).
         /// </summary>
-        [JsonProperty("excludeData", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeData")]
         [CodeGenProperty("Exclude", Title = "The option to exclude the generation of the `Data` class (`XxxData.cs`).", Options = new string[] { "Include", "Exclude", "RequiresMapper" },
             Description = "Defaults to `Include` indicating _not_ to exlude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
         public string? ExcludeData { get; set; }
@@ -814,49 +813,49 @@ entities:
         /// <summary>
         /// Indicates whether to exclude the generation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
         /// </summary>
-        [JsonProperty("excludeIDataSvc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeIDataSvc")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`).")]
         public bool? ExcludeIDataSvc { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the generation of the <c>DataSvc</c> class (<c>XxxDataSvc.cs</c>).
         /// </summary>
-        [JsonProperty("excludeDataSvc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeDataSvc")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`).")]
         public bool? ExcludeDataSvc { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the generation of the <c>Manager</c> interface (<c>IXxxManager.cs</c>).
         /// </summary>
-        [JsonProperty("excludeIManager", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeIManager")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the `Manager` interface (`IXxxManager.cs`).")]
         public bool? ExcludeIManager { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the generation of the <c>Manager</c> class (<c>XxxManager.cs</c>).
         /// </summary>
-        [JsonProperty("excludeManager", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeManager")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the `Manager` class (`XxxManager.cs`).")]
         public bool? ExcludeManager { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the generation of the WebAPI <c>Controller</c> class (<c>XxxController.cs</c>).
         /// </summary>
-        [JsonProperty("excludeWebApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeWebApi")]
         [CodeGenProperty("Exclude", Title = "The option to exclude the generation of the WebAPI `Controller` class (`XxxController.cs`).")]
         public bool? ExcludeWebApi { get; set; }
 
         /// <summary>
         /// The option to exclude the generation of the WebAPI <c>Agent</c> class (<c>XxxAgent.cs</c>).
         /// </summary>
-        [JsonProperty("excludeWebApiAgent", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeWebApiAgent")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the WebAPI consuming `Agent` class (`XxxAgent.cs`).")]
         public bool? ExcludeWebApiAgent { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the generation of the gRPC <c>Agent</c> class (<c>XxxAgent.cs</c>).
         /// </summary>
-        [JsonProperty("excludeGrpcAgent", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeGrpcAgent")]
         [CodeGenProperty("Exclude", Title = "Indicates whether to exclude the generation of the gRPC consuming `Agent` class (`XxxAgent.cs`).")]
         public bool? ExcludeGrpcAgent { get; set; }
 
@@ -867,7 +866,7 @@ entities:
         /// <summary>
         /// Gets or sets the role (permission) used by the <c>ExecutionContext.IsInRole(role)</c> for each <c>Operation</c>.
         /// </summary>
-        [JsonProperty("authRole", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("authRole")]
         [CodeGenProperty("Auth", Title = "The role (permission) used by the `ExecutionContext.IsInRole(role)` for each `Operation`.", IsImportant = true,
             Description = "Used where not overridden specifically for an `Operation`; i.e. acts as the default.")]
         public string? AuthRole { get; set; }
@@ -879,7 +878,7 @@ entities:
         /// <summary>
         /// Indicates whether gRPC support (more specifically service-side) is required for the Entity.
         /// </summary>
-        [JsonProperty("grpc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("grpc")]
         [CodeGenProperty("gRPC", Title = "Indicates whether gRPC support (more specifically service-side) is required for the Entity.", IsImportant = true,
             Description = "gRPC support is an explicit opt-in model (see `CodeGeneration.Grpc` configuration); therefore, each corresponding `Property` and `Operation` will also need to be opted-in specifically.")]
         public bool? Grpc { get; set; }
@@ -891,7 +890,7 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding <see cref="PropertyConfig"/> collection.
         /// </summary>
-        [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("properties")]
         [CodeGenPropertyCollection("Collections", Title = "The corresponding `Property` collection.")]
         public List<PropertyConfig>? Properties { get; set; }
 
@@ -990,7 +989,7 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
         /// </summary>
-        [JsonProperty("operations", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("operations")]
         [CodeGenPropertyCollection("Collections", Title = "The corresponding `Operation` collection.")]
         public List<OperationConfig>? Operations { get; set; }
 
@@ -1087,7 +1086,7 @@ entities:
         /// <summary>
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
         /// </summary>
-        [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("consts")]
         [CodeGenPropertyCollection("Collections", Title = "The corresponding `Consts` collection.")]
         public List<ConstConfig>? Consts { get; set; }
 

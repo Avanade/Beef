@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OnRamp;
 using OnRamp.Config;
 using System;
@@ -12,7 +12,6 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the table join on condition configuration.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("QueryJoinOn", Title = "'QueryJoinOn' object (database-driven)",
         Description = "The `QueryJoinOn` object defines the join on characteristics for a join within a query.",
         ExampleMarkdown = @"A YAML configuration example is as follows:
@@ -42,14 +41,14 @@ queries:
         /// <summary>
         /// Gets or sets the name of the join column (from the `Join` table).
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("name")]
         [CodeGenProperty("Key", Title = "The name of the join column (from the `Join` table).", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the other join to table schema.
         /// </summary>
-        [JsonProperty("toSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("toSchema")]
         [CodeGenProperty("Key", Title = "The name of the other join to table schema.",
             Description = "Defaults to `Table.Schema`; i.e. same schema. See also `ToTable` and `ToColumn` as these all relate.")]
         public string? ToSchema { get; set; }
@@ -57,7 +56,7 @@ queries:
         /// <summary>
         /// Gets or sets the name of the other join to table.
         /// </summary>
-        [JsonProperty("toTable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("toTable")]
         [CodeGenProperty("Key", Title = "The name of the other join to table.",
             Description = "Defaults to `Table.Name`; i.e. primary table. See also `ToSchema` and `ToColumn` as these all relate.")]
         public string? ToTable { get; set; }
@@ -65,7 +64,7 @@ queries:
         /// <summary>
         /// Gets or sets the name of the other join to column.
         /// </summary>
-        [JsonProperty("toColumn", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("toColumn")]
         [CodeGenProperty("Key", Title = "The name of the other join to column.", IsImportant = true,
             Description = "Defaults to `Name`; i.e. assumes same name. See also `ToSchema` and `ToTable` as these all relate.")]
         public string? ToColumn { get; set; }
@@ -73,7 +72,7 @@ queries:
         /// <summary>
         /// Gets or sets the fully qualified name (`Alias.Name`) of the other column being joined to or other valid SQL (e.g. function) bypassing the corresponding `Schema`, `Table` and `Column` logic.
         /// </summary>
-        [JsonProperty("toStatement", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("toStatement")]
         [CodeGenProperty("Key", Title = "The fully qualified name (`Alias.Name`) of the other column being joined to or other valid SQL (e.g. function) bypassing the corresponding `Schema`, `Table` and `Column` logic.")]
         public string? ToStatement { get; set; }
 

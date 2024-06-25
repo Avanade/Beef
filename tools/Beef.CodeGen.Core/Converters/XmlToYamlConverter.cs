@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
@@ -218,7 +218,7 @@ namespace Beef.CodeGen.Converters
                 if (val == null)
                     continue;
 
-                if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
+                if (pi == null || pi.GetCustomAttribute<JsonPropertyNameAttribute>() == null)
                 {
                     jname = att.Name.LocalName;
                     args.UnknownAttributes.Add($"{xml.Name.LocalName}.{jname} = {val}");

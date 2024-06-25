@@ -2,7 +2,7 @@
   "profiles": {
     "My.Hr.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "entity"
+      "commandLineArgs": "entity -sim"
     }
   }
 }

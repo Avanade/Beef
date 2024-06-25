@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Enhancement:* Added `net8.0` support to existing `netstandard2.1` and `net6.0`.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+  - *Note* Given latest changes to underlying `OnRamp` all serialization is now handled by `System.Text.Json` (versus `Newtonsoft.Json`) for the code-gen configurations.
+
 ## v4.2.21
 - *Fixed:* Upgraded `DbEx.SqlServer` to version `2.3.9`.
 

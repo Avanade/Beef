@@ -9,7 +9,7 @@ namespace Beef.Caching
     /// Provides concurrency locking for a specified key value.
     /// </summary>
     /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
-    public sealed class KeyedLock<TKey>
+    public sealed class KeyedLock<TKey> where TKey : notnull
     {
         private readonly ConcurrentDictionary<TKey, object> _lockDict = new();
 

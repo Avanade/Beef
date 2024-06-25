@@ -10,7 +10,7 @@ namespace Beef.Caching
     /// <summary>
     /// Provides multi-key cache management over underlying data caches.
     /// </summary>
-    public class MultiKeyCache<TKey, TCache> : CacheCoreBase
+    public class MultiKeyCache<TKey, TCache> : CacheCoreBase where TKey : notnull
         where TCache : ICacheCore
     {
         private readonly Func<TKey, ICachePolicy, TCache> _createCache;

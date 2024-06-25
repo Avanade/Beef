@@ -69,7 +69,7 @@ namespace Beef.RefData
         {
             Check.NotNull(coll, nameof(coll));
             Check.NotNull(filter, nameof(filter));
-            if (!filter.Codes.Any() && string.IsNullOrEmpty(filter.Text) && !includeInactive)
+            if (filter.Codes is null || !filter.Codes.Any() && string.IsNullOrEmpty(filter.Text) && !includeInactive)
                 return new ReferenceDataFilterResult<TItem>(coll.ActiveList) { ETag = coll.ETag };
 
             // Validate the arguments.

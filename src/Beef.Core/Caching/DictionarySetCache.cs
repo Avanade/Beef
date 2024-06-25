@@ -11,7 +11,7 @@ namespace Beef.Caching
     /// </summary>
     /// <typeparam name="TKey">The <see cref="ICollection{TKey}"/> <see cref="Type"/> that is being cache managed.</typeparam>
     /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
-    public class DictionarySetCache<TKey, TValue> : CacheCoreBase
+    public class DictionarySetCache<TKey, TValue> : CacheCoreBase where TKey : notnull
     {
         private Dictionary<TKey, TValue>? _dict;
 

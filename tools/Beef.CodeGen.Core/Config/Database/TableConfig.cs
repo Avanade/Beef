@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using DbEx.DbSchema;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using OnRamp;
 using OnRamp.Config;
 using OnRamp.Utility;
@@ -15,7 +15,6 @@ namespace Beef.CodeGen.Config.Database
     /// <summary>
     /// Represents the table configuration.
     /// </summary>
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [CodeGenClass("Table", Title = "'Table' object (entity-driven)", 
         Description = "The `Table` object identifies an existing database `Table` (or `View`) and defines its code-generation characteristics.", 
         Markdown = @"The columns for the table (or view) are inferred from the database schema definition. The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns from all the `StoredProcedure` children. A table can be defined more that once to enable different column configurations as required.
@@ -66,14 +65,14 @@ tables:
         /// <summary>
         /// Gets or sets the name of the `Table` (or `View`) in the database.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("name")]
         [CodeGenProperty("Key", Title = "The name of the `Table` in the database.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the `Schema` where the `Table` is defined in the database.
         /// </summary>
-        [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("schema")]
         [CodeGenProperty("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsImportant = true,
             Description = "Defaults to `CodeGeneration.Schema`.")]
         public string? Schema { get; set; }
@@ -81,7 +80,7 @@ tables:
         /// <summary>
         /// Gets or sets the `Schema.Table` alias name.
         /// </summary>
-        [JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("alias")]
         [CodeGenProperty("Key", Title = "The `Schema.Table` alias name.",
             Description = "Will automatically default where not specified.")]
         public string? Alias { get; set; }
@@ -93,7 +92,7 @@ tables:
         /// <summary>
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
-        [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("includeColumns")]
         [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
         public List<string>? IncludeColumns { get; set; }
@@ -101,7 +100,7 @@ tables:
         /// <summary>
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
-        [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("excludeColumns")]
         [CodeGenPropertyCollection("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         public List<string>? ExcludeColumns { get; set; }
@@ -113,14 +112,14 @@ tables:
         /// <summary>
         /// Indicates whether a `Get` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("get", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("get")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `Get` stored procedure is to be automatically generated where not otherwise explicitly specified.")]
         public bool? Get { get; set; }
 
         /// <summary>
         /// Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("getAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("getAll")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.",
             Description = "The `GetAllOrderBy` is used to specify the `GetAll` query sort order.")]
         public bool? GetAll { get; set; }
@@ -128,7 +127,7 @@ tables:
         /// <summary>
         /// Gets or sets the list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.
         /// </summary>
-        [JsonProperty("getAllOrderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("getAllOrderBy")]
         [CodeGenPropertyCollection("CodeGen", Title = "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
             Description = "This relates to the `GetAll` selection.")]
         public List<string>? GetAllOrderBy { get; set; }
@@ -136,35 +135,35 @@ tables:
         /// <summary>
         /// Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("create", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("create")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified.")]
         public bool? Create { get; set; }
 
         /// <summary>
         /// Indicates whether a `Update` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("update", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("update")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `Update` stored procedure is to be automatically generated where not otherwise explicitly specified.")]
         public bool? Update { get; set; }
 
         /// <summary>
         /// Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("upsert", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("upsert")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified.")]
         public bool? Upsert { get; set; }
 
         /// <summary>
         /// Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("delete", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("delete")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified.")]
         public bool? Delete { get; set; }
 
         /// <summary>
         /// Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("merge", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("merge")]
         [CodeGenProperty("CodeGen", Title = "Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.",
             Description = "This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.")]
         public bool? Merge { get; set; }
@@ -176,14 +175,14 @@ tables:
         /// <summary>
         /// Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
         /// </summary>
-        [JsonProperty("efModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("efModel")]
         [CodeGenProperty("EntityFramework", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated.")]
         public bool? EfModel { get; set; }
 
         /// <summary>
         /// Gets or sets the .NET (C#) EntityFramework (EF) model name.
         /// </summary>
-        [JsonProperty("efModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("efModelName")]
         [CodeGenProperty("EntityFramework", Title = "The .NET (C#) EntityFramework (EF) model name.",
             Description = "Defaults to `Name`.")]
         public string? EfModelName { get; set; }
@@ -195,14 +194,14 @@ tables:
         /// <summary>
         /// Indicates whether a `User Defined Table (UDT)` type should be created.
         /// </summary>
-        [JsonProperty("udt", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("udt")]
         [CodeGenProperty("UDT", Title = "Indicates whether a `User Defined Table (UDT)` type should be created.", IsImportant = true)]
         public bool? Udt { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names to be excluded from the `User Defined Table (UDT)`.
         /// </summary>
-        [JsonProperty("udtExcludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("udtExcludeColumns")]
         [CodeGenPropertyCollection("UDT", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
             Description = "Where not specified this indicates that no `Columns` are to be excluded.")]
         public List<string>? UdtExcludeColumns { get; set; }
@@ -210,14 +209,14 @@ tables:
         /// <summary>
         /// Gets or sets the name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
         /// </summary>
-        [JsonProperty("tvp", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("tvp")]
         [CodeGenProperty("UDT", Title = "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.", IsImportant = true)]
         public string? Tvp { get; set; }
 
         /// <summary>
         /// Gets or sets the entity scope option.
         /// </summary>
-        [JsonProperty("entityScope", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("entityScope")]
         [CodeGenProperty("UDT", Title = "The entity scope option.", Options = new string[] { "Common", "Business", "Autonomous" },
             Description = "Defaults to `CodeGeneration.EntityScope`. Determines where the entity is scoped/defined, being `Common` or `Business` (i.e. not externally visible).")]
         public string? EntityScope { get; set; }
@@ -229,14 +228,14 @@ tables:
         /// <summary>
         /// Gets or sets the permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).
         /// </summary>
-        [JsonProperty("permission", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("permission")]
         [CodeGenProperty("Auth", Title = "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).", IsImportant = true)]
         public string? Permission { get; set; }
 
         /// <summary>
         /// Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.
         /// </summary>
-        [JsonProperty("orgUnitImmutable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("orgUnitImmutable")]
         [CodeGenProperty("Auth", Title = "Indicates whether the `OrgUnitId` column is considered immutable, in that it can not be changed once set.", IsImportant = true,
             Description = "Defaults to `CodeGeneration.OrgUnitImmutable`. This is only applicable for stored procedures.")]
         public bool? OrgUnitImmutable { get; set; }
@@ -248,7 +247,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `IsDeleted` capability.
         /// </summary>
-        [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameIsDeleted")]
         [CodeGenProperty("Infer", Title = "The column name for the `IsDeleted` capability.",
             Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
@@ -256,7 +255,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `TenantId` capability.
         /// </summary>
-        [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameTenantId")]
         [CodeGenProperty("Infer", Title = "The column name for the `TenantId` capability.",
             Description = "Defaults to `CodeGeneration.TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
@@ -264,7 +263,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `OrgUnitId` capability.
         /// </summary>
-        [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameOrgUnitId")]
         [CodeGenProperty("Infer", Title = "The column name for the `OrgUnitId` capability.",
             Description = "Defaults to `CodeGeneration.OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
@@ -272,7 +271,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `RowVersion` capability.
         /// </summary>
-        [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameRowVersion")]
         [CodeGenProperty("Infer", Title = "The column name for the `RowVersion` capability.",
             Description = "Defaults to `CodeGeneration.RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
@@ -280,7 +279,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `CreatedBy` capability.
         /// </summary>
-        [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameCreatedBy")]
         [CodeGenProperty("Infer", Title = "The column name for the `CreatedBy` capability.",
             Description = "Defaults to `CodeGeneration.CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
@@ -288,7 +287,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `CreatedDate` capability.
         /// </summary>
-        [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameCreatedDate")]
         [CodeGenProperty("Infer", Title = "The column name for the `CreatedDate` capability.",
             Description = "Defaults to `CodeGeneration.CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
@@ -296,7 +295,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `UpdatedBy` capability.
         /// </summary>
-        [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameUpdatedBy")]
         [CodeGenProperty("Infer", Title = "The column name for the `UpdatedBy` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
@@ -304,7 +303,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `UpdatedDate` capability.
         /// </summary>
-        [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameUpdatedDate")]
         [CodeGenProperty("Infer", Title = "The column name for the `UpdatedDate` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
@@ -312,7 +311,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `DeletedBy` capability.
         /// </summary>
-        [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameDeletedBy")]
         [CodeGenProperty("Infer", Title = "The column name for the `DeletedBy` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
@@ -320,7 +319,7 @@ tables:
         /// <summary>
         /// Gets or sets the column name for the `DeletedDate` capability.
         /// </summary>
-        [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("columnNameDeletedDate")]
         [CodeGenProperty("Infer", Title = "The column name for the `DeletedDate` capability.",
             Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
@@ -332,7 +331,7 @@ tables:
         /// <summary>
         /// Gets or sets the corresponding <see cref="StoredProcedureConfig"/> collection.
         /// </summary>
-        [JsonProperty("storedProcedures", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("storedProcedures")]
         [CodeGenPropertyCollection("Collections", Title = "The corresponding `StoredProcedure` collection.",
             Markdown = "A `StoredProcedure` object defines the stored procedure code-generation characteristics.")]
         public List<StoredProcedureConfig>? StoredProcedures { get; set; }

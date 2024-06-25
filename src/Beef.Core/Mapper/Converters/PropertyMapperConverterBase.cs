@@ -16,7 +16,7 @@ namespace Beef.Mapper.Converters
     /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
     public abstract class PropertyMapperConverterBase<T, TSrceProperty, TDestProperty>
         : TwoKeySetCache<TSrceProperty, TDestProperty>, IPropertyMapperConverter<TSrceProperty, TDestProperty>
-        where T : PropertyMapperConverterBase<T, TSrceProperty, TDestProperty>, new()
+        where T : PropertyMapperConverterBase<T, TSrceProperty, TDestProperty>, new() where TSrceProperty : notnull where TDestProperty : notnull
     {
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>

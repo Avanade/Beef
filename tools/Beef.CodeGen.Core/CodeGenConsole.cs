@@ -43,6 +43,11 @@ namespace Beef.CodeGen
         public const string ApiNameParamName = "ApiName";
 
         /// <summary>
+        /// Gets the 'DatabaseMigrator' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
+        /// </summary>
+        public const string DatabaseMigratorParamName = "DatabaseMigrator";
+
+        /// <summary>
         /// Gets the default masthead text.
         /// </summary>
         /// <remarks>Defaults to 'Beef Code-Gen Tool' formatted using <see href="http://www.patorjk.com/software/taag/#p=display&amp;f=Calvin%20S&amp;t=Beef%20Code-Gen%20Tool%0A"/>.</remarks>

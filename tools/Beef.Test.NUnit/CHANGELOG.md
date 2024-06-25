@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.3.0
+- *Enhancement:* Updated to use common version number across all _Beef_ projects; simplifies version and compatibility management.
+- *Enhancement:* Replaced existing `netstandard2.1` support with `net6.0` and `net8.0`.
+- *Fixed:* Updated internal dependencies to latest per above framework version.
+  - The `UnitTestEx.NUnit` is dependent on `NUnit` version `4.1.0` which has the [*Contraint Model*](https://docs.nunit.org/articles/nunit/writing-tests/assertions/assertion-models/constraint.html) versus existing [*Classic*](https://docs.nunit.org/articles/nunit/writing-tests/assertions/assertion-models/classic.html); this will result in breaking changes. To resolve, either update to the new model or use the `ClassicAssert` class. A quick fix can be achieved by adding the following XML to the *test* `.csproj` file: 
+	`<ItemGroup><Using Include="NUnit.Framework.Legacy.ClassicAssert" Alias="Assert"/></ItemGroup>`.
+
 ## v4.2.10
 - *Fixed:* Upgraded internal `CoreEx.Newtonsoft` and `UnitTestEx.NUnit` internal (and related) references. Needed to support `Beef.Database.Core` version `4.2.8` and `Beef.CodeGen.Core` version `4.2.21`.
 

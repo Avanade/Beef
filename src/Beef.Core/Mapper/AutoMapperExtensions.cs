@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using AutoMapper;
+using AutoMapper.Configuration;
 using System;
 using System.Linq.Expressions;
 
@@ -30,7 +31,15 @@ namespace Beef.Mapper
             if (mce == null)
                 throw new ArgumentNullException(nameof(mce));
 
-            mce.PreCondition((ResolutionContext rc) => !rc.Options.Items.TryGetValue(OperationTypesName, out var ot) || operationTypes.HasFlag((OperationTypes)ot));
+            //mce.PreCondition((ResolutionContext rc) => !rc.Items.TryGetValue(OperationTypesName, out var ot) || operationTypes.HasFlag((OperationTypes)ot));
+            mce.PreCondition((ResolutionContext rc) =>
+            {
+                if (!rc.TryGetItems(out var items))
+                    return true;
+
+                return !items.TryGetValue(OperationTypesName, out var ot) || operationTypes.HasFlag((OperationTypes)ot);
+            });
+
             return mce;
         }
 
@@ -48,7 +57,15 @@ namespace Beef.Mapper
             if (pce == null)
                 throw new ArgumentNullException(nameof(pce));
 
-            pce.Condition(cp => !cp.Context.Options.Items.TryGetValue(OperationTypesName, out var ot) || operationTypes.HasFlag((OperationTypes)ot));
+            //pce.Condition(cp => !cp.Context.Items.TryGetValue(OperationTypesName, out var ot) || operationTypes.HasFlag((OperationTypes)ot));
+            pce.Condition(cp =>
+            {
+                if (!cp.Context.TryGetItems(out var items))
+                    return true;
+
+                return !items.TryGetValue(OperationTypesName, out var ot) || operationTypes.HasFlag((OperationTypes)ot);
+            });
+
             return pce;
         }
 

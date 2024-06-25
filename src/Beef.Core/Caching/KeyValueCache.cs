@@ -14,7 +14,7 @@ namespace Beef.Caching
     /// </summary>
     /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
-    public class KeyValueCache<TKey, TValue> : CacheCoreBase
+    public class KeyValueCache<TKey, TValue> : CacheCoreBase where TKey : notnull
     {
         private readonly ConcurrentDictionary<TKey, CacheValue<TValue>> _dict = new();
         private readonly Func<TKey, TValue>? _get;

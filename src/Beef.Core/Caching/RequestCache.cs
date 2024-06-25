@@ -23,7 +23,7 @@ namespace Beef.Caching
         /// <returns><c>true</c> where found; otherwise, <c>false</c>.</returns>
         public bool TryGetValue<T>(UniqueKey key, out T value)
         {
-            if (_caching.IsValueCreated && _caching.Value.TryGetValue(new Tuple<Type, UniqueKey>(typeof(T), key), out object val))
+            if (_caching.IsValueCreated && _caching.Value.TryGetValue(new Tuple<Type, UniqueKey>(typeof(T), key), out object? val))
             {
                 value = (T)val;
                 return true;

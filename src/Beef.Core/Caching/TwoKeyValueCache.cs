@@ -18,7 +18,7 @@ namespace Beef.Caching
     /// <remarks>To ensure the most effective concurrency throughput and consistency <i>Key1</i> is the primary and is used for all cross-thread locking scenarios; as such,
     /// <i>Key2</i> is considered secondary. Therefore, it is possible that if an access it made for both <i>Key1</i> and <i>Key2</i> concurrently each will result in a <i>Value</i> get;
     /// in this case the value for <i>Key1</i> is always used.</remarks>
-    public class TwoKeyValueCache<TKey1, TKey2, TValue> : CacheCoreBase
+    public class TwoKeyValueCache<TKey1, TKey2, TValue> : CacheCoreBase where TKey1 : notnull where TKey2 : notnull
     {
         private readonly ConcurrentDictionary<TKey1, CacheValue> _dict1 = new();
         private readonly ConcurrentDictionary<TKey2, CacheValue> _dict2 = new();
