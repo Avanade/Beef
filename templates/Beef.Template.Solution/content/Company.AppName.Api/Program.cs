@@ -1,5 +1,5 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddEnvironmentVariables("Bookings_");
+builder.Configuration.AddEnvironmentVariables("AppName_");
 
 var startup = new Startup();
 startup.ConfigureServices(builder.Services);
