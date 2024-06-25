@@ -1,13 +1,16 @@
-﻿Host.CreateDefaultBuilder()
-    .ConfigureWebHostDefaults(b => b.UseStartup<Startup>())
-    .ConfigureAppConfiguration(c => c.AddEnvironmentVariables("AppName_").AddCommandLine(args))
-    .ConfigureServices(s =>
-    {
+﻿var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables("Bookings_");
+
+var startup = new Startup();
+startup.ConfigureServices(builder.Services);
+
 #if (implement_entityframework)
-        s.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddEntityFrameworkCoreInstrumentation().AddSource("CoreEx.*", "Company.AppName.*"));
+builder.Services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddEntityFrameworkCoreInstrumentation().AddSource("CoreEx.*", "Company.AppName.*"));
 #else
-        s.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "Company.AppName.*"));
+builder.Services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "Company.AppName.*"));
 #endif
-    })
-    .Build()
-    .Run();
+
+var app = builder.Build();
+startup.Configure(app);
+
+app.Run();

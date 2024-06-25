@@ -1715,7 +1715,7 @@ entities:
 
                 if (PrimaryKeyProperties.Count == 1)
                 {
-                    var id = Properties!.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
+                    var id = PrimaryKeyProperties!.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
                     if (id != null)
                     {
                         var iid = id.Type switch
@@ -1735,6 +1735,12 @@ entities:
                             HasIdentifier = true;
                         }
                     }
+                }
+                else if (PrimaryKeyPropertiesIncludeInherited.Count == 1)
+                {
+                    var id = PrimaryKeyPropertiesIncludeInherited!.FirstOrDefault(x => x.Name == "Id");
+                    if (id != null)
+                        HasIdentifier = true;
                 }
             }
 
@@ -1772,6 +1778,12 @@ entities:
                     if (Properties!.Any(x => x.IsChangeLog && CompareNullOrValue(x.Inherited, false) && CompareNullOrValue(x.InternalOnly, false)))
                         commonImplements.Insert(c++, "IChangeLog");
                 }
+
+                if (Properties!.Any(x => x.Name == "TenantId" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
+                    modelImplements.Insert(m++, "ITenantId");
+
+                if (Properties!.Any(x => x.Name == "IsDeleted" && x.Type == "bool" && CompareNullOrValue(x.Nullable, true) && CompareNullOrValue(x.Inherited, false)))
+                    modelImplements.Insert(m++, "ILogicallyDeleted");
             }
 
             EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.GroupBy(x => x).Select(y => y.First()).ToArray());

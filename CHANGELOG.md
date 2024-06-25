@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.7
+- *Fixed*: Fixes the model code-generation to auto implement the `ITenantId` and `ILogicallyDeleted` where corresponding properties are defined.
+- *Fixed*: Fixed the manager code-generation to output the `IdentifierGenerator` code where inheriting the `Id` property.
+
 ## v5.12.6
 - *Fixed*: The EF Model generation has had the `ITenantId.TenantId` filtering removed as out-of-the-box EF caches first and uses resulting in an unexpected side-effect. The `CoreEx.EntityFramework` as of `v3.20.0` automatically includes tenant filtering to achieve the desired behavior.
 - *Fixed:* Upgraded `CoreEx` (`v3.20.0`) to include all related fixes and improvements.
