@@ -93,7 +93,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "5.12.7"
+        "value": "5.12.8"
       },
       "replaces": "BeefVersion"
     },

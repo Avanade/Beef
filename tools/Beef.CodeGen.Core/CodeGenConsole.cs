@@ -381,7 +381,7 @@ namespace Beef.CodeGen
         {
             foreach (var di in dcs.Directory.EnumerateDirectories())
             {
-                if (di.Name.Equals("obj", StringComparison.InvariantCultureIgnoreCase) || di.Name.Equals("bin", StringComparison.InvariantCultureIgnoreCase))
+                if (di.Name.Equals("obj", StringComparison.InvariantCultureIgnoreCase) || di.Name.Equals("bin", StringComparison.InvariantCultureIgnoreCase) || di.Name.StartsWith('.'))
                     continue;
 
                 if (dcs.Exclude.Any(x => di.Name.Contains(x, StringComparison.InvariantCultureIgnoreCase)))

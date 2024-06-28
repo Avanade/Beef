@@ -863,6 +863,13 @@ entities:
             Description = "The model will be generated with `OmitEntityBase = true`. Any reference data properties will be defined using their `RefDataType` intrinsic `Type` versus their corresponding (actual) reference data `Type`.")]
         public bool? DataModel { get; set; }
 
+        /// <summary>
+        /// Gets or sets the override for the data <i>model</i> inherits.
+        /// </summary>
+        [JsonPropertyName("dataModelInherits")]
+        [CodeGenProperty("Model", Title = "Overrides the default data `model` inherits value.")]
+        public string? DataModelInherits { get; set; }
+
         #endregion
 
         #region Exclude
@@ -1473,7 +1480,7 @@ entities:
             HttpAgentReturnModel = DefaultWhereNull(HttpAgentReturnModel, () => HttpAgentModel);
 
             // Ensure the WebApiTags are set correctly.
-            if (WebApiTags is not null && WebApiTags.Any())
+            if (WebApiTags is not null && WebApiTags.Count != 0)
             {
                 var list = new List<string>();
                 foreach (var tag in WebApiTags)
@@ -1528,6 +1535,15 @@ entities:
                 "Guid" => $"ReferenceDataBaseEx<Guid, {Name}>",
                 "string" => $"ReferenceDataBaseEx<string?, {Name}>",
                 _ => CompareNullOrValue(OmitEntityBase, false) ? $"EntityBase" : null
+            });
+
+            DataModelInherits = DefaultWhereNull(DataModelInherits, () => RefDataType switch
+            {
+                "int" => "ReferenceDataBase<int>",
+                "long" => "ReferenceDataBase<long>",
+                "Guid" => "ReferenceDataBase<Guid>",
+                "string" => "ReferenceDataBase<string?>",
+                _ => EntityInherits == "EntityBase" ? null : EntityInherits
             });
 
             ModelInherits = RefDataType switch
