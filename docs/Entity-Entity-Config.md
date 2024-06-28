@@ -280,6 +280,7 @@ Provides the data _Model_ configuration.
 Property | Description
 -|-
 `dataModel` | Indicates whether a data `model` version of the entity should also be generated (output to `.\Business\Data\Model`).<br/>&dagger; The model will be generated with `OmitEntityBase = true`. Any reference data properties will be defined using their `RefDataType` intrinsic `Type` versus their corresponding (actual) reference data `Type`.
+`modelInherits` | Overrides the default data `model` inherits value.
 
 <br/>
 

@@ -45,7 +45,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
     /// </summary>
 {{#if Root.IsDataModel}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval DataModelInherits}} : {{{DataModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval DataModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
 {{else}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval CommonImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{CommonImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
 {{/if}}

@@ -888,6 +888,10 @@
           "title": "Indicates whether a data \u0060model\u0060 version of the entity should also be generated (output to \u0060.\\Business\\Data\\Model\u0060).",
           "description": "The model will be generated with \u0060OmitEntityBase = true\u0060. Any reference data properties will be defined using their \u0060RefDataType\u0060 intrinsic \u0060Type\u0060 versus their corresponding (actual) reference data \u0060Type\u0060."
         },
+        "modelInherits": {
+          "type": "string",
+          "title": "Overrides the default data \u0060model\u0060 inherits value."
+        },
         "excludeEntity": {
           "type": "boolean",
           "title": "Indicates whether to exclude the generation of the \u0060Entity\u0060 class (\u0060Xxx.cs\u0060)."
@@ -1563,13 +1567,14 @@
         "webApiAlternateStatus": {
           "type": "string",
           "title": "The primary HTTP Status Code that will be returned for the operation where there is a \u0060null\u0060 return value.",
-          "description": "The value defaults as follows: \u0060NotFound\u0060 for \u0060Operation.Type\u0060 value \u0060Get\u0060 and \u0060NoContent\u0060 for \u0060Operation.Type\u0060 value \u0060GetColl\u0060; otherwise, \u0060null\u0060.",
+          "description": "The value defaults as follows: \u0060NotFound\u0060 for \u0060Operation.Type\u0060 of \u0060Get\u0060, \u0060Update\u0060, \u0060Patch\u0060; \u0060NoContent\u0060 for \u0060Operation.Type\u0060 of \u0060GetColl\u0060; otherwise, \u0060none\u0060. A value of \u0060none\u0060 indicates that there is _no_ alternate status.",
           "enum": [
             "OK",
             "Accepted",
             "Created",
             "NoContent",
-            "NotFound"
+            "NotFound",
+            "none"
           ]
         },
         "webApiLocation": {
