@@ -4,7 +4,7 @@ Represents the **NuGet** versions.
 
 ## v5.12.8
 - *Fixed*: Fixed the model code-generation by allowing the `ModelInherits` to be specified within the `Entity` YAML configuration to override the default.
-- *Fixed*: Fixed `dotnet run count` to exclude paths that start with `.` (dot) to avoid including in the count.
+- *Fixed*: Fixed `dotnet run count` to exclude paths that start with `.` (dot) to avoid including hidden files in the count.
 
 ## v5.12.7
 - *Fixed*: Fixes the model code-generation to auto implement the `ITenantId` and `ILogicallyDeleted` where corresponding properties are defined.
