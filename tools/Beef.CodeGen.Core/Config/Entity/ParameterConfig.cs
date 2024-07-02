@@ -52,7 +52,7 @@ parameters: [
         /// </summary>
         [JsonPropertyName("text")]
         [CodeGenProperty("Key", Title = "The overriding text for use in comments.",
-            Description = "By default the `Text` will be the `Name` reformatted as sentence casing.")]
+            Description = "By default the `Text` will be the `Name` reformatted as sentence casing. To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? Text { get; set; }
 
         /// <summary>
@@ -198,7 +198,7 @@ parameters: [
         /// </summary>
         [JsonPropertyName("webApiText")]
         [CodeGenProperty("WebApi", Title = "The overriding text for use in the Web API comments.",
-            Description = "By default the `Text` will be the `Name` reformatted as sentence casing.")]
+            Description = "By default the `WbeApiText` will be the `Name` reformatted as sentence casing. To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? WebApiText { get; set; }
 
         #endregion
@@ -227,16 +227,16 @@ parameters: [
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" 
-            ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {Text}.")
-            : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? SummaryText => CodeGenConfig.GetSentenceText(CodeGenConfig.GetFormattedText(Text, text => IsValueArg && Parent!.Type == "Patch" 
+            ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {text}.")
+            : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {text}.")));
 
         /// <summary>
         /// Gets the formatted WebApi summary text.
         /// </summary>
-        public string? WebApiSummaryText => IsValueArg && Parent!.Type == "Patch"
-            ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {WebApiText}.")
-            : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {WebApiText}.");
+        public string? WebApiSummaryText => CodeGenConfig.GetSentenceText(CodeGenConfig.GetFormattedText(WebApiText, text => IsValueArg && Parent!.Type == "Patch"
+            ? StringConverter.ToComments($"The {{{{string}}}} that contains the patch content for the {text}.")
+            : StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {text}.")));
 
         /// <summary>
         /// Gets the computed declared parameter type.

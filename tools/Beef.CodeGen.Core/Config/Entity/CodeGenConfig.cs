@@ -710,5 +710,37 @@ entities:
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the formatted text.
+        /// </summary>
+        /// <param name="text">The original text.</param>
+        /// <param name="formatter">The text formatter function.</param>
+        /// <returns>The formatted text.</returns>
+        /// <remarks>Where the text starts with a <c>+</c> (plus sign) then the text will be used as-is (without the plus); otherwise, the formatter will be used.</remarks>
+        internal static string? GetFormattedText(string? text, Func<string, string?> formatter)
+        {
+            text = text?.TrimEnd();
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            if (text.StartsWith('+'))
+                return text[1..];
+
+            return formatter(text);
+        }
+
+        /// <summary>
+        /// Gets the sentence text.
+        /// </summary>
+        /// <param name="text">The original text.</param>
+        /// <returns>The text with a terminating full stop.</returns>
+        internal static string? GetSentenceText(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            else
+                return text.EndsWith('.') ? text : text + ".";
+        }
     }
 }

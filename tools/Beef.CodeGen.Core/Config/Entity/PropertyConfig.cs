@@ -4,7 +4,6 @@ using OnRamp;
 using OnRamp.Config;
 using OnRamp.Utility;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -64,7 +63,7 @@ properties: [
         [JsonPropertyName("text")]
         [CodeGenProperty("Key", Title = "The overriding text for use in comments.",
             Description = "By default the `Text` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. " +
-            "Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            "Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? Text { get; set; }
 
         /// <summary>
@@ -73,7 +72,7 @@ properties: [
         [JsonPropertyName("modelText")]
         [CodeGenProperty("Key", Title = "The overriding model text for use in comments.",
             Description = "By default the `ModelText` will be the `Name` reformatted as sentence casing. Depending on whether the `Type` is `bool`, will appear in one of the two generated sentences. Where not `bool` it will be: Gets or sets a value indicating whether {text}.'. " +
-            "Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            "Otherwise, it will be: Gets or sets the {text}.'. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? ModelText { get; set; }
 
         /// <summary>
@@ -475,12 +474,12 @@ properties: [
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
+        public string? SummaryText => CodeGenConfig.GetSentenceText(StringConverter.ToComments(CodeGenConfig.GetFormattedText(Text, text => $"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {text}.")));
 
         /// <summary>
         /// Gets the formatted model summary text.
         /// </summary>
-        public string? ModelSummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {ModelText}.");
+        public string? ModelSummaryText => CodeGenConfig.GetSentenceText(StringConverter.ToComments(CodeGenConfig.GetFormattedText(ModelText, text => $"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {text}.")));
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
@@ -497,7 +496,7 @@ properties: [
         /// <summary>
         /// Gets the formatted summary text when used in a parameter context.
         /// </summary>
-        public string? ParameterSummaryText => StringConverter.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? ParameterSummaryText => CodeGenConfig.GetSentenceText(StringConverter.ToComments(CodeGenConfig.GetFormattedText(Text, text => $"{(Type == "bool" ? "Indicates whether" : "The")} {text}.")));
 
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.

@@ -158,9 +158,9 @@ entities:
   # <Parameter Name="Args" Type="ProductArgs" Validator="ProductArgsValidator" />
   # </Operation>
   # </Entity>
-- { name: ProductArgs, text: '{{Product}} arguments', excludeAll: true,
+- { name: ProductArgs, text: '+The {{Product}} arguments.', excludeAll: true,
     properties: [
-      { name: Name, type: string },
+      { name: Name, type: string, text: +The product name. },
       { name: Description, type: string }
     ]
   }
@@ -177,7 +177,7 @@ entities:
       { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 7 }
     ],
     operations: [
-      { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', grpc: true },
+      { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', grpc: true, text: +Get the R-O-B-O-T },
       { name: Create, type: Create, webApiLocation: ^Get, grpc: true },
       { name: Update, type: Update, primaryKey: true, webApiRoute: '{id}', grpc: true },
       { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },

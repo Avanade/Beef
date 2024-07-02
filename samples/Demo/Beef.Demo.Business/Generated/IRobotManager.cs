@@ -13,7 +13,7 @@ namespace Beef.Demo.Business;
 public partial interface IRobotManager
 {
     /// <summary>
-    /// Gets the specified <see cref="Robot"/>.
+    /// Get the R-O-B-O-T.
     /// </summary>
     /// <param name="id">The <see cref="Robot"/> identifier.</param>
     /// <returns>The selected <see cref="Robot"/> where found.</returns>

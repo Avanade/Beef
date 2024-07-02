@@ -74,7 +74,7 @@ entities:
         /// </summary>
         [JsonPropertyName("text")]
         [CodeGenProperty("Key", Title = "The overriding text for use in comments.",
-            Description = "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            Description = "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? Text { get; set; }
 
         /// <summary>
@@ -1227,7 +1227,12 @@ entities:
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => StringConverter.ToComments($"Represents the {Text} entity.");
+        public string? SummaryText => CodeGenConfig.GetSentenceText(StringConverter.ToComments(CodeGenConfig.GetFormattedText(Text, text => $"Represents the {text} entity.")));
+
+        /// <summary>
+        /// Gets the formatted model text.
+        /// </summary>
+        public string? ModelSummaryText => CodeGenConfig.GetSentenceText(StringConverter.ToComments(CodeGenConfig.GetFormattedText(Text, text => $"Represents the {text} model.")));
 
         /// <summary>
         /// Gets the entity name (accounts for <see cref="GenericWithT"/>).

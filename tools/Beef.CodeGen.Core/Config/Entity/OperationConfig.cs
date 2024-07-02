@@ -88,7 +88,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("text")]
         [CodeGenProperty("Key", Title = "The text for use in comments.",
-            Description = "The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            Description = "The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? Text { get; set; }
 
         /// <summary>
@@ -135,7 +135,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("returnText")]
         [CodeGenProperty("Key", Title = "The text for use in comments to describe the `ReturnType`.",
-            Description = "A default will be created where not specified. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            Description = "A default will be created where not specified. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.")]
         public string? ReturnText { get; set; }
 
         /// <summary>
@@ -804,7 +804,7 @@ operations: [
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => Text + ".";
+        public string? SummaryText => CodeGenConfig.GetSentenceText(CodeGenConfig.GetFormattedText(Text, text => text));
 
         /// <summary>
         /// Gets the return type including nullability (where specified).

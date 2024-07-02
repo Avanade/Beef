@@ -66,13 +66,13 @@ Property | Description
 -|-
 **`name`** | The unique operation name. [Mandatory]
 **`type`** | The type of operation that is to be code-generated. Valid options are: `Get`, `GetColl`, `Create`, `Update`, `Patch`, `Delete`, `Custom`, `CustomManagerOnly`.<br/>&dagger; Defaults to `Custom`.
-`text` | The text for use in comments.<br/>&dagger; The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
+`text` | The text for use in comments.<br/>&dagger; The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.
 **`primaryKey`** | Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters.<br/>&dagger; This simplifies the specification of these properties as parameters versus having to declare each specifically. Each of the parameters will also be set to be mandatory.
 **`paging`** | Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.
 `valueType` | The .NET value parameter `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Create` or `Update`.
 `returnType` | The .NET return `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.
 `returnTypeNullable` | Indicates whether the `ReturnType` is nullable for the operation.<br/>&dagger; This is only applicable for an `Operation.Type` of `Custom`. Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`.
-`returnText` | The text for use in comments to describe the `ReturnType`.<br/>&dagger; A default will be created where not specified. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
+`returnText` | The text for use in comments to describe the `ReturnType`.<br/>&dagger; A default will be created where not specified. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.
 `privateName` | The overriding private name.<br/>&dagger; Overrides the `Name` to be used for private usage. By default reformatted from `Name`; e.g. `GetByArgs` as `_getByArgs`.
 `withResult` | Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).<br/>&dagger; Defaults to `Entity.WilhResult`.
 

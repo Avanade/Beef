@@ -42,7 +42,7 @@ using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
 namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}}
 {
     /// <summary>
-    /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
+    /// {{#if Root.IsDataModel}}{{ModelSummaryText}}{{else}}{{SummaryText}}{{/if}}
     /// </summary>
 {{#if Root.IsDataModel}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval DataModelInherits}} : {{{DataModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval DataModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}

@@ -371,7 +371,7 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: \u0060Represents the {Text} entity.\u0060. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "Overrides the Name (as sentence text) for the summary comments. It will be formatted as: \u0060Represents the {Text} entity.\u0060. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "fileName": {
           "type": "string",
@@ -888,7 +888,7 @@
           "title": "Indicates whether a data \u0060model\u0060 version of the entity should also be generated (output to \u0060.\\Business\\Data\\Model\u0060).",
           "description": "The model will be generated with \u0060OmitEntityBase = true\u0060. Any reference data properties will be defined using their \u0060RefDataType\u0060 intrinsic \u0060Type\u0060 versus their corresponding (actual) reference data \u0060Type\u0060."
         },
-        "modelInherits": {
+        "dataModelInherits": {
           "type": "string",
           "title": "Overrides the default data \u0060model\u0060 inherits value."
         },
@@ -991,12 +991,12 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. Depending on whether the \u0060Type\u0060 is \u0060bool\u0060, will appear in one of the two generated sentences. Where not \u0060bool\u0060 it will be: Gets or sets a value indicating whether {text}.\u0027. Otherwise, it will be: Gets or sets the {text}.\u0027. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. Depending on whether the \u0060Type\u0060 is \u0060bool\u0060, will appear in one of the two generated sentences. Where not \u0060bool\u0060 it will be: Gets or sets a value indicating whether {text}.\u0027. Otherwise, it will be: Gets or sets the {text}.\u0027. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "modelText": {
           "type": "string",
           "title": "The overriding model text for use in comments.",
-          "description": "By default the \u0060ModelText\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. Depending on whether the \u0060Type\u0060 is \u0060bool\u0060, will appear in one of the two generated sentences. Where not \u0060bool\u0060 it will be: Gets or sets a value indicating whether {text}.\u0027. Otherwise, it will be: Gets or sets the {text}.\u0027. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "By default the \u0060ModelText\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. Depending on whether the \u0060Type\u0060 is \u0060bool\u0060, will appear in one of the two generated sentences. Where not \u0060bool\u0060 it will be: Gets or sets a value indicating whether {text}.\u0027. Otherwise, it will be: Gets or sets the {text}.\u0027. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "type": {
           "type": "string",
@@ -1313,7 +1313,7 @@
         "text": {
           "type": "string",
           "title": "The text for use in comments.",
-          "description": "The \u0060Text\u0060 will be defaulted for all the \u0060Operation.Type\u0060 options with the exception of \u0060Custom\u0060. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "The \u0060Text\u0060 will be defaulted for all the \u0060Operation.Type\u0060 options with the exception of \u0060Custom\u0060. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "primaryKey": {
           "type": "boolean",
@@ -1342,7 +1342,7 @@
         "returnText": {
           "type": "string",
           "title": "The text for use in comments to describe the \u0060ReturnType\u0060.",
-          "description": "A default will be created where not specified. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}})."
+          "description": "A default will be created where not specified. To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "privateName": {
           "type": "string",
@@ -1695,7 +1695,7 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "type": {
           "type": "string",
@@ -1790,7 +1790,7 @@
         "webApiText": {
           "type": "string",
           "title": "The overriding text for use in the Web API comments.",
-          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing."
+          "description": "By default the \u0060WbeApiText\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         },
         "grpcType": {
           "type": "string",
@@ -1818,7 +1818,7 @@
         "text": {
           "type": "string",
           "title": "The overriding text for use in comments.",
-          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. It will be formatted as: \u0060Represents a {text} constant value.\u0060 To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. \u0060{{Xxx}}\u0060)."
+          "description": "By default the \u0060Text\u0060 will be the \u0060Name\u0060 reformatted as sentence casing. It will be formatted as: \u0060Represents a {text} constant value.\u0060 To create a \u0060\u003Csee cref=\u0022XXX\u0022/\u003E\u0060 within use moustache shorthand (e.g. \u0060{{Xxx}}\u0060). To have the text used as-is prefix with a \u0060\u002B\u0060 plus-sign character."
         }
       },
       "required": [

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.12.9
+- *Fixed:* Enable `text` specification to be used as-is by prefixing with a `+` plus-sign character. 
+- *Fixed:* Upgraded `DbEx` (`v2.5.8`) to include all related fixes and improvements.
+
 ## v5.12.8
 - *Fixed*: Fixed the model code-generation by allowing the `ModelInherits` to be specified within the `Entity` YAML configuration to override the default.
 - *Fixed*: Fixed `dotnet run count` to exclude paths that start with `.` (dot) to avoid including hidden files in the count.

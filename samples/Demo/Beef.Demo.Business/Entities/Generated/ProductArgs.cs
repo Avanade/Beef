@@ -8,7 +8,7 @@
 namespace Beef.Demo.Business.Entities;
 
 /// <summary>
-/// Represents the <see cref="Product"/> arguments entity.
+/// The <see cref="Product"/> arguments.
 /// </summary>
 public partial class ProductArgs : EntityBase
 {
@@ -16,7 +16,7 @@ public partial class ProductArgs : EntityBase
     private string? _description;
 
     /// <summary>
-    /// Gets or sets the Name.
+    /// The product name.
     /// </summary>
     public string? Name { get => _name; set => SetValue(ref _name, value); }
 

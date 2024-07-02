@@ -34,7 +34,7 @@ using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
 namespace {{Root.NamespaceBusiness}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}};
 
 /// <summary>
-/// Represents the {{{Text}}} entity.
+/// {{{SummaryText}}}
 /// </summary>
 public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}{{#ifval EntityInherits}}, {{/ifval}}{{{EntityImplements}}}{{/ifval}}
 {

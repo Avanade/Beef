@@ -26,7 +26,7 @@ namespace Beef.Demo.Common.Agents
     public partial interface IRobotAgent
     {
         /// <summary>
-        /// Gets the specified <see cref="Robot"/>.
+        /// Get the R-O-B-O-T.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>

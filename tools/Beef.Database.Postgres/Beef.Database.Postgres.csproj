@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="CoreEx.Database.Postgres" Version="3.21.0" />
-    <PackageReference Include="DbEx.Postgres" Version="2.5.7" />
+    <PackageReference Include="DbEx.Postgres" Version="2.5.8" />
   </ItemGroup>
 
   <ItemGroup>

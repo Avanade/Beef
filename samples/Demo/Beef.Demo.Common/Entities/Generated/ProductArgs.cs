@@ -14,12 +14,12 @@ using CoreEx.Entities;
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Product"/> arguments entity.
+    /// The <see cref="Product"/> arguments.
     /// </summary>
     public partial class ProductArgs
     {
         /// <summary>
-        /// Gets or sets the Name.
+        /// The product name.
         /// </summary>
         public string? Name { get; set; }
 

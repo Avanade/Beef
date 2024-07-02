@@ -58,7 +58,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`name`** | The unique entity name. [Mandatory]
-`text` | The overriding text for use in comments.<br/>&dagger; Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}).
+`text` | The overriding text for use in comments.<br/>&dagger; Overrides the Name (as sentence text) for the summary comments. It will be formatted as: `Represents the {Text} entity.`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.
 `fileName` | The overriding file name.<br/>&dagger; Overrides the Name as the code-generated file name.
 `privateName` | The overriding private name.<br/>&dagger; Overrides the `Name` to be used for private fields. By default reformatted from `Name`; e.g. `FirstName` as `_firstName`.
 `argumentName` | The overriding argument name.<br/>&dagger; Overrides the `Name` to be used for argument parameters. By default reformatted from `Name`; e.g. `FirstName` as `firstName`.
@@ -280,7 +280,7 @@ Provides the data _Model_ configuration.
 Property | Description
 -|-
 `dataModel` | Indicates whether a data `model` version of the entity should also be generated (output to `.\Business\Data\Model`).<br/>&dagger; The model will be generated with `OmitEntityBase = true`. Any reference data properties will be defined using their `RefDataType` intrinsic `Type` versus their corresponding (actual) reference data `Type`.
-`modelInherits` | Overrides the default data `model` inherits value.
+`dataModelInherits` | Overrides the default data `model` inherits value.
 
 <br/>
 
