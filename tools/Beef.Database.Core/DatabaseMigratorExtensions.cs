@@ -98,7 +98,6 @@ namespace Beef.Database
         public static async Task<(bool Success, string? Statistics)> ExecuteYamlCodeGenAsync(this DatabaseMigrationBase migrator, string? schema, string[] tables, CancellationToken cancellationToken = default)
         {
             const string templateFileName = "Entity_yaml";
-            const string tempFileName = "temp.entity.beef-5.yaml";
 
             // Infer database schema.
             migrator.Logger.LogInformation("{Content}", "  ** Code-generation of temporary entity YAML requested **");
@@ -126,7 +125,7 @@ namespace Beef.Database
                 ?? throw new InvalidOperationException($"Embedded Template resource '{templateFileName}' is required and was not found within the selected assemblies.");
 
             // Set the path/filename.
-            var fn = Path.Combine(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), tempFileName);
+            var fn = Path.Combine(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory(), CodeGenFileManager.TemporaryEntityFilename);
             var fi = new FileInfo(fn);
 
             // Execute the code-generation proper and write contents (new or overwrite).
@@ -137,7 +136,7 @@ namespace Beef.Database
             migrator.Logger.LogWarning("{Content}", $"Temporary entity file created: {fi.FullName}");
             migrator.Logger.LogInformation("{Content}", string.Empty);
             migrator.Logger.LogInformation("{Content}", "Copy and paste generated contents into their respective files and amend accordingly.");
-            migrator.Logger.LogInformation("{Content}", $"Once complete it is recommended that the '{tempFileName}' file is deleted, as it is otherwise not used.");
+            migrator.Logger.LogInformation("{Content}", $"Once complete it is recommended that the '{fi.Name}' file is deleted, as it is otherwise not used.");
 
             return (true, string.Empty);
         }

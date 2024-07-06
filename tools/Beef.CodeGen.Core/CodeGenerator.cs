@@ -41,6 +41,9 @@ namespace Beef.CodeGen
                 if (!Path.GetFileNameWithoutExtension(secondaryFile.FullName).EndsWith(root, StringComparison.OrdinalIgnoreCase))
                     continue;
 
+                if (secondaryFile.Name.Equals(CodeGenFileManager.TemporaryEntityFilename, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 try
                 {
                     using var configReader = secondaryFile.OpenText();

@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<Version>5.12.9</Version>
+		<Version>5.13.0</Version>
 		<LangVersion>preview</LangVersion>
 		<Authors>Avanade</Authors>
 		<Company>Avanade</Company>
@@ -27,6 +27,7 @@
     <IsPackable>true</IsPackable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -48,6 +48,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// Reports all the endpoints.
         /// </summary>
-        EndPoints = 8192
+        EndPoints = 8192,
+
+        /// <summary>
+        /// Parses and imports from an OpenAPI document into a temporary file.
+        /// </summary>
+        OpenApi = 16384
     }
 }
