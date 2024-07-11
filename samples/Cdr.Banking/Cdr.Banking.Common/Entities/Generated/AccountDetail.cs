@@ -11,7 +11,7 @@ using CoreEx.Entities;
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Account"/> Detail entity.
+    /// Represents the <c>Account</c> Detail entity.
     /// </summary>
     public partial class AccountDetail : Account
     {

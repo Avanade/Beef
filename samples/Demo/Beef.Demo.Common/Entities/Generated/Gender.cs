@@ -37,7 +37,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Gender"/> collection.
+    /// Represents the <c>Gender</c> collection.
     /// </summary>
     public partial class GenderCollection : List<Gender> { }
 }

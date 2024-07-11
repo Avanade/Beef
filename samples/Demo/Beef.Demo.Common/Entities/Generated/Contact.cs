@@ -19,7 +19,7 @@ namespace Beef.Demo.Common.Entities
     public partial class Contact : IIdentifier<Guid>
     {
         /// <summary>
-        /// Gets or sets the <see cref="Contact"/> identifier.
+        /// Gets or sets the <c>Contact</c> identifier.
         /// </summary>
         public Guid Id { get; set; }
 
@@ -34,7 +34,7 @@ namespace Beef.Demo.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
+        /// Gets the corresponding <c>Status</c> text (read-only where selected).
         /// </summary>
         public string? StatusDescription { get; set; }
 
@@ -50,12 +50,12 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Contact"/> collection.
+    /// Represents the <c>Contact</c> collection.
     /// </summary>
     public partial class ContactCollection : List<Contact> { }
 
     /// <summary>
-    /// Represents the <see cref="Contact"/> collection result.
+    /// Represents the <c>Contact</c> collection result.
     /// </summary>
     public class ContactCollectionResult : CollectionResult<ContactCollection, Contact>
     {

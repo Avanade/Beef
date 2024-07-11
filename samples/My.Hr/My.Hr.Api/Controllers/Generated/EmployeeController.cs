@@ -25,10 +25,10 @@ public partial class EmployeeController : ControllerBase
     partial void EmployeeControllerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <summary>
-    /// Gets the specified <see cref="Employee"/>.
+    /// Gets the specified <c>Employee</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The selected <see cref="Employee"/> where found.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The selected <c>Employee</c> where found.</returns>
     [HttpGet("employees/{id}", Name="Employee_Get")]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -36,9 +36,9 @@ public partial class EmployeeController : ControllerBase
         => _webApi.GetWithResultAsync<Employee?>(Request, p => _manager.GetAsync(id));
 
     /// <summary>
-    /// Creates a new <see cref="Employee"/>.
+    /// Creates a new <c>Employee</c>.
     /// </summary>
-    /// <returns>The created <see cref="Employee"/>.</returns>
+    /// <returns>The created <c>Employee</c>.</returns>
     [HttpPost("employees", Name="Employee_Create")]
     [AcceptsBody(typeof(Common.Entities.Employee))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.Created)]
@@ -46,10 +46,10 @@ public partial class EmployeeController : ControllerBase
         => _webApi.PostWithResultAsync<Employee, Employee>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/employees/{r.Id}", UriKind.Relative));
 
     /// <summary>
-    /// Updates an existing <see cref="Employee"/>.
+    /// Updates an existing <c>Employee</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The updated <see cref="Employee"/>.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The updated <c>Employee</c>.</returns>
     [HttpPut("employees/{id}", Name="Employee_Update")]
     [AcceptsBody(typeof(Common.Entities.Employee))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
@@ -58,10 +58,10 @@ public partial class EmployeeController : ControllerBase
         => _webApi.PutWithResultAsync<Employee, Employee>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Patches an existing <see cref="Employee"/>.
+    /// Patches an existing <c>Employee</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The patched <see cref="Employee"/>.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The patched <c>Employee</c>.</returns>
     [HttpPatch("employees/{id}", Name="Employee_Patch")]
     [AcceptsBody(typeof(Common.Entities.Employee), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]
@@ -70,24 +70,24 @@ public partial class EmployeeController : ControllerBase
         => _webApi.PatchWithResultAsync<Employee>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Deletes the specified <see cref="Employee"/>.
+    /// Deletes the specified <c>Employee</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
     [HttpDelete("employees/{id}", Name="Employee_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteWithResultAsync(Request, p => _manager.DeleteAsync(id));
 
     /// <summary>
-    /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>EmployeeBase</c> array that contains the items that match the selection criteria.
     /// </summary>
     /// <param name="firstName">The First Name.</param>
     /// <param name="lastName">The Last Name.</param>
-    /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+    /// <param name="genders">The Genders.</param>
     /// <param name="startFrom">The Start From.</param>
     /// <param name="startTo">The Start To.</param>
     /// <param name="isIncludeTerminated">Indicates whether Is Include Terminated.</param>
-    /// <returns>The <see cref="EmployeeBaseCollection"/></returns>
+    /// <returns>The <c>EmployeeBase</c> array</returns>
     [HttpGet("employees", Name="Employee_GetByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.EmployeeBaseCollection), (int)HttpStatusCode.OK)]
@@ -99,10 +99,10 @@ public partial class EmployeeController : ControllerBase
     }
 
     /// <summary>
-    /// Terminates an existing <see cref="Employee"/>.
+    /// Terminates an existing <c>Employee</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The updated <see cref="Employee"/>.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The updated <c>Employee</c>.</returns>
     [HttpPost("employees/{id}/terminate", Name="Employee_Terminate")]
     [AcceptsBody(typeof(Common.Entities.TerminationDetail))]
     [ProducesResponseType(typeof(Common.Entities.Employee), (int)HttpStatusCode.OK)]

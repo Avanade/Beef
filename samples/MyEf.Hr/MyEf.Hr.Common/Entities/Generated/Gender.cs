@@ -17,7 +17,7 @@ namespace MyEf.Hr.Common.Entities
     public partial class Gender : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="Gender"/> collection.
+    /// Represents the <c>Gender</c> collection.
     /// </summary>
     public partial class GenderCollection : List<Gender> { }
 }

@@ -6,7 +6,7 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.1.0" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />
     <PackageReference Include="CoreEx.AspNetCore" Version="CoreExVersion" />
     <!--#if (implement_services) -->
     <PackageReference Include="CoreEx.Azure" Version="CoreExVersion" />

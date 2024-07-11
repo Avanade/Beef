@@ -21,7 +21,7 @@ namespace MyEf.Hr.Common.Entities
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Reason"/> text (read-only where selected).
+        /// Gets the corresponding <c>Reason</c> text (read-only where selected).
         /// </summary>
         public string? ReasonText { get; set; }
 

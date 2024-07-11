@@ -17,7 +17,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class AccountUType : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="AccountUType"/> collection.
+    /// Represents the <c>AccountUType</c> collection.
     /// </summary>
     public partial class AccountUTypeCollection : List<AccountUType> { }
 }

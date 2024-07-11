@@ -2,18 +2,24 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace Beef.CodeGen.OpenApi
 {
     /// <summary>
     /// Provides the base YAML configuration.
     /// </summary>
-    public abstract class YamlBase(string name)
+    public abstract class YamlBase(string? originalName, string name)
     {
         /// <summary>
-        /// Gets the name.
+        /// Gets the original name.
         /// </summary>
-        public string? Name { get; } = name;
+        public string? OriginalName { get; } = originalName;
+
+        /// <summary>
+        /// Gets the .NET name.
+        /// </summary>
+        public string? Name { get; internal set; } = name;
 
         /// <summary>
         /// Gets the attributes.
@@ -61,12 +67,17 @@ namespace Beef.CodeGen.OpenApi
             else
                 throw new NotSupportedException($"The value type '{value?.GetType().Name}' is not supported.");
         }
+
+        /// <summary>
+        /// Gets the summary text (if available).
+        /// </summary>
+        public string? SummaryText => Attributes["text"]?.ToString()?[2..^1];
     }
 
     /// <summary>
     /// Represents the YAML root configuration.
     /// </summary>
-    public class YamlConfig(string name, OpenApiArgs args) : YamlBase(name)
+    public class YamlConfig(string? originalName, string name, OpenApiArgs args) : YamlBase(originalName, name)
     {
         /// <summary>
         /// Gets the <see cref="OpenApiArgs"/>.
@@ -87,7 +98,7 @@ namespace Beef.CodeGen.OpenApi
     /// <summary>
     /// Represents the YAML entity.
     /// </summary>
-    public class YamlEntity(string name) : YamlBase(name)
+    public class YamlEntity(string? originalName, string name) : YamlBase(originalName, name)
     {
         /// <summary>
         /// Gets or sets the JSON V3 representation to enable uniqueness comparison.
@@ -108,12 +119,12 @@ namespace Beef.CodeGen.OpenApi
     /// <summary>
     /// Represents the YAML property.
     /// </summary>
-    public class YamlProperty(string name) : YamlBase(name) { }
+    public class YamlProperty(string? originalName, string name) : YamlBase(originalName, name) { }
 
     /// <summary>
     /// Represents the YAML operation.
     /// </summary>
-    public class YamlOperation(string name) : YamlBase(name)
+    public class YamlOperation(string? originalName, string name) : YamlBase(originalName, name)
     {
         /// <summary>
         /// Gets the parameters.
@@ -124,16 +135,21 @@ namespace Beef.CodeGen.OpenApi
     /// <summary>
     /// Represents the YAML parameter.
     /// </summary>
-    public class YamlParameter(string name) : YamlBase(name) { }
+    public class YamlParameter(string? originalName, string name) : YamlBase(originalName, name) { }
 
     /// <summary>
     /// Represents the YAML enum.
     /// </summary>
-    public class YamlEnum(string name) : YamlBase(name)
+    public class YamlEnum(string? originalName, string name) : YamlBase(originalName, name)
     {
         /// <summary>
         /// Gets the enum values.
         /// </summary>
-        public List<string> Values { get; } = [];
+        public List<YamlEnumValue> Values { get; } = [];
     }
+
+    /// <summary>
+    /// Represents the YAML enum value.
+    /// </summary>
+    public class YamlEnumValue(string? originalName, string name) : YamlBase(originalName, name) { }
 }

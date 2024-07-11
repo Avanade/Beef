@@ -16,7 +16,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class Transaction : IIdentifier<string>
     {
         /// <summary>
-        /// Gets or sets the <see cref="Account"/> identifier.
+        /// Gets or sets the <c>Account</c> identifier.
         /// </summary>
         [JsonPropertyName("transactionId")]
         public string? Id { get; set; }
@@ -98,12 +98,12 @@ namespace Cdr.Banking.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Transaction"/> collection.
+    /// Represents the <c>Transaction</c> collection.
     /// </summary>
     public partial class TransactionCollection : List<Transaction> { }
 
     /// <summary>
-    /// Represents the <see cref="Transaction"/> collection result.
+    /// Represents the <c>Transaction</c> collection result.
     /// </summary>
     public class TransactionCollectionResult : CollectionResult<TransactionCollection, Transaction>
     {

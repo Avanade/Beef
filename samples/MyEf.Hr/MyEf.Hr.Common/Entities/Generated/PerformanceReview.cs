@@ -16,12 +16,12 @@ namespace MyEf.Hr.Common.Entities
     public partial class PerformanceReview : IIdentifier<Guid>, IETag, IChangeLog
     {
         /// <summary>
-        /// Gets or sets the <see cref="PerformanceReview"/> identifier.
+        /// Gets or sets the <c>PerformanceReview</c> identifier.
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Employee.Id"/> (value is immutable).
+        /// Gets or sets the <c>Employee.Id</c> (value is immutable).
         /// </summary>
         public Guid EmployeeId { get; set; }
 
@@ -31,7 +31,7 @@ namespace MyEf.Hr.Common.Entities
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Outcome"/> text (read-only where selected).
+        /// Gets the corresponding <c>Outcome</c> text (read-only where selected).
         /// </summary>
         public string? OutcomeText { get; set; }
 
@@ -63,12 +63,12 @@ namespace MyEf.Hr.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="PerformanceReview"/> collection.
+    /// Represents the <c>PerformanceReview</c> collection.
     /// </summary>
     public partial class PerformanceReviewCollection : List<PerformanceReview> { }
 
     /// <summary>
-    /// Represents the <see cref="PerformanceReview"/> collection result.
+    /// Represents the <c>PerformanceReview</c> collection result.
     /// </summary>
     public class PerformanceReviewCollectionResult : CollectionResult<PerformanceReviewCollection, PerformanceReview>
     {

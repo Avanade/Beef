@@ -14,7 +14,7 @@ using CoreEx.Entities;
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Robot"/> arguments entity.
+    /// Represents the <c>Robot</c> arguments entity.
     /// </summary>
     public partial class RobotArgs
     {

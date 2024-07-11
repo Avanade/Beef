@@ -16,7 +16,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class Balance : IIdentifier<string>
     {
         /// <summary>
-        /// Gets or sets the <see cref="Account"/> identifier.
+        /// Gets or sets the <c>Account</c> identifier.
         /// </summary>
         [JsonPropertyName("accountId")]
         public string? Id { get; set; }

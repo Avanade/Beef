@@ -19,7 +19,7 @@ namespace Beef.Demo.Common.Entities
     public partial class Robot : IIdentifier<Guid>, IETag, IChangeLog
     {
         /// <summary>
-        /// Gets or sets the <see cref="Robot"/> identifier.
+        /// Gets or sets the <c>Robot</c> identifier.
         /// </summary>
         public Guid Id { get; set; }
 
@@ -34,7 +34,7 @@ namespace Beef.Demo.Common.Entities
         public string? SerialNo { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
+        /// Gets the corresponding <c>EyeColor</c> text (read-only where selected).
         /// </summary>
         public string? EyeColorText { get; set; }
 
@@ -44,7 +44,7 @@ namespace Beef.Demo.Common.Entities
         public string? EyeColor { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
+        /// Gets the corresponding <c>PowerSource</c> text (read-only where selected).
         /// </summary>
         public string? PowerSourceText { get; set; }
 
@@ -66,12 +66,12 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Robot"/> collection.
+    /// Represents the <c>Robot</c> collection.
     /// </summary>
     public partial class RobotCollection : List<Robot> { }
 
     /// <summary>
-    /// Represents the <see cref="Robot"/> collection result.
+    /// Represents the <c>Robot</c> collection result.
     /// </summary>
     public class RobotCollectionResult : CollectionResult<RobotCollection, Robot>
     {

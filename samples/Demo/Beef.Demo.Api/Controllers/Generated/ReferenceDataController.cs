@@ -29,11 +29,11 @@ public partial class ReferenceDataController : ControllerBase
         { _webApi = webApi.ThrowIfNull(); _orchestrator = orchestrator.ThrowIfNull(); }
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.Country"/> reference data items that match the specified criteria.
+    /// Gets all of the 'Country' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.Country collection.</returns>
+    /// <returns>The 'Country' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/countries", Name="ReferenceData_CountryGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Country>), (int)HttpStatusCode.OK)]
@@ -41,11 +41,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Country>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data items that match the specified criteria.
+    /// Gets all of the 'USState' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.USState collection.</returns>
+    /// <returns>The 'USState' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/usStates", Name="ReferenceData_USStateGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
@@ -53,11 +53,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data items that match the specified criteria.
+    /// Gets all of the 'Gender' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.Gender collection.</returns>
+    /// <returns>The 'Gender' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/genders", Name="ReferenceData_GenderGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
@@ -65,11 +65,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data items that match the specified criteria.
+    /// Gets all of the 'EyeColor' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.EyeColor collection.</returns>
+    /// <returns>The 'EyeColor' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/eyeColors", Name="ReferenceData_EyeColorGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
@@ -77,11 +77,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.EyeColor>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data items that match the specified criteria.
+    /// Gets all of the 'PowerSource' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.PowerSource collection.</returns>
+    /// <returns>The 'PowerSource' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/powerSources", Name="ReferenceData_PowerSourceGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
@@ -89,11 +89,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.PowerSource>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data items that match the specified criteria.
+    /// Gets all of the 'Company' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.Company collection.</returns>
+    /// <returns>The 'Company' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/companies", Name="ReferenceData_CompanyGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Company>), (int)HttpStatusCode.OK)]
@@ -101,11 +101,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Company>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.Status"/> reference data items that match the specified criteria.
+    /// Gets all of the 'Status' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.Status collection.</returns>
+    /// <returns>The 'Status' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/statuses", Name="ReferenceData_StatusGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Status>), (int)HttpStatusCode.OK)]
@@ -113,11 +113,11 @@ public partial class ReferenceDataController : ControllerBase
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Status>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.CommunicationType"/> reference data items that match the specified criteria.
+    /// Gets all of the 'CommunicationType' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.CommunicationType collection.</returns>
+    /// <returns>The 'CommunicationType' array.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref/communicationTypes", Name="ReferenceData_CommunicationTypeGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.CommunicationType>), (int)HttpStatusCode.OK)]
@@ -127,7 +127,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <summary>
     /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
     /// </summary>
-    /// <returns>A <see cref="ReferenceDataMultiDictionary"/>.</returns>
+    /// <returns>The 'ReferenceDataMultiDictionary'.</returns>
     [AllowAnonymous]
     [HttpGet("api/v1/demo/ref", Name="ReferenceData_GetNamed")]
     [ProducesResponseType(typeof(CoreEx.RefData.ReferenceDataMultiDictionary), (int)HttpStatusCode.OK)]

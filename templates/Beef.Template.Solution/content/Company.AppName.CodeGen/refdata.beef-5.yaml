@@ -31,7 +31,7 @@ entities:
   - { name: Gender, entityFrameworkModel: EfModel.Gender }
 //#endif
 //#if (implement_cosmos)
-cosmosName: ICosmos
+cosmosName: AppNameCosmosDb
 refDataType: Guid
 autoImplement: Cosmos
 entities:

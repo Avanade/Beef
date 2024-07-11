@@ -627,7 +627,7 @@
           "type": "string",
           "title": "The name of the \u0060Mapper\u0060 that the generated Database \u0060Mapper\u0060 inherits from."
         },
-        "databaseCustomerMapper": {
+        "databaseCustomMapper": {
           "type": "boolean",
           "title": "Indicates that a custom Database \u0060Mapper\u0060 will be used; i.e. not generated.",
           "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."

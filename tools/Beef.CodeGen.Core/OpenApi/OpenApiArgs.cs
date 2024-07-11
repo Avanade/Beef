@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Beef.CodeGen.OpenApi
@@ -27,6 +28,35 @@ namespace Beef.CodeGen.OpenApi
         public char[] IgnoreParametersThatStartWith { get; set; } = ['$'];
 
         /// <summary>
+        /// Gets or sets the type name suffix that is used where an underlying member name is the same.
+        /// </summary>
+        /// <remarks>Member names cannot be the same as their enclosing type: <see href="https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs0542?f1url=%3FappId%3Droslyn%26k%3Dk(CS0542)"/>.</remarks>
+        public string TypeWithSameMemberNameSuffix { get; set; } = "X";
+
+        /// <summary>
+        /// Gets or sets the list of types that should be ignored (skipped).
+        /// </summary>
+        /// <remarks>Extend (add to) using command line: <c>--param ignore=[name[,name..]]</c></remarks>
+        public List<string> IgnoreTypes { get; set; } = [];
+
+        /// <summary>
+        /// Gets or sets the list of types that should be treated as reference data.
+        /// </summary>
+        /// <remarks>Extend (add to) using command line: <c>--param refdata=[name[,name..]]</c></remarks>
+        public List<string> RefDataTypes { get; set; } = [];
+
+        /// <summary>
+        /// Indicates whether to output the OpenApi text where applicable.
+        /// </summary>
+        /// <remarks>Override using command line: <c>--param text=true|false</c></remarks>
+        public bool OutputText { get; set; } = false;
+
+        /// <summary>
+        /// Get or sets the function to convert the OpenAPI name to the corresponding .NET name.
+        /// </summary>
+        public Func<OpenApiNameType, string, string>? ConvertDotNetName { get; set; }
+
+        /// <summary>
         /// Gets or sets the action that is invoked after the <see cref="OpenApiDocument"/> has been converted to the corresponding <see cref="YamlConfig"/>. 
         /// </summary>
         public Action<YamlConfig, OpenApiDocument>? OnYamlConfig { get; set; }
@@ -45,25 +75,28 @@ namespace Beef.CodeGen.OpenApi
         /// <summary>
         /// Gets or sets the action that is invoked after the <see cref="OpenApiSchema"/> has been converted to the corresponding <see cref="YamlEntity"/>.
         /// </summary>
-        /// <remarks>The <see cref="string"/> parameter value is the originating OpenAPI name.
-        /// <para>Defaults to <see cref="OnYamlEntityAutoSelectPrimaryKey"/>.</para></remarks>>
-        public Action<YamlEntity, string, OpenApiSchema>? OnYamlEntity { get; set; } = OnYamlEntityAutoSelectPrimaryKey;
+        /// <remarks>Defaults to <see cref="OnYamlEntityAutoSelectPrimaryKey"/>.</remarks>
+        public Action<YamlEntity, OpenApiSchema>? OnYamlEntity { get; set; } = OnYamlEntityAutoSelectPrimaryKey;
 
         /// <summary>
         /// Gets or sets the action that is invoked after the <see cref="OpenApiSchema"/> has been converted to the corresponding <see cref="YamlProperty"/>.
         /// </summary>
-        /// <remarks>The <see cref="string"/> parameter value is the originating OpenAPI name.</remarks>>
-        public Action<YamlProperty, string, OpenApiSchema>? OnYamlProperty { get; set; }
+        public Action<YamlProperty, OpenApiSchema>? OnYamlProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the action that is invoked after the <see cref="OpenApiSchema"/> has been converted to the corresponding <see cref="YamlEnum"/>.
         /// </summary>
-        public Action<YamlEnum, string, OpenApiSchema>? OnYamlEnum { get; set; }
+        public Action<YamlEnum, OpenApiSchema>? OnYamlEnum { get; set; }
+
+        /// <summary>
+        /// Gets or sets the action that is invoked after the <see cref="OpenApiSchema"/> has been converted to the corresponding <see cref="YamlEnumValue"/>.
+        /// </summary>
+        public Action<YamlEnumValue, OpenApiSchema>? OnYamlEnumValue { get; set; }
 
         /// <summary>
         /// Provides out-of-the-box <see cref="OnYamlEntity"/> logic to determine the primary key property.
         /// </summary>
-        public static Action<YamlEntity, string, OpenApiSchema> OnYamlEntityAutoSelectPrimaryKey { get; } = (entity, _, _) =>
+        public static Action<YamlEntity, OpenApiSchema> OnYamlEntityAutoSelectPrimaryKey { get; } = (entity, _) =>
         {
             var first = entity.Properties.FirstOrDefault();
             if (first is not null && (first.Name!.Equals("Id", StringComparison.OrdinalIgnoreCase) || first.Name!.Equals(entity.Name! + "Id", StringComparison.OrdinalIgnoreCase)))

@@ -30,7 +30,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Address"/> collection.
+    /// Represents the <c>Address</c> collection.
     /// </summary>
     public partial class AddressCollection : List<Address> { }
 }

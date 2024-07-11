@@ -26,7 +26,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Company"/> collection.
+    /// Represents the <c>Company</c> collection.
     /// </summary>
     public partial class CompanyCollection : List<Company> { }
 }

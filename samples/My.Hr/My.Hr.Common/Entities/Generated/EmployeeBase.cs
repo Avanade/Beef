@@ -11,17 +11,17 @@ using CoreEx.Entities;
 namespace My.Hr.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Employee"/> base entity.
+    /// Represents the <c>Employee</c> base entity.
     /// </summary>
     public partial class EmployeeBase : IIdentifier<Guid>
     {
         /// <summary>
-        /// Gets or sets the <see cref="Employee"/> identifier.
+        /// Gets or sets the <c>Employee</c> identifier.
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unique <see cref="Employee"/> Email.
+        /// Gets or sets the Unique <c>Employee</c> Email.
         /// </summary>
         public string? Email { get; set; }
 
@@ -36,7 +36,7 @@ namespace My.Hr.Common.Entities
         public string? LastName { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
+        /// Gets the corresponding <c>Gender</c> text (read-only where selected).
         /// </summary>
         public string? GenderText { get; set; }
 
@@ -67,12 +67,12 @@ namespace My.Hr.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="EmployeeBase"/> collection.
+    /// Represents the <c>EmployeeBase</c> collection.
     /// </summary>
     public partial class EmployeeBaseCollection : List<EmployeeBase> { }
 
     /// <summary>
-    /// Represents the <see cref="EmployeeBase"/> collection result.
+    /// Represents the <c>EmployeeBase</c> collection result.
     /// </summary>
     public class EmployeeBaseCollectionResult : CollectionResult<EmployeeBaseCollection, EmployeeBase>
     {

@@ -28,10 +28,10 @@ public partial class AccountController : ControllerBase
     /// <summary>
     /// Get all accounts.
     /// </summary>
-    /// <param name="productCategory">The Product Category (see <see cref="RefDataNamespace.ProductCategory"/>).</param>
-    /// <param name="openStatus">The Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).</param>
+    /// <param name="productCategory">The Product Category.</param>
+    /// <param name="openStatus">The Open Status.</param>
     /// <param name="isOwned">Indicates whether Is Owned.</param>
-    /// <returns>The <see cref="AccountCollection"/></returns>
+    /// <returns>The <c>Account</c> array</returns>
     [Tags("Banking", "Accounts")]
     [HttpGet("api/v1/banking/accounts", Name="Account_GetAccounts")]
     [Paging]
@@ -44,10 +44,10 @@ public partial class AccountController : ControllerBase
     }
 
     /// <summary>
-    /// Get <see cref="AccountDetail"/>.
+    /// Get <c>AccountDetail</c>.
     /// </summary>
-    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-    /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
+    /// <param name="accountId">The <c>Account</c> identifier.</param>
+    /// <returns>The selected <c>AccountDetail</c> where found.</returns>
     [HttpGet("api/v1/banking/accounts/{accountId}", Name="Account_GetDetail")]
     [ProducesResponseType(typeof(Common.Entities.AccountDetail), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -55,10 +55,10 @@ public partial class AccountController : ControllerBase
         => _webApi.GetWithResultAsync<AccountDetail?>(Request, p => _manager.GetDetailAsync(accountId));
 
     /// <summary>
-    /// Get <see cref="Account"/> <see cref="Balance"/>.
+    /// Get <c>Account</c> <c>Balance</c>.
     /// </summary>
-    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-    /// <returns>The selected <see cref="Balance"/> where found.</returns>
+    /// <param name="accountId">The <c>Account</c> identifier.</param>
+    /// <returns>The selected <c>Balance</c> where found.</returns>
     [HttpGet("api/v1/banking/accounts/{accountId}/balance", Name="Account_GetBalance")]
     [ProducesResponseType(typeof(Common.Entities.Balance), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -66,10 +66,10 @@ public partial class AccountController : ControllerBase
         => _webApi.GetWithResultAsync<Balance?>(Request, p => _manager.GetBalanceAsync(accountId));
 
     /// <summary>
-    /// Get <see cref="Account"/> statement (file).
+    /// Get <c>Account</c> statement (file).
     /// </summary>
-    /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-    /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
+    /// <param name="accountId">The <c>Account</c> identifier.</param>
+    /// <returns>A resultant <c>FileContentResult</c>.</returns>
     [HttpGet("api/v1/banking/accounts/{accountId}/statement", Name="Account_GetStatement")]
     [Produces("text/plain")]
     [ProducesResponseType((int)HttpStatusCode.OK)]

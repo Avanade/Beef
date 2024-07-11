@@ -7,8 +7,9 @@ Represents the **NuGet** versions.
   - Execute `dotnet run -- --help` to see all command-line capabilities for this.
   - All OpenAPI paths (operations) are generated into a single `Service` entity; this can be further split into multiple entities manually as required.
   - Where a schema (entity) is specified more than once with the same name it will attempt to match the configuration (including properties) to an existing entity and reuse; otherwise, a new entity will be created with a postfix number to ensure uniqueness.
-  - The `OpenApiArgs` supports further options to enable additional customization of processing and generated output; this is set using the `CodeGeneratorArgs.UseOpenApiArgs` extension method. 
+  - The `OpenApiArgs` supports further options to enable additional customization of processing and generated output; this is set using the `CodeGenConsole.WithOpenApiArgs` method. 
   - _Note:_ this is in _preview_ until explicitly noted in a later version; as such, the generated YAML will require manual review and adjustment as required and may not support all features (for some time or ever). This is only intended to help accelerate the initial configuration process where an OpenAPI document is available.
+- *Fixed*: Sanitize the generated `Api.Controller` and `Common` summary text comments to remove internal references, etc.
 
 ## v5.12.9
 - *Fixed:* Enable `text` specification to be used as-is by prefixing with a `+` plus-sign character. 

@@ -17,7 +17,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class TransactionStatus : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="TransactionStatus"/> collection.
+    /// Represents the <c>TransactionStatus</c> collection.
     /// </summary>
     public partial class TransactionStatusCollection : List<TransactionStatus> { }
 }

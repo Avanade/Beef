@@ -14,5 +14,5 @@ Extended commands and argument(s):
               - Use --param exclude=[method:]path[,[method:]path..] to exclude named method (optional) and path (starts with).
               - Use --param ignore=[name[,name..]] to ignore named data types (.NET name).
               - Use --param refdata=[name[,name..]] to identify reference data property names to automatically type.
-              - Use --param text=false to disable text attribute output (defaults to true).
+              - Use --param text=true|false to disable text attribute output.
               - eg: dotnet run openapi "https://localhost/openapi.json" --param exclude=/ref --param ignore=changelog --param refdata=gender,outcome 

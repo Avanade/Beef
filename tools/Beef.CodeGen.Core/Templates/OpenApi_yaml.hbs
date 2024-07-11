@@ -1,4 +1,5 @@
-# {{Name}}
+# dotnet run {{Name}}
+# - review the entities, properties and operations then copy into your destination YAML file under 'entities'.
 entities:
 {{#each Entities}}
 - { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}}{{#ifne Properties.Count 0}},{{else}}{{#ifne Operations.Count 0}},{{/ifne}}{{/ifne}}
@@ -39,12 +40,14 @@ entities:
 
   {{#if Args.EnumAsReferenceData}}
 # Enums converted to reference data entities.
+# - review the entities then copy into your destination YAML file under 'entities:'.
 refDataEntities:
     {{#each Enums}}
 - { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}} }
     {{/each}}
 
-# Enums converted for reference data loading. 
+# Enums converted for reference data loading.
+# - review the data then copy into your destination YAML file (remove the merge '$' symbol as required).
 refDataData:
     {{#each Enums}}
       {{#unless @first}}
@@ -52,20 +55,26 @@ refDataData:
       {{/unless}}
 - ${{Name}}:
       {{#each Values}}
-  - {{.}}: {{sentence .}}
+  - {{OriginalName}}: {{sentence Name}}
       {{/each}}
     {{/each}}
   {{else}}
 # Enums converted to c# code.
+# - review the C# code then copy into your appropriate destination file(s).
 enums: |
     {{#each Enums}}
       {{#unless @first}}
 
       {{/unless}}
+      {{#ifval SummaryText}}
+  /// <summary>
+  /// {{SummaryText}}
+  /// </summary>
+      {{/ifval}}
   public enum {{Name}}
   {
       {{#each Values}}
-      {{.}}{{#unless @last}},{{/unless}}
+      {{OriginalName}}{{#unless @last}},{{/unless}}
       {{/each}}
   }
     {{/each}}

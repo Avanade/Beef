@@ -25,10 +25,10 @@ public partial class PerformanceReviewController : ControllerBase
     partial void PerformanceReviewControllerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <summary>
-    /// Gets the specified <see cref="PerformanceReview"/>.
+    /// Gets the specified <c>PerformanceReview</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The selected <c>PerformanceReview</c> where found.</returns>
     [HttpGet("reviews/{id}", Name="PerformanceReview_Get")]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -36,10 +36,10 @@ public partial class PerformanceReviewController : ControllerBase
         => _webApi.GetWithResultAsync<PerformanceReview?>(Request, p => _manager.GetAsync(id));
 
     /// <summary>
-    /// Gets the <see cref="PerformanceReviewCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>PerformanceReview</c> array that contains the items that match the selection criteria.
     /// </summary>
-    /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
-    /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
+    /// <param name="employeeId">The <c>Employee.Id</c>.</param>
+    /// <returns>The <c>PerformanceReview</c> array</returns>
     [HttpGet("employees/{employeeId}/reviews", Name="PerformanceReview_GetByEmployeeId")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReviewCollection), (int)HttpStatusCode.OK)]
@@ -48,10 +48,10 @@ public partial class PerformanceReviewController : ControllerBase
         => _webApi.GetWithResultAsync<PerformanceReviewCollectionResult>(Request, p => _manager.GetByEmployeeIdAsync(employeeId, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
 
     /// <summary>
-    /// Creates a new <see cref="PerformanceReview"/>.
+    /// Creates a new <c>PerformanceReview</c>.
     /// </summary>
-    /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
-    /// <returns>The created <see cref="PerformanceReview"/>.</returns>
+    /// <param name="employeeId">The <c>Employee.Id</c>.</param>
+    /// <returns>The created <c>PerformanceReview</c>.</returns>
     [HttpPost("employees/{employeeId}/reviews", Name="PerformanceReview_Create")]
     [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.Created)]
@@ -59,10 +59,10 @@ public partial class PerformanceReviewController : ControllerBase
         => _webApi.PostWithResultAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.CreateAsync(p.Value!, employeeId), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/reviews/{r.Id}", UriKind.Relative));
 
     /// <summary>
-    /// Updates an existing <see cref="PerformanceReview"/>.
+    /// Updates an existing <c>PerformanceReview</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The updated <c>PerformanceReview</c>.</returns>
     [HttpPut("reviews/{id}", Name="PerformanceReview_Update")]
     [AcceptsBody(typeof(Common.Entities.PerformanceReview))]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
@@ -71,10 +71,10 @@ public partial class PerformanceReviewController : ControllerBase
         => _webApi.PutWithResultAsync<PerformanceReview, PerformanceReview>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Patches an existing <see cref="PerformanceReview"/>.
+    /// Patches an existing <c>PerformanceReview</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
-    /// <returns>The patched <see cref="PerformanceReview"/>.</returns>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
+    /// <returns>The patched <c>PerformanceReview</c>.</returns>
     [HttpPatch("reviews/{id}", Name="PerformanceReview_Patch")]
     [AcceptsBody(typeof(Common.Entities.PerformanceReview), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.PerformanceReview), (int)HttpStatusCode.OK)]
@@ -83,9 +83,9 @@ public partial class PerformanceReviewController : ControllerBase
         => _webApi.PatchWithResultAsync<PerformanceReview>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Deletes the specified <see cref="PerformanceReview"/>.
+    /// Deletes the specified <c>PerformanceReview</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Employee"/> identifier.</param>
+    /// <param name="id">The <c>Employee</c> identifier.</param>
     [HttpDelete("reviews/{id}", Name="PerformanceReview_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)

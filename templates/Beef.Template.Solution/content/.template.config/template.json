@@ -85,7 +85,7 @@
       "type": "generated",
       "generator": "constant",
       "parameters": {
-        "value": "3.21.0"
+        "value": "3.21.1"
       },
       "replaces": "CoreExVersion"
     },
@@ -192,7 +192,7 @@
         },
         {
           "condition": "(!implement_cosmos)",
-          "exclude": [ "Company.AppName.Business/Data/CosmosDb.cs", "Company.AppName.Test/Cosmos/**/*", "Company.AppName.CodeGen/datamodel.beef-5.yaml" ]
+          "exclude": [ "Company.AppName.Business/Data/AppNameCosmosDb.cs", "Company.AppName.Test/Cosmos/**/*", "Company.AppName.CodeGen/datamodel.beef-5.yaml" ]
         },
         {
           "condition": "(!implement_httpagent)",

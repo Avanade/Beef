@@ -28,12 +28,12 @@ public partial class PostalInfoController : ControllerBase
     partial void PostalInfoControllerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <summary>
-    /// Gets the specified <see cref="PostalInfo"/>.
+    /// Gets the specified <c>PostalInfo</c>.
     /// </summary>
-    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
+    /// <param name="country">The Country.</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
-    /// <returns>The selected <see cref="PostalInfo"/> where found.</returns>
+    /// <returns>The selected <c>PostalInfo</c> where found.</returns>
     [HttpGet("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_GetPostCodes")]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -41,12 +41,12 @@ public partial class PostalInfoController : ControllerBase
         => _webApi.GetWithResultAsync<PostalInfo?>(Request, p => _manager.GetPostCodesAsync(country, state, city));
 
     /// <summary>
-    /// Creates a new <see cref="PostalInfo"/>.
+    /// Creates a new <c>PostalInfo</c>.
     /// </summary>
-    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
+    /// <param name="country">The Country.</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
-    /// <returns>The created <see cref="PostalInfo"/>.</returns>
+    /// <returns>The created <c>PostalInfo</c>.</returns>
     [HttpPost("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_CreatePostCodes")]
     [AcceptsBody(typeof(Common.Entities.PostalInfo))]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.Created)]
@@ -54,12 +54,12 @@ public partial class PostalInfoController : ControllerBase
         => _webApi.PostWithResultAsync<PostalInfo, PostalInfo>(Request, p => _manager.CreatePostCodesAsync(p.Value!, country, state, city), statusCode: HttpStatusCode.Created);
 
     /// <summary>
-    /// Updates an existing <see cref="PostalInfo"/>.
+    /// Updates an existing <c>PostalInfo</c>.
     /// </summary>
-    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
+    /// <param name="country">The Country.</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
-    /// <returns>The updated <see cref="PostalInfo"/>.</returns>
+    /// <returns>The updated <c>PostalInfo</c>.</returns>
     [HttpPut("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_UpdatePostCodes")]
     [AcceptsBody(typeof(Common.Entities.PostalInfo))]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
@@ -68,12 +68,12 @@ public partial class PostalInfoController : ControllerBase
         => _webApi.PutWithResultAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
     /// <summary>
-    /// Patches an existing <see cref="PostalInfo"/>.
+    /// Patches an existing <c>PostalInfo</c>.
     /// </summary>
-    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
+    /// <param name="country">The Country.</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
-    /// <returns>The patched <see cref="PostalInfo"/>.</returns>
+    /// <returns>The patched <c>PostalInfo</c>.</returns>
     [HttpPatch("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_PatchPostCodes")]
     [AcceptsBody(typeof(Common.Entities.PostalInfo), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.PostalInfo), (int)HttpStatusCode.OK)]
@@ -82,9 +82,9 @@ public partial class PostalInfoController : ControllerBase
         => _webApi.PatchWithResultAsync<PostalInfo>(Request, get: _ => _manager.GetPostCodesAsync(country, state, city), put: p => _manager.UpdatePostCodesAsync(p.Value!, country, state, city), simulatedConcurrency: true);
 
     /// <summary>
-    /// Deletes the specified <see cref="PostalInfo"/>.
+    /// Deletes the specified <c>PostalInfo</c>.
     /// </summary>
-    /// <param name="country">The Country (see <see cref="RefDataNamespace.Country"/>).</param>
+    /// <param name="country">The Country.</param>
     /// <param name="state">The State.</param>
     /// <param name="city">The City.</param>
     [HttpDelete("api/v1/postal/{country}/{state}/{city}", Name="PostalInfo_DeletePostCodes")]

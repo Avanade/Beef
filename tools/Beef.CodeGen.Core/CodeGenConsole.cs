@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.OpenApi;
+using CoreEx;
 using CoreEx.Abstractions;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
@@ -190,6 +191,17 @@ namespace Beef.CodeGen
         public CodeGenConsole DatabaseConnectionString(string connectionString)
         {
             Args.ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            return this;
+        }
+
+        /// <summary>
+        /// Add or replace the <see cref="OpenApiArgs"/> to the underlying <see cref="OnRamp.Console.CodeGenConsole.Args"/>.
+        /// </summary>
+        /// <param name="openApiArgs">The <see cref="OpenApiArgs"/>.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsole WithOpenApiArgs(OpenApiArgs openApiArgs)
+        {
+            Args.Parameters[nameof(OpenApiArgs)] = openApiArgs.ThrowIfNull(nameof(openApiArgs));
             return this;
         }
 

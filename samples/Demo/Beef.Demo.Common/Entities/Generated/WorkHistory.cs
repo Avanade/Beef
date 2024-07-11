@@ -19,7 +19,7 @@ namespace Beef.Demo.Common.Entities
     public partial class WorkHistory : IPrimaryKey
     {
         /// <summary>
-        /// Gets or sets the <see cref="Person"/> identifier (not serialized/read-only for internal data merging).
+        /// Gets or sets the <c>Person</c> identifier (not serialized/read-only for internal data merging).
         /// </summary>
         [JsonIgnore]
         public Guid PersonId { get; set; }
@@ -55,7 +55,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="WorkHistory"/> collection.
+    /// Represents the <c>WorkHistory</c> collection.
     /// </summary>
     public partial class WorkHistoryCollection : List<WorkHistory> { }
 }

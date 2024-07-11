@@ -54,38 +54,10 @@ namespace Beef.CodeGen
         public static void AddDatabaseMigrator(this ICodeGeneratorArgs args, DatabaseMigrationBase migrator) => args.AddParameter(CodeGenConsole.DatabaseMigratorParamName, migrator ?? throw new ArgumentNullException(nameof(args)));
 
         /// <summary>
-        /// Uses (adds) the <see cref="OpenApiArgs"/> to the <see cref="ICodeGeneratorArgs.Parameters"/>.
-        /// </summary>
-        /// <typeparam name="TArgs">The <see cref="ICodeGeneratorArgs"/> <see cref="Type"/>.</typeparam>
-        /// <param name="args">The <see cref="ICodeGeneratorArgs"/>.</param>
-        /// <param name="openApiArgs">The <see cref="OpenApiArgs"/>.</param>
-        /// <returns>The <see cref="ICodeGeneratorArgs"/> instance.</returns>
-        public static TArgs UseOpenApiArgs<TArgs>(this TArgs args, OpenApiArgs openApiArgs) where TArgs : ICodeGeneratorArgs
-        {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
-
-            if (openApiArgs == null)
-                throw new ArgumentNullException(nameof(openApiArgs));
-
-            args.AddParameter(nameof(OpenApiArgs), openApiArgs);
-            return args;
-        }
-
-        /// <summary>
         /// Gets the <see cref="OpenApiArgs"/>.
         /// </summary>
         /// <param name="args">The <see cref="ICodeGeneratorArgs"/>.</param>
         /// <returns>The <see cref="OpenApiArgs"/>.</returns>
-        public static OpenApiArgs GetOpenApiArgs(this ICodeGeneratorArgs args)
-        {
-            var openApiArgs = args.GetParameter<OpenApiArgs>(nameof(OpenApiArgs), false)!;
-            if (openApiArgs is not null)
-                return openApiArgs;
-
-            openApiArgs = new OpenApiArgs();
-            args.UseOpenApiArgs(openApiArgs);
-            return openApiArgs;
-        }
+        public static OpenApiArgs? GetOpenApiArgs(this ICodeGeneratorArgs args) => args.GetParameter<OpenApiArgs>(nameof(OpenApiArgs), false)!;
     }
 }

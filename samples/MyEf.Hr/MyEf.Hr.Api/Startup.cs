@@ -96,6 +96,11 @@ namespace MyEf.Hr.Api
                 if (File.Exists(xmlFile))
                     options.IncludeXmlComments(xmlFile);
 
+                xmlName = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml".Replace(".Api", ".Common");
+                xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
+                if (File.Exists(xmlFile))
+                    options.IncludeXmlComments(xmlFile);
+
                 options.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
                 options.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
             });

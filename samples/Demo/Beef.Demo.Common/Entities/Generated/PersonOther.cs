@@ -14,12 +14,12 @@ using CoreEx.Entities;
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
-    /// Represents the other <see cref="Person"/> without <see cref="EntityBase"/> capabilities entity.
+    /// Represents the other <c>Person</c> without <c>EntityBase</c> capabilities entity.
     /// </summary>
     public partial class PersonOther : IIdentifier<Guid>, IETag, IChangeLog
     {
         /// <summary>
-        /// Gets or sets the <see cref="Person"/> identifier.
+        /// Gets or sets the <c>Person</c> identifier.
         /// </summary>
         public Guid Id { get; set; }
 
@@ -46,7 +46,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="PersonOther"/> collection.
+    /// Represents the <c>PersonOther</c> collection.
     /// </summary>
     public partial class PersonOtherCollection : List<PersonOther> { }
 }

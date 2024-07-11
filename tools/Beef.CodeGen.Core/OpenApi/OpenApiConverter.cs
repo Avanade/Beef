@@ -20,7 +20,7 @@ namespace Beef.CodeGen.OpenApi
     /// <summary>
     /// Provides the ability to convert an OpenAPI document to an equivalent Beef-5 YAML configuration.
     /// </summary>
-    internal class OpenApiConverter
+    public class OpenApiConverter
     {
         private static readonly char[] _separators = "^&*$!@#%*{}[]|:;\"'_- .,".ToCharArray();
         private static readonly char[] _yamlEscapeChars = "!@#%*{}[]|:;\"'".ToCharArray();
@@ -29,9 +29,6 @@ namespace Beef.CodeGen.OpenApi
         private readonly YamlConfig _config;
         private readonly CodeGeneratorArgs _codeGenArgs;
         private readonly OpenApiArgs _openApiArgs;
-        private readonly string[] _refDataTypes;
-        private readonly string[] _ignoreTypes;
-        private readonly bool _outputText = true;
 
         /// <summary>
         /// Read the OpenAPI document and create the <see cref="OpenApiConverter"/>.
@@ -80,11 +77,12 @@ namespace Beef.CodeGen.OpenApi
         {
             _document = document;
             _codeGenArgs = args ?? throw new ArgumentNullException(nameof(args));
-            _openApiArgs = _codeGenArgs.GetOpenApiArgs();
+            _openApiArgs = _codeGenArgs.GetOpenApiArgs() ?? new OpenApiArgs();
 
-            _refDataTypes = _codeGenArgs.GetParameter<string>("refdata")?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
-            _ignoreTypes = _codeGenArgs.GetParameter<string>("ignore")?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
-            _outputText = !(_codeGenArgs.Parameters.TryGetValue("text", out var val) && val is string text && text.Equals("false", StringComparison.OrdinalIgnoreCase));
+            _openApiArgs.RefDataTypes.AddRange(_codeGenArgs.GetParameter<string>("refdata")?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? []);
+            _openApiArgs.IgnoreTypes.AddRange(_codeGenArgs.GetParameter<string>("ignore")?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? []);
+            if (_codeGenArgs.Parameters.TryGetValue("text", out var val) && val is string text)
+                _openApiArgs.OutputText = text.Equals("true", StringComparison.OrdinalIgnoreCase);
 
             var sb = new StringBuilder($"openapi \"{path}\"");
             foreach (var p in args.Parameters.Where(x => new List<string> { "include", "exclude", "ignore", "refdata", "text" }.Contains(x.Key, StringComparer.OrdinalIgnoreCase)))
@@ -92,7 +90,7 @@ namespace Beef.CodeGen.OpenApi
                 sb.Append($" --param \"{p.Key}={p.Value}\"");
             }
 
-            _config = new(sb.ToString(), _openApiArgs);
+            _config = new(null, sb.ToString(), _openApiArgs);
         }
 
         /// <summary>
@@ -104,9 +102,10 @@ namespace Beef.CodeGen.OpenApi
             const string templateFileName = "OpenApi_yaml";
 
             // Create the owning beef "entity" to house all the operations.
-            var ename = GetDotNetName(_document.Info.Title) + "Service";
-            var entity = new YamlEntity(string.IsNullOrWhiteSpace(ename) ? "NoTitleSpecifiedService" : ename);
-            if (_outputText)
+            var ename = GetDotNetName(OpenApiNameType.Entity, _document.Info.Title) + "Service";
+            var entity = new YamlEntity(_document.Info.Title, string.IsNullOrWhiteSpace(ename) ? "NoTitleSpecifiedService" : ename);
+            entity.AddAttribute("excludeEntity", true);
+            if (_openApiArgs.OutputText)
                 entity.AddAttribute("text", _document.Info.Description);
 
             static (string? method, string path) MethodPathSplitter(string text)
@@ -160,7 +159,7 @@ namespace Beef.CodeGen.OpenApi
         /// </summary>
         private void CreateOperation(YamlEntity entity, ApiOperation ao)
         {
-            var operation = new YamlOperation(ao.Operation.OperationId);
+            var operation = new YamlOperation(ao.Operation.OperationId, GetDotNetName(OpenApiNameType.Operation, ao.Operation.OperationId));
 
             operation.AddAttribute("type", ao.Method switch
             {
@@ -178,11 +177,11 @@ namespace Beef.CodeGen.OpenApi
                 if (_openApiArgs.IgnoreParametersThatStartWith.Length > 0 && _openApiArgs.IgnoreParametersThatStartWith.Contains(p.Name.FirstOrDefault()))
                     continue;
 
-                var pname = StringConverter.ToPascalCase(GetDotNetName(p.Name))!;
-                var pp = new YamlParameter(pname);
+                var pname = GetDotNetName(OpenApiNameType.Parameter, p.Name)!;
+                var pp = new YamlParameter(p.Name, pname);
                 pp.AddAttribute("type", GetDotNetType(pname, p.Schema), false, "string");
                 pp.AddAttribute("isMandatory", p.Required);
-                if (_outputText)
+                if (_openApiArgs.OutputText)
                     pp.AddAttribute("text", FormatText(p.Description));
 
                 var comparer = _openApiArgs.JsonNameComparer;
@@ -208,16 +207,16 @@ namespace Beef.CodeGen.OpenApi
             // Add the response (body); being the first 2XX response, - if any.
             var response = ao.Operation.Responses.FirstOrDefault(x => x.Key.StartsWith('2'));
             if (response.Value is null)
-                operation.AddAttribute("resultType", "void");
+                operation.AddAttribute("returnType", "void");
             else if (response.Value.Reference is not null)
-                operation.AddAttribute("resultType", GetDotNetType(response.Value));
+                operation.AddAttribute("returnType", GetDotNetType(response.Value));
             else
             {
                 var content = response.Value.Content.FirstOrDefault();
                 if (content.Value is null || content.Value.Schema is null)
-                    operation.AddAttribute("resultType", "void");
+                    operation.AddAttribute("returnType", "void");
                 else
-                    operation.AddAttribute("resultType", GetDotNetType(string.Empty, content.Value.Schema));
+                    operation.AddAttribute("returnType", GetDotNetType(string.Empty, content.Value.Schema));
             }
 
             // Add the web api attributes.
@@ -231,7 +230,7 @@ namespace Beef.CodeGen.OpenApi
             operation.AddAttribute("webApiStatus", response.Key is null ? "NoContent" : ((HttpStatusCode)int.Parse(response.Key)).ToString());
 
             // Finish it!
-            if (_outputText)
+            if (_openApiArgs.OutputText)
                 operation.AddAttribute("text", FormatText(ao.Operation.Summary));
 
             entity.Operations.Add(operation);
@@ -243,26 +242,37 @@ namespace Beef.CodeGen.OpenApi
         /// </summary>
         private YamlEntity CreateOrGetSchemaEntity(string name, OpenApiSchema schema, bool createWhereDifferences)
         {
-            // Check if a faux entity is to be created as it should be ignored.
-            var ename = GetDotNetName(name);
-            if (_ignoreTypes.Contains(ename, StringComparer.OrdinalIgnoreCase))
-                return new YamlEntity(ename);
+            // Get the .NET name.
+            var ename = GetDotNetName(OpenApiNameType.Entity, name);
+            foreach (var p in schema.Properties)
+            {
+                // Rename where the type name is the same as a member name (not allowed in .NET).
+                var pname = GetDotNetName(OpenApiNameType.Property, p.Key);
+                if (ename == pname)
+                {
+                    ename += _openApiArgs.TypeWithSameMemberNameSuffix;
+                    break;
+                }
+            }
 
+            // Check if a faux entity is to be created as it should be ignored.
+            if (_openApiArgs.IgnoreTypes.Contains(ename, StringComparer.OrdinalIgnoreCase) || _openApiArgs.RefDataTypes.Contains(ename, StringComparer.OrdinalIgnoreCase))
+                return new YamlEntity(name, ename);
+
+            // Serialize to JSON for comparison.
             using var sw = new StringWriter();
             var oajw = new OpenApiJsonWriter(sw, new OpenApiJsonWriterSettings { Terse = true });
             schema.SerializeAsV3WithoutReference(oajw);
             var json = sw.ToString();
 
-            // Create or get.
-            YamlEntity? entity = null;
-
+            // Create entity where unique and further rename where applicable.
             if (createWhereDifferences)
             {
                 int count = 0;
                 while (true)
                 {
                     var uename = count == 0 ? ename : $"{ename}{count}";
-                    var eentity = _config.Entities!.FirstOrDefault(x => x.Name == GetDotNetName(uename));
+                    var eentity = _config.Entities!.FirstOrDefault(x => x.Name == GetDotNetName(OpenApiNameType.Entity, uename));
                     if (eentity is null)
                     {
                         ename = uename;
@@ -279,34 +289,34 @@ namespace Beef.CodeGen.OpenApi
             else
             {
                 // Only create if not already exists.
-                entity = _config.Entities!.FirstOrDefault(x => x.Name == ename);
-                if (entity is not null)
-                    return entity;
+                var eentity = _config.Entities!.FirstOrDefault(x => x.Name == ename);
+                if (eentity is not null)
+                    return eentity;
             }
 
-            // Create the entity with its properties.
-            entity = new YamlEntity(ename) { Json = json };
-            if (_outputText)
+            var entity = new YamlEntity(name, ename) { Json = json };
+            if (_openApiArgs.OutputText)
                 entity.AddAttribute("text", FormatText(schema.Description));
 
             _config.Entities!.Add(entity);
 
-            string ApplyRefDataTypeNotation(string name, string type) => type == "string" && _refDataTypes.Contains(name, StringComparer.OrdinalIgnoreCase) ? "^" + name : type;
+            // Add all the properties.
+            string ApplyRefDataTypeNotation(string name, string type) => type == "string" && _openApiArgs.RefDataTypes.Contains(name, StringComparer.OrdinalIgnoreCase) ? "^" + name : type;
 
             foreach (var prop in schema.Properties)
             {
-                var pname = StringConverter.ToPascalCase(GetDotNetName(prop.Key))!;
-                var p = new YamlProperty(pname);
+                var pname = GetDotNetName(OpenApiNameType.Property, prop.Key)!;
+                var p = new YamlProperty(prop.Key, pname);
                 p.AddAttribute("type", ApplyRefDataTypeNotation(pname, GetDotNetType(pname, prop.Value)), false, "string");
 
                 var comparer = _openApiArgs.JsonNameComparer;
                 if (comparer.Compare(prop.Key, StringConverter.ToCamelCase(p.Name)) != 0)
                     p.AddAttribute("jsonName", prop.Key);
 
-                if (_outputText)
+                if (_openApiArgs.OutputText)
                     p.AddAttribute("text", FormatText(prop.Value.Description));
 
-                _openApiArgs.OnYamlProperty?.Invoke(p, prop.Key, prop.Value);
+                _openApiArgs.OnYamlProperty?.Invoke(p, prop.Value);
                 entity.Properties.Add(p);
             }
 
@@ -325,19 +335,19 @@ namespace Beef.CodeGen.OpenApi
             }
 
             // Done! Finalize.
-            _openApiArgs.OnYamlEntity?.Invoke(entity, name, schema);
+            _openApiArgs.OnYamlEntity?.Invoke(entity, schema);
             return entity;
         }
 
         /// <summary>
         /// Gets a .NET friendly name.
         /// </summary>
-        private static string GetDotNetName(string name)
+        private string GetDotNetName(OpenApiNameType type, string name)
         {
             name.ThrowIfNullOrEmpty(nameof(name));
             var sb = new StringBuilder();
             name.Split(_separators, StringSplitOptions.RemoveEmptyEntries).ForEach(part => sb.Append(StringConverter.ToPascalCase(part)));
-            return sb.ToString();
+            return _openApiArgs.ConvertDotNetName is null ? sb.ToString() : _openApiArgs.ConvertDotNetName(type, sb.ToString());
         }
 
         /// <summary>
@@ -353,7 +363,7 @@ namespace Beef.CodeGen.OpenApi
                 return null;
 
             if (!text.EndsWith('.'))
-                text = text + ".";
+                text += ".";
 
             if (text.Any(c => _yamlEscapeChars.Contains(c)))
                 return "'+" + text.Replace("'", "''") + "'";
@@ -361,6 +371,9 @@ namespace Beef.CodeGen.OpenApi
                 return "+" + text;
         }
 
+        /// <summary>
+        /// Gets the equivalent .NET type.
+        /// </summary>
         private string GetDotNetType(IOpenApiReferenceable reference)
         {
             var schema = _document.Components.Schemas[reference.Reference.Id];
@@ -384,14 +397,23 @@ namespace Beef.CodeGen.OpenApi
                 {
                     if (schema.Reference is not null && schema.Reference.Id is not null)
                     {
-                        var yenum = new YamlEnum(GetDotNetName(schema.Reference.Id));
+                        var yenum = new YamlEnum(schema.Reference.Id, GetDotNetName(OpenApiNameType.Enum, schema.Reference.Id));
+                        if (_openApiArgs.OutputText)
+                            yenum.AddAttribute("text", FormatText(schema.Description));
+
                         foreach (var v in (schema.Enum ?? []).OfType<OpenApiString>())
                         {
-                            yenum.Values.Add(v.Value);
+                            var yev = new YamlEnumValue(v.Value, GetDotNetName(OpenApiNameType.EnumValue, v.Value));
+                            _openApiArgs.OnYamlEnumValue?.Invoke(yev, schema);
+                            yenum.Values.Add(yev);
                         }
 
-                        _openApiArgs.OnYamlEnum?.Invoke(yenum, schema.Reference.Id, schema);
-                        _config.Enums.Add(yenum);
+                        if (_config.Enums.FirstOrDefault(x => x.Name == yenum.Name) is null)
+                        {
+                            _openApiArgs.OnYamlEnum?.Invoke(yenum, schema);
+                            _config.Enums.Add(yenum);
+                        }
+
                         return (_openApiArgs.EnumAsReferenceData ? "^" : "") + yenum.Name;
                     }
                     else
@@ -424,7 +446,7 @@ namespace Beef.CodeGen.OpenApi
             {
                 if (schema.Items.Type == "object")
                 {
-                    var aname = GetDotNetName(schema.Items.Reference.Id);
+                    var aname = GetDotNetName(OpenApiNameType.Entity, schema.Items.Reference.Id);
                     var entity = CreateOrGetSchemaEntity(aname, schema.Items, false);
                     entity!.AddAttribute("collection", true);
                     return entity.Name + "Collection";
@@ -439,7 +461,7 @@ namespace Beef.CodeGen.OpenApi
                     if (_document.Components.Schemas.TryGetValue(schema.Reference.Id, out var refSchema))
                         return CreateOrGetSchemaEntity(schema.Reference.Id, refSchema, false)!.Name!;
 
-                    return GetDotNetName(schema.Reference.Id);
+                    return GetDotNetName(OpenApiNameType.Entity, schema.Reference.Id);
                 }
 
                 if (schema.Properties.Count == 0)

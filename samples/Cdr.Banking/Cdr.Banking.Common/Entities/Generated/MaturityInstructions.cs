@@ -17,7 +17,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class MaturityInstructions : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="MaturityInstructions"/> collection.
+    /// Represents the <c>MaturityInstructions</c> collection.
     /// </summary>
     public partial class MaturityInstructionsCollection : List<MaturityInstructions> { }
 }
