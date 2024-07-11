@@ -17,7 +17,7 @@ namespace MyEf.Hr.Common.Entities
     public partial class TerminationReason : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="TerminationReason"/> collection.
+    /// Represents the <c>TerminationReason</c> collection.
     /// </summary>
     public partial class TerminationReasonCollection : List<TerminationReason> { }
 }

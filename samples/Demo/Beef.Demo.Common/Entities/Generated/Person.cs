@@ -19,7 +19,7 @@ namespace Beef.Demo.Common.Entities
     public partial class Person : IIdentifier<Guid>, IETag, IChangeLog
     {
         /// <summary>
-        /// Gets or sets the <see cref="Person"/> identifier.
+        /// Gets or sets the <c>Person</c> identifier.
         /// </summary>
         [System.Xml.Serialization.XmlElement("Id")]
         public Guid Id { get; set; }
@@ -40,7 +40,7 @@ namespace Beef.Demo.Common.Entities
         public string? UniqueCode { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
+        /// Gets the corresponding <c>Gender</c> text (read-only where selected).
         /// </summary>
         public string? GenderText { get; set; }
 
@@ -50,7 +50,7 @@ namespace Beef.Demo.Common.Entities
         public string? Gender { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
+        /// Gets the corresponding <c>EyeColor</c> text (read-only where selected).
         /// </summary>
         public string? EyeColorText { get; set; }
 
@@ -87,12 +87,12 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Person"/> collection.
+    /// Represents the <c>Person</c> collection.
     /// </summary>
     public partial class PersonCollection : List<Person> { }
 
     /// <summary>
-    /// Represents the <see cref="Person"/> collection result.
+    /// Represents the <c>Person</c> collection result.
     /// </summary>
     public class PersonCollectionResult : CollectionResult<PersonCollection, Person>
     {

@@ -17,7 +17,7 @@ namespace MyEf.Hr.Common.Entities
     public partial class USState : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="USState"/> collection.
+    /// Represents the <c>USState</c> collection.
     /// </summary>
     public partial class USStateCollection : List<USState> { }
 }

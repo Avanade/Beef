@@ -25,55 +25,55 @@ public partial class ReferenceDataController : ControllerBase
         { _webApi = webApi.ThrowIfNull(); _orchestrator = orchestrator.ThrowIfNull(); }
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data items that match the specified criteria.
+    /// Gets all of the 'Gender' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.Gender collection.</returns>
+    /// <returns>The 'Gender' array.</returns>
     [HttpGet("ref/genders", Name="ReferenceData_GenderGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> GenderGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.Gender>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.TerminationReason"/> reference data items that match the specified criteria.
+    /// Gets all of the 'TerminationReason' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.TerminationReason collection.</returns>
+    /// <returns>The 'TerminationReason' array.</returns>
     [HttpGet("ref/terminationreasons", Name="ReferenceData_TerminationReasonGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> TerminationReasonGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.TerminationReason>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.RelationshipType"/> reference data items that match the specified criteria.
+    /// Gets all of the 'RelationshipType' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.RelationshipType collection.</returns>
+    /// <returns>The 'RelationshipType' array.</returns>
     [HttpGet("ref/relationshiptypes", Name="ReferenceData_RelationshipTypeGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> RelationshipTypeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.RelationshipType>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data items that match the specified criteria.
+    /// Gets all of the 'USState' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.USState collection.</returns>
+    /// <returns>The 'USState' array.</returns>
     [HttpGet("ref/usstates", Name="ReferenceData_USStateGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.USState>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> USStateGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
         => _webApi.GetAsync(Request, p => _orchestrator.GetWithFilterAsync<RefDataNamespace.USState>(codes, text, p.RequestOptions.IncludeInactive));
 
     /// <summary> 
-    /// Gets all of the <see cref="RefDataNamespace.PerformanceOutcome"/> reference data items that match the specified criteria.
+    /// Gets all of the 'PerformanceOutcome' reference data items that match the specified criteria.
     /// </summary>
     /// <param name="codes">The reference data code list.</param>
     /// <param name="text">The reference data text (including wildcards).</param>
-    /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
+    /// <returns>The 'PerformanceOutcome' array.</returns>
     [HttpGet("ref/performanceoutcomes", Name="ReferenceData_PerformanceOutcomeGetAll")]
     [ProducesResponseType(typeof(IEnumerable<CommonRefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
     public Task<IActionResult> PerformanceOutcomeGetAll([FromQuery] IEnumerable<string>? codes = default, string? text = default)
@@ -82,7 +82,7 @@ public partial class ReferenceDataController : ControllerBase
     /// <summary>
     /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
     /// </summary>
-    /// <returns>A <see cref="ReferenceDataMultiDictionary"/>.</returns>
+    /// <returns>The 'ReferenceDataMultiDictionary'.</returns>
     [HttpGet("ref", Name="ReferenceData_GetNamed")]
     [ProducesResponseType(typeof(CoreEx.RefData.ReferenceDataMultiDictionary), (int)HttpStatusCode.OK)]
     public Task<IActionResult> GetNamed() => _webApi.GetAsync(Request, p => _orchestrator.GetNamedAsync(p.RequestOptions));

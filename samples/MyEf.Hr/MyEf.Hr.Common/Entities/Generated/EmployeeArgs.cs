@@ -11,7 +11,7 @@ using CoreEx.Entities;
 namespace MyEf.Hr.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Employee"/> Arguments entity.
+    /// Represents the <c>Employee</c> Arguments entity.
     /// </summary>
     public partial class EmployeeArgs
     {

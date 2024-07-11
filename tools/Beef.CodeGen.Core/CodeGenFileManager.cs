@@ -13,6 +13,11 @@ namespace Beef.CodeGen
     public static class CodeGenFileManager
     {
         /// <summary>
+        /// Gets the temporary entity file name.
+        /// </summary>
+        public static string TemporaryEntityFilename { get; } = "temp.entity.beef-5.yaml";
+
+        /// <summary>
         /// Gets the list of supported <see cref="CommandType.Entity"/> filenames (will search in order specified).
         /// </summary>
         public static List<string> EntityFilenames { get; } = new List<string>(new string[] { "entity.beef-5.yaml", "entity.beef-5.yml", "entity.beef-5.json" });

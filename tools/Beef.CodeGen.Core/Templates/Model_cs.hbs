@@ -42,7 +42,7 @@ using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
 namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}}
 {
     /// <summary>
-    /// {{#if Root.IsDataModel}}{{ModelSummaryText}}{{else}}{{SummaryText}}{{/if}}
+    /// {{#if Root.IsDataModel}}{{ModelSummaryText}}{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryText}}{{else}}{{SummaryText}}{{/ifeq}}{{/if}}
     /// </summary>
 {{#if Root.IsDataModel}}
     public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval DataModelInherits}} : {{{DataModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval DataModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
@@ -67,7 +67,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         {{#unless Root.IsDataModel}}
           {{#ifeq RefDataText 'Optional' 'Always'}}
         /// <summary>
-        /// {{{SummaryRefDataText}}}
+        /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryRefDataText}}{{else}}{{SummaryRefDataText}}{{/ifeq}}
         /// </summary>
             {{#ifval JsonName}}
               {{#ifeq Parent.JsonSerializer 'SystemText'}}
@@ -84,7 +84,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{/unless}}
   {{/ifval}}
         /// <summary>
-        /// {{{ModelSummaryText}}}
+        /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments ModelSummaryText}}{{else}}{{ModelSummaryText}}{{/ifeq}}
         /// </summary>
   {{#if Root.IsDataModel}}   
     {{#if DataModelSerializationIgnore}}
@@ -178,7 +178,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
 {{#if Collection}}
 
     /// <summary>
-    /// Represents the {{{EntityNameSeeComments}}} collection.
+    /// Represents the {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments EntityNameSeeComments}}{{else}}{{EntityNameSeeComments}}{{/ifeq}} collection.
     /// </summary>
     public partial class {{{EntityCollectionName}}} : {{{CollectionInherits}}} { }
 {{/if}}
@@ -186,7 +186,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
   {{#unless Root.IsDataModel}}
 
     /// <summary>
-    /// Represents the {{{EntityNameSeeComments}}} collection result.
+    /// Represents the {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments EntityNameSeeComments}}{{else}}{{EntityNameSeeComments}}{{/ifeq}} collection result.
     /// </summary>
     public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
     {

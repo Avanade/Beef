@@ -20,15 +20,15 @@ public partial class ReferenceDataProvider : IReferenceDataProvider
     partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
 
     /// <inheritdoc/>
-    public Type[] Types => new Type[] 
-    {
+    public Type[] Types =>
+    [
         typeof(RefDataNamespace.OpenStatus),
         typeof(RefDataNamespace.ProductCategory),
         typeof(RefDataNamespace.AccountUType),
         typeof(RefDataNamespace.MaturityInstructions),
         typeof(RefDataNamespace.TransactionType),
         typeof(RefDataNamespace.TransactionStatus)
-    };
+    ];
 
     /// <inheritdoc/>
     public Task<Result<IReferenceDataCollection>> GetAsync(Type type, CancellationToken cancellationToken = default) => _dataService.GetAsync(type);

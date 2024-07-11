@@ -30,7 +30,7 @@ public partial class ConfigController : ControllerBase
     /// <summary>
     /// Get Env Vars.
     /// </summary>
-    /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
+    /// <returns>A resultant <c>System.Collections.IDictionary</c>.</returns>
     [HttpPost("api/v1/envvars", Name="Config_GetEnvVars")]
     [ProducesResponseType(typeof(System.Collections.IDictionary), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]

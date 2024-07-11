@@ -1,15 +1,18 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config.Entity;
+using HandlebarsDotNet;
 using Microsoft.Extensions.Logging;
 using OnRamp;
 using OnRamp.Scripts;
 using OnRamp.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace Beef.CodeGen
 {
@@ -20,7 +23,28 @@ namespace Beef.CodeGen
     /// <param name="scripts">The <see cref="CodeGenScript"/>.</param>
     internal class CodeGenerator(ICodeGeneratorArgs args, CodeGenScript scripts) : OnRamp.CodeGenerator(args, scripts)
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "Supporting multi-versions of .NET.")]
+        private static readonly Regex _seeRegex = new(@"<see cref=""(.*?)""/>", RegexOptions.Compiled);
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "Supporting multi-versions of .NET.")]
+        private static readonly Regex _seeRefRegex = new(@" \((.*?)<see cref=""(.*?)""/>\)", RegexOptions.Compiled);
+
         private const string _entitiesName = "entities";
+
+        /// <summary>
+        /// Static constructor.
+        /// </summary>
+        static CodeGenerator()
+        {
+            Handlebars.RegisterHelper("sanitize-comments", (writer, context, args) =>
+            {
+                var ua = args.OfType<UndefinedBindingResult>().FirstOrDefault();
+                if (ua is not null)
+                    throw new CodeGenException($"Handlebars template invokes function 'sanitize-comments' that references '{ua.Value}' which is undefined.");
+
+                writer.WriteSafeString(_seeRegex.Replace(_seeRefRegex.Replace(args.FirstOrDefault()?.ToString() ?? "", ""), "<c>$1</c>").Replace("RefDataNamespace.", "").Replace("CollectionResult", "Collection").Replace("Collection</c>", "</c> array"));
+            });
+        }
 
         /// <inheritdoc/>
         /// <remarks>Will search for secondary (related) configuration files and will dynamically include (merge) the configured entities into the primary configuration.</remarks>
@@ -39,6 +63,9 @@ namespace Beef.CodeGen
             foreach (var secondaryFile in fi.Directory!.EnumerateFiles($"*.{root}.*", SearchOption.AllDirectories))
             {
                 if (!Path.GetFileNameWithoutExtension(secondaryFile.FullName).EndsWith(root, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (secondaryFile.Name.Equals(CodeGenFileManager.TemporaryEntityFilename, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 try

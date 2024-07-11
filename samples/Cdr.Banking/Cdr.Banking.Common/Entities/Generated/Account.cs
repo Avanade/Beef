@@ -63,12 +63,12 @@ namespace Cdr.Banking.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Account"/> collection.
+    /// Represents the <c>Account</c> collection.
     /// </summary>
     public partial class AccountCollection : List<Account> { }
 
     /// <summary>
-    /// Represents the <see cref="Account"/> collection result.
+    /// Represents the <c>Account</c> collection result.
     /// </summary>
     public class AccountCollectionResult : CollectionResult<AccountCollection, Account>
     {

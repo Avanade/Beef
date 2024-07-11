@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
@@ -11,8 +12,8 @@
     <Folder Include="DataSvc\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AspNetCore" Version="3.21.0" />
-    <PackageReference Include="CoreEx.Cosmos" Version="3.21.0" />
-    <PackageReference Include="CoreEx.Validation" Version="3.21.0" />
+    <PackageReference Include="CoreEx.AspNetCore" Version="3.21.1" />
+    <PackageReference Include="CoreEx.Cosmos" Version="3.21.1" />
+    <PackageReference Include="CoreEx.Validation" Version="3.21.1" />
   </ItemGroup>
 </Project>

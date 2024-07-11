@@ -54,7 +54,7 @@ namespace Cdr.Banking.Test
                     await _cosmosDb.Transactions.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 
                     jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
-                    await _cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.ReferenceDataOrchestrator>().GetAllTypes(), cancellationToken: ct).ConfigureAwait(false);
+                    await _cosmosDb.ImportValueBatchAsync("RefData", jdr, CoreEx.RefData.ReferenceDataOrchestrator.GetAllTypesInNamespace<Business.Data.Model.Account>(), cancellationToken: ct).ConfigureAwait(false);
                 }
 
                 return true;

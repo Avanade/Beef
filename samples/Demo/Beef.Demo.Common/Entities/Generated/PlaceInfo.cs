@@ -30,7 +30,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="PlaceInfo"/> collection.
+    /// Represents the <c>PlaceInfo</c> collection.
     /// </summary>
     public partial class PlaceInfoCollection : List<PlaceInfo> { }
 }

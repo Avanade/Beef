@@ -84,7 +84,7 @@ entities:
   }
 //#endif
 //#if (implement_cosmos)
-cosmosName: ICosmos
+cosmosName: AppNameCosmosDb
 eventSubjectRoot: Company
 eventActionFormat: PastTense
 eventSourceRoot: Company/AppName

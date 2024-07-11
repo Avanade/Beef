@@ -17,7 +17,7 @@ namespace MyEf.Hr.Common.Entities
     public partial class PerformanceOutcome : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="PerformanceOutcome"/> collection.
+    /// Represents the <c>PerformanceOutcome</c> collection.
     /// </summary>
     public partial class PerformanceOutcomeCollection : List<PerformanceOutcome> { }
 }

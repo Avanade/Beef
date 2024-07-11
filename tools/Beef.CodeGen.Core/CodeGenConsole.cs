@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.OpenApi;
+using CoreEx;
 using CoreEx.Abstractions;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
@@ -9,7 +11,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -29,6 +30,7 @@ namespace Beef.CodeGen
         private string _databaseScript = "Database.yaml";
 
         private CommandArgument<CommandType>? _cmdArg;
+        private CommandArgument? _additionalArgs;
 
         /// <summary>
         /// Gets the 'Company' <see cref="CodeGeneratorArgsBase.Parameters"/> name.
@@ -192,10 +194,22 @@ namespace Beef.CodeGen
             return this;
         }
 
+        /// <summary>
+        /// Add or replace the <see cref="OpenApiArgs"/> to the underlying <see cref="OnRamp.Console.CodeGenConsole.Args"/>.
+        /// </summary>
+        /// <param name="openApiArgs">The <see cref="OpenApiArgs"/>.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsole WithOpenApiArgs(OpenApiArgs openApiArgs)
+        {
+            Args.Parameters[nameof(OpenApiArgs)] = openApiArgs.ThrowIfNull(nameof(openApiArgs));
+            return this;
+        }
+
         /// <inheritdoc/>
         protected override void OnBeforeExecute(CommandLineApplication app)
         {
             _cmdArg = app.Argument<CommandType>("command", "Execution command type.", false).IsRequired();
+            _additionalArgs = app.Argument("args", "Additional arguments for the 'OpenApi' command (further described).", multipleValues: true);
 
             using var sr = Resource.GetStreamReader<CodeGenConsole>("ExtendedHelp.txt");
             app.ExtendedHelpText = sr.ReadToEnd();
@@ -270,6 +284,9 @@ namespace Beef.CodeGen
             if (cmd.HasFlag(CommandType.EndPoints))
                 await ExecuteEndpointsAsync(exedir, company, appName).ConfigureAwait(false);
 
+            if (cmd.HasFlag(CommandType.OpenApi))
+                await ExecuteOpenApiAsync(exedir).ConfigureAwait(false);
+
             if (count > 1)
             {
                 Args.Logger?.LogInformation("{Content}", new string('-', 80));
@@ -333,7 +350,6 @@ namespace Beef.CodeGen
             Args.Logger?.LogInformation("{Content}", $"Cleaning: {Args.OutputDirectory.FullName}");
             Args.Logger?.LogInformation("{Content}", $"Exclude:  {string.Join(", ", exclude)}");
             Args.Logger?.LogInformation("{Content}", string.Empty);
-
 
             // Use the count logic to detemine all paths with specified exclusions.
             var sw = Stopwatch.StartNew();
@@ -471,6 +487,34 @@ namespace Beef.CodeGen
 
             var cg = await OnRamp.CodeGenerator.CreateAsync<CodeGenerator>(args).ConfigureAwait(false);
             return (Config.Entity.CodeGenConfig)await cg.LoadConfigAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Execute the OpenAPI processing.
+        /// </summary>
+        private async Task ExecuteOpenApiAsync(string exedir)
+        {
+            if (_additionalArgs!.Values.Count != 1)
+                throw new CodeGenException("The OpenAPI document path must be specified as the only argument.");
+
+            Args.Logger?.LogInformation("{Content}", "  ** Code-generation of temporary entity YAML requested **");
+
+            // Read in the specified document.
+            var args = new CodeGeneratorArgs();
+            args.CopyFrom(Args);
+            args.OutputDirectory = new DirectoryInfo(exedir!);
+            
+            var oac = await OpenApiConverter.ReadAsync(args, _additionalArgs.Value!).ConfigureAwait(false);
+
+            // Convert the OpenAPI document and generate the Beef YAML.
+            var fi = await oac.ConvertAsync().ConfigureAwait(false);
+
+            // Done, boom!
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogWarning("{Content}", $"Temporary entity file created: {fi.FullName}");
+            Args.Logger?.LogInformation("{Content}", string.Empty);
+            Args.Logger?.LogInformation("{Content}", "Copy and paste generated contents into their respective files and amend accordingly.");
+            Args.Logger?.LogInformation("{Content}", $"Once complete it is recommended that the '{fi.Name}' file is deleted, as it is otherwise not used.");
         }
     }
 }

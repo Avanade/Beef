@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     public partial class Country : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="Country"/> collection.
+    /// Represents the <c>Country</c> collection.
     /// </summary>
     public partial class CountryCollection : List<Country> { }
 }

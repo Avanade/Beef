@@ -40,7 +40,7 @@ public class FixtureSetUp
             if (count == 0)
             {
                 using var test = ApiTester.Create<Startup>();
-                var cosmosDb = test.Services.GetRequiredService<ICosmos>();
+                var cosmosDb = test.Services.GetRequiredService<AppNameCosmosDb>();
 
                 await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
 
@@ -61,7 +61,7 @@ public class FixtureSetUp
                 await cosmosDb.Persons.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 
                 jdr = JsonDataReader.ParseYaml<FixtureSetUp>("RefData.yaml", new JsonDataReaderArgs(new CoreEx.Text.Json.ReferenceDataContentJsonSerializer()));
-                await cosmosDb.ImportValueBatchAsync("RefData", jdr, test.Services.GetRequiredService<CoreEx.RefData.ReferenceDataOrchestrator>().GetAllTypes(), cancellationToken: ct).ConfigureAwait(false);
+                await cosmosDb.ImportValueBatchAsync("RefData", jdr, ReferenceDataOrchestrator.GetAllTypesInNamespace<Business.Data.Model.Gender>(), cancellationToken: ct).ConfigureAwait(false);
             }
 
             return true;

@@ -14,7 +14,7 @@ using CoreEx.Entities;
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Contact"/> Comm entity.
+    /// Represents the <c>Contact</c> Comm entity.
     /// </summary>
     public partial class ContactComm
     {
@@ -30,7 +30,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="ContactComm"/> collection.
+    /// Represents the <c>ContactComm</c> collection.
     /// </summary>
     public partial class ContactCommCollection : Dictionary<string, ContactComm> { }
 }

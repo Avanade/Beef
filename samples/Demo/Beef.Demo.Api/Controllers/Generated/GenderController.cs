@@ -29,10 +29,10 @@ public partial class GenderController : ControllerBase
     partial void GenderControllerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <summary>
-    /// Gets the specified <see cref="Gender"/>.
+    /// Gets the specified <c>Gender</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Gender"/> identifier.</param>
-    /// <returns>The selected <see cref="Gender"/> where found.</returns>
+    /// <param name="id">The <c>Gender</c> identifier.</param>
+    /// <returns>The selected <c>Gender</c> where found.</returns>
     [HttpGet("api/v1/demo/ref/genders/{id}", Name="Gender_Get")]
     [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -40,9 +40,9 @@ public partial class GenderController : ControllerBase
         => _webApi.GetWithResultAsync<Gender?>(Request, p => _manager.GetAsync(id));
 
     /// <summary>
-    /// Creates a new <see cref="Gender"/>.
+    /// Creates a new <c>Gender</c>.
     /// </summary>
-    /// <returns>The created <see cref="Gender"/>.</returns>
+    /// <returns>The created <c>Gender</c>.</returns>
     [HttpPost("api/v1/demo/ref/genders", Name="Gender_Create")]
     [AcceptsBody(typeof(Common.Entities.Gender))]
     [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.Created)]
@@ -50,10 +50,10 @@ public partial class GenderController : ControllerBase
         => _webApi.PostWithResultAsync<Gender, Gender>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
 
     /// <summary>
-    /// Updates an existing <see cref="Gender"/>.
+    /// Updates an existing <c>Gender</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Gender"/> identifier.</param>
-    /// <returns>The updated <see cref="Gender"/>.</returns>
+    /// <param name="id">The <c>Gender</c> identifier.</param>
+    /// <returns>The updated <c>Gender</c>.</returns>
     [HttpPut("api/v1/demo/ref/genders/{id}", Name="Gender_Update")]
     [AcceptsBody(typeof(Common.Entities.Gender))]
     [ProducesResponseType(typeof(Common.Entities.Gender), (int)HttpStatusCode.OK)]

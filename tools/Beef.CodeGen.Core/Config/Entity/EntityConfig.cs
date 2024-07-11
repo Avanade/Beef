@@ -455,7 +455,7 @@ entities:
         /// <summary>
         /// Indicates that a custom Database <c>Mapper</c> will be used; i.e. not generated.
         /// </summary>
-        [JsonPropertyName("databaseCustomerMapper")]
+        [JsonPropertyName("databaseCustomMapper")]
         [CodeGenProperty("Database", Title = "Indicates that a custom Database `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
         public bool? DatabaseCustomMapper { get; set; }
@@ -1947,6 +1947,7 @@ entities:
             ("eventSubjectFormat", null, false),
             ("eventCasing", null, false),
             ("iValidator", null, false),
-            ("crud", " Use the new 'behavior' property with a value of 'crupd' to achieve same functionality.", true));
+            ("crud", " Use the new 'behavior' property with a value of 'crupd' to achieve same functionality.", true),
+            ("databaseCustomerMapper", "Use 'databaseCustomMappper' instead; this was a spelling mistake that has now been corrected.", true));
     }
 }

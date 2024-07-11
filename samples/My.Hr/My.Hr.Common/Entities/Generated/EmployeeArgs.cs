@@ -11,7 +11,7 @@ using CoreEx.Entities;
 namespace My.Hr.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Employee"/> search arguments entity.
+    /// Represents the <c>Employee</c> search arguments entity.
     /// </summary>
     public partial class EmployeeArgs
     {

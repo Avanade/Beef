@@ -48,11 +48,11 @@ public class Startup
 #endif
 #if (implement_cosmos)
         // Add the cosmos database.
-        services.AddSingleton<ICosmos>(sp =>
+        services.AddSingleton(sp =>
         {
             var settings = sp.GetRequiredService<AppNameSettings>();
             var cco = new AzCosmos.CosmosClientOptions { SerializerOptions = new AzCosmos.CosmosSerializationOptions { PropertyNamingPolicy = AzCosmos.CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
-            return new CosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
+            return new AppNameCosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
         });
 
 #endif

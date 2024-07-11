@@ -17,7 +17,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class OpenStatus : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="OpenStatus"/> collection.
+    /// Represents the <c>OpenStatus</c> collection.
     /// </summary>
     public partial class OpenStatusCollection : List<OpenStatus> { }
 }

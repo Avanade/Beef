@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     public partial class Status : ReferenceDataBase<string?> { }
 
     /// <summary>
-    /// Represents the <see cref="Status"/> collection.
+    /// Represents the <c>Status</c> collection.
     /// </summary>
     public partial class StatusCollection : List<Status> { }
 }

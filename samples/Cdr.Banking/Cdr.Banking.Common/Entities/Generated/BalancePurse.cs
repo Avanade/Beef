@@ -11,7 +11,7 @@ using CoreEx.Entities;
 namespace Cdr.Banking.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Balance"/> Purse entity.
+    /// Represents the <c>Balance</c> Purse entity.
     /// </summary>
     public partial class BalancePurse
     {
@@ -27,7 +27,7 @@ namespace Cdr.Banking.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="BalancePurse"/> collection.
+    /// Represents the <c>BalancePurse</c> collection.
     /// </summary>
     public partial class BalancePurseCollection : List<BalancePurse> { }
 }

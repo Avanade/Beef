@@ -17,7 +17,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class ProductCategory : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="ProductCategory"/> collection.
+    /// Represents the <c>ProductCategory</c> collection.
     /// </summary>
     public partial class ProductCategoryCollection : List<ProductCategory> { }
 }

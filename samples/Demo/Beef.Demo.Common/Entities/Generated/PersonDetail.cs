@@ -14,7 +14,7 @@ using CoreEx.Entities;
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
-    /// Represents the <see cref="Person"/> detail entity.
+    /// Represents the <c>Person</c> detail entity.
     /// </summary>
     public partial class PersonDetail : Person
     {
@@ -25,12 +25,12 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="PersonDetail"/> collection.
+    /// Represents the <c>PersonDetail</c> collection.
     /// </summary>
     public partial class PersonDetailCollection : List<PersonDetail> { }
 
     /// <summary>
-    /// Represents the <see cref="PersonDetail"/> collection result.
+    /// Represents the <c>PersonDetail</c> collection result.
     /// </summary>
     public class PersonDetailCollectionResult : CollectionResult<PersonDetailCollection, PersonDetail>
     {

@@ -36,7 +36,7 @@ namespace MyEf.Hr.Common.Entities
         public string? PhoneNo { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Relationship"/> text (read-only where selected).
+        /// Gets the corresponding <c>Relationship</c> text (read-only where selected).
         /// </summary>
         public string? RelationshipText { get; set; }
 
@@ -47,7 +47,7 @@ namespace MyEf.Hr.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="EmergencyContact"/> collection.
+    /// Represents the <c>EmergencyContact</c> collection.
     /// </summary>
     public partial class EmergencyContactCollection : List<EmergencyContact> { }
 }

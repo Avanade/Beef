@@ -31,7 +31,7 @@ namespace My.Hr.Common.Entities
         public string? City { get; set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="State"/> text (read-only where selected).
+        /// Gets the corresponding <c>State</c> text (read-only where selected).
         /// </summary>
         public string? StateText { get; set; }
 

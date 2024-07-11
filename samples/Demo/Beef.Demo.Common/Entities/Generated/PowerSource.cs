@@ -26,7 +26,7 @@ namespace Beef.Demo.Common.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="PowerSource"/> collection.
+    /// Represents the <c>PowerSource</c> collection.
     /// </summary>
     public partial class PowerSourceCollection : List<PowerSource> { }
 }

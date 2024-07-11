@@ -31,9 +31,9 @@ public partial class ContactController : ControllerBase
     partial void ContactControllerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <summary>
-    /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>Contact</c> array that contains the items that match the selection criteria.
     /// </summary>
-    /// <returns>The <see cref="ContactCollection"/></returns>
+    /// <returns>The <c>Contact</c> array</returns>
     [HttpGet("api/v1/contacts", Name="Contact_GetAll")]
     [ProducesResponseType(typeof(Common.Entities.ContactCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -41,10 +41,10 @@ public partial class ContactController : ControllerBase
         => _webApi.GetAsync<ContactCollectionResult>(Request, p => _manager.GetAllAsync(), alternateStatusCode: HttpStatusCode.NoContent);
 
     /// <summary>
-    /// Gets the specified <see cref="Contact"/>.
+    /// Gets the specified <c>Contact</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Contact"/> identifier.</param>
-    /// <returns>The selected <see cref="Contact"/> where found.</returns>
+    /// <param name="id">The <c>Contact</c> identifier.</param>
+    /// <returns>The selected <c>Contact</c> where found.</returns>
     [HttpGet("api/v1/contacts/{id}", Name="Contact_Get")]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -52,9 +52,9 @@ public partial class ContactController : ControllerBase
         => _webApi.GetAsync<Contact?>(Request, p => _manager.GetAsync(id));
 
     /// <summary>
-    /// Creates a new <see cref="Contact"/>.
+    /// Creates a new <c>Contact</c>.
     /// </summary>
-    /// <returns>The created <see cref="Contact"/>.</returns>
+    /// <returns>The created <c>Contact</c>.</returns>
     [HttpPost("api/v1/contacts", Name="Contact_Create")]
     [AcceptsBody(typeof(Common.Entities.Contact))]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.Created)]
@@ -62,10 +62,10 @@ public partial class ContactController : ControllerBase
         => _webApi.PostAsync<Contact, Contact>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created);
 
     /// <summary>
-    /// Updates an existing <see cref="Contact"/>.
+    /// Updates an existing <c>Contact</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Contact"/> identifier.</param>
-    /// <returns>The updated <see cref="Contact"/>.</returns>
+    /// <param name="id">The <c>Contact</c> identifier.</param>
+    /// <returns>The updated <c>Contact</c>.</returns>
     [HttpPut("api/v1/contacts/{id}", Name="Contact_Update")]
     [AcceptsBody(typeof(Common.Entities.Contact))]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
@@ -74,10 +74,10 @@ public partial class ContactController : ControllerBase
         => _webApi.PutAsync<Contact, Contact>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Patches an existing <see cref="Contact"/>.
+    /// Patches an existing <c>Contact</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Contact"/> identifier.</param>
-    /// <returns>The patched <see cref="Contact"/>.</returns>
+    /// <param name="id">The <c>Contact</c> identifier.</param>
+    /// <returns>The patched <c>Contact</c>.</returns>
     [HttpPatch("api/v1/contacts/{id}", Name="Contact_Patch")]
     [AcceptsBody(typeof(Common.Entities.Contact), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Contact), (int)HttpStatusCode.OK)]
@@ -86,9 +86,9 @@ public partial class ContactController : ControllerBase
         => _webApi.PatchAsync<Contact>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Deletes the specified <see cref="Contact"/>.
+    /// Deletes the specified <c>Contact</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Contact"/> identifier.</param>
+    /// <param name="id">The <c>Contact</c> identifier.</param>
     [HttpDelete("api/v1/contacts/{id}", Name="Contact_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)

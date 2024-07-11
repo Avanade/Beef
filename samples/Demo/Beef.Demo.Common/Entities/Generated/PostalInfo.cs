@@ -19,7 +19,7 @@ namespace Beef.Demo.Common.Entities
     public partial class PostalInfo
     {
         /// <summary>
-        /// Gets the corresponding <see cref="Country"/> text (read-only where selected).
+        /// Gets the corresponding <c>Country</c> text (read-only where selected).
         /// </summary>
         public string? CountryText { get; set; }
 

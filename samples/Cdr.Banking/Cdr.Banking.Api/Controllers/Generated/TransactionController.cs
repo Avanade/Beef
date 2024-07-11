@@ -33,7 +33,7 @@ public partial class TransactionController : ControllerBase
     /// <param name="minAmount">The Min Amount.</param>
     /// <param name="maxAmount">The Max Amount.</param>
     /// <param name="text">The Text.</param>
-    /// <returns>The <see cref="TransactionCollection"/></returns>
+    /// <returns>The <c>Transaction</c> array</returns>
     [HttpGet("api/v1/banking/accounts/{accountId}/transactions", Name="Transaction_GetTransactions")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.TransactionCollection), (int)HttpStatusCode.OK)]

@@ -2,20 +2,29 @@
 
 Represents the **NuGet** versions.
 
+## v5.13.0
+- *Enhancement:* Added `dotnet run openapi` option to perform *basic* parsing of an [OpenAPI](https://spec.openapis.org/oas/latest.html) document generating the corresponding `Entity`, `Operation` and `Property` configuration into a temporary YAML file. The contents are expected to then be copied and pasted into the appropriate YAML destination and further configured as necessary.
+  - Execute `dotnet run -- --help` to see all command-line capabilities for this.
+  - All OpenAPI paths (operations) are generated into a single `Service` entity; this can be further split into multiple entities manually as required.
+  - Where a schema (entity) is specified more than once with the same name it will attempt to match the configuration (including properties) to an existing entity and reuse; otherwise, a new entity will be created with a postfix number to ensure uniqueness.
+  - The `OpenApiArgs` supports further options to enable additional customization of processing and generated output; this is set using the `CodeGenConsole.WithOpenApiArgs` method. 
+  - _Note:_ this is in _preview_ until explicitly noted in a later version; as such, the generated YAML will require manual review and adjustment as required and may not support all features (for some time or ever). This is only intended to help accelerate the initial configuration process where an OpenAPI document is available.
+- *Fixed*: Sanitize the generated `Api.Controller` and `Common` summary text comments to remove internal references, etc.
+
 ## v5.12.9
 - *Fixed:* Enable `text` specification to be used as-is by prefixing with a `+` plus-sign character. 
 - *Fixed:* Upgraded `DbEx` (`v2.5.8`) to include all related fixes and improvements.
 
 ## v5.12.8
-- *Fixed*: Fixed the model code-generation by allowing the `ModelInherits` to be specified within the `Entity` YAML configuration to override the default.
-- *Fixed*: Fixed `dotnet run count` to exclude paths that start with `.` (dot) to avoid including hidden files in the count.
+- *Fixed:* Fixed the model code-generation by allowing the `ModelInherits` to be specified within the `Entity` YAML configuration to override the default.
+- *Fixed:* Fixed `dotnet run count` to exclude paths that start with `.` (dot) to avoid including hidden files in the count.
 
 ## v5.12.7
-- *Fixed*: Fixes the model code-generation to auto implement the `ITenantId` and `ILogicallyDeleted` where corresponding properties are defined.
-- *Fixed*: Fixed the manager code-generation to output the `IdentifierGenerator` code where inheriting the `Id` property.
+- *Fixed:* Fixes the model code-generation to auto implement the `ITenantId` and `ILogicallyDeleted` where corresponding properties are defined.
+- *Fixed:* Fixed the manager code-generation to output the `IdentifierGenerator` code where inheriting the `Id` property.
 
 ## v5.12.6
-- *Fixed*: The EF Model generation has had the `ITenantId.TenantId` filtering removed as out-of-the-box EF caches first and uses resulting in an unexpected side-effect. The `CoreEx.EntityFramework` as of `v3.20.0` automatically includes tenant filtering to achieve the desired behavior.
+- *Fixed:* The EF Model generation has had the `ITenantId.TenantId` filtering removed as out-of-the-box EF caches first and uses resulting in an unexpected side-effect. The `CoreEx.EntityFramework` as of `v3.20.0` automatically includes tenant filtering to achieve the desired behavior.
 - *Fixed:* Upgraded `CoreEx` (`v3.20.0`) to include all related fixes and improvements.
 
 ## v5.12.5

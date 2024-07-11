@@ -1,0 +1,82 @@
+# dotnet run {{Name}}
+# - review the entities, properties and operations then copy into your destination YAML file under 'entities'.
+entities:
+{{#each Entities}}
+- { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}}{{#ifne Properties.Count 0}},{{else}}{{#ifne Operations.Count 0}},{{/ifne}}{{/ifne}}
+  {{#each Properties}}
+    {{#if @first}}
+    properties: [
+    {{/if}}
+      { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}} }{{#unless @last}},{{/unless}}
+    {{#if @last}}
+    ]{{#ifne ../Operations.Count 0}},{{/ifne}}
+    {{/if}}
+  {{/each}}
+  {{#each Operations}}
+    {{#if @first}}
+    operations: [
+    {{/if}}
+      { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}}{{#ifeq Parameters.Count 0}} }{{#unless @last}},{{/unless}}{{else}},{{/ifeq}}
+    {{#each Parameters}}
+      {{#if @first}}
+        parameters: [
+      {{/if}}
+          { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}} }{{#unless @last}},{{/unless}}
+      {{#if @last}}
+        ]
+      }{{#unless ../@last}},{{/unless}}
+      {{/if}}
+    {{/each}}
+    {{#if @last}}
+    ]
+    {{/if}}
+  {{/each}}
+  }
+  {{#unless @last}}
+
+  {{/unless}}
+{{/each}}
+{{#ifne Enums.Count 0}}
+
+  {{#if Args.EnumAsReferenceData}}
+# Enums converted to reference data entities.
+# - review the entities then copy into your destination YAML file under 'entities:'.
+refDataEntities:
+    {{#each Enums}}
+- { name: {{Name}}{{#each Attributes}}, {{@key}}: {{@value}}{{/each}} }
+    {{/each}}
+
+# Enums converted for reference data loading.
+# - review the data then copy into your destination YAML file (remove the merge '$' symbol as required).
+refDataData:
+    {{#each Enums}}
+      {{#unless @first}}
+
+      {{/unless}}
+- ${{Name}}:
+      {{#each Values}}
+  - {{OriginalName}}: {{sentence Name}}
+      {{/each}}
+    {{/each}}
+  {{else}}
+# Enums converted to c# code.
+# - review the C# code then copy into your appropriate destination file(s).
+enums: |
+    {{#each Enums}}
+      {{#unless @first}}
+
+      {{/unless}}
+      {{#ifval SummaryText}}
+  /// <summary>
+  /// {{SummaryText}}
+  /// </summary>
+      {{/ifval}}
+  public enum {{Name}}
+  {
+      {{#each Values}}
+      {{OriginalName}}{{#unless @last}},{{/unless}}
+      {{/each}}
+  }
+    {{/each}}
+  {{/if}}
+{{/ifne}}

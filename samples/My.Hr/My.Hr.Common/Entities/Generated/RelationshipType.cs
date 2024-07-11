@@ -17,7 +17,7 @@ namespace My.Hr.Common.Entities
     public partial class RelationshipType : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="RelationshipType"/> collection.
+    /// Represents the <c>RelationshipType</c> collection.
     /// </summary>
     public partial class RelationshipTypeCollection : List<RelationshipType> { }
 }

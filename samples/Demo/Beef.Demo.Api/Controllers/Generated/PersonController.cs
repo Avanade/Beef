@@ -32,9 +32,9 @@ public partial class PersonController : ControllerBase
     partial void PersonControllerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <summary>
-    /// Creates a new <see cref="Person"/>.
+    /// Creates a new <c>Person</c>.
     /// </summary>
-    /// <returns>The created <see cref="Person"/>.</returns>
+    /// <returns>The created <c>Person</c>.</returns>
     [HttpPost("api/v1/persons", Name="Person_Create")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.Created)]
@@ -42,19 +42,19 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync<Person, Person>(Request, p => _manager.CreateAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/persons/{r.Id}", UriKind.Relative));
 
     /// <summary>
-    /// Deletes the specified <see cref="Person"/>.
+    /// Deletes the specified <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
+    /// <param name="id">The <c>Person</c> identifier.</param>
     [HttpDelete("api/v1/persons/{id}", Name="Person_Delete")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> Delete(Guid id)
         => _webApi.DeleteAsync(Request, p => _manager.DeleteAsync(id));
 
     /// <summary>
-    /// Gets the specified <see cref="Person"/>.
+    /// Gets the specified <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The selected <see cref="Person"/> where found.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The selected <c>Person</c> where found.</returns>
     [HttpGet("api/v1/persons/{id}", Name="Person_Get")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -62,10 +62,10 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<Person?>(Request, p => _manager.GetAsync(id));
 
     /// <summary>
-    /// Gets the specified <see cref="Person"/>.
+    /// Gets the specified <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The selected <see cref="Person"/> where found.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The selected <c>Person</c> where found.</returns>
     [HttpGet("api/v1/persons/ex/{id}", Name="Person_GetEx")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -73,10 +73,10 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<Person?>(Request, p => _manager.GetExAsync(id));
 
     /// <summary>
-    /// Updates an existing <see cref="Person"/>.
+    /// Updates an existing <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The updated <see cref="Person"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The updated <c>Person</c>.</returns>
     [HttpPut("api/v1/persons/{id}", Name="Person_Update")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
@@ -85,10 +85,10 @@ public partial class PersonController : ControllerBase
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Updates an existing <see cref="Person"/>.
+    /// Updates an existing <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The updated <see cref="Person"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The updated <c>Person</c>.</returns>
     [HttpPut("api/v1/persons/withRollback/{id}", Name="Person_UpdateWithRollback")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
@@ -97,10 +97,10 @@ public partial class PersonController : ControllerBase
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateWithRollbackAsync(p.Value!, id));
 
     /// <summary>
-    /// Patches an existing <see cref="Person"/>.
+    /// Patches an existing <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The patched <see cref="Person"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The patched <c>Person</c>.</returns>
     [HttpPatch("api/v1/persons/{id}", Name="Person_Patch")]
     [AcceptsBody(typeof(Common.Entities.Person), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
@@ -109,9 +109,9 @@ public partial class PersonController : ControllerBase
         => _webApi.PatchAsync<Person>(Request, get: _ => _manager.GetAsync(id), put: p => _manager.UpdateAsync(p.Value!, id));
 
     /// <summary>
-    /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>Person</c> array that contains the items that match the selection criteria.
     /// </summary>
-    /// <returns>The <see cref="PersonCollection"/></returns>
+    /// <returns>The <c>Person</c> array</returns>
     [Tags("apples", "oranges")]
     [HttpGet("api/v1/persons/all", Name="Person_GetAll")]
     [Paging]
@@ -121,9 +121,9 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetAllAsync(p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
 
     /// <summary>
-    /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>Person</c> array that contains the items that match the selection criteria.
     /// </summary>
-    /// <returns>The <see cref="PersonCollection"/></returns>
+    /// <returns>The <c>Person</c> array</returns>
     [HttpGet("api/v1/persons/allnopaging", Name="Person_GetAll2")]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -131,13 +131,13 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<PersonCollectionResult>(Request, p => _manager.GetAll2Async(), alternateStatusCode: HttpStatusCode.NoContent);
 
     /// <summary>
-    /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>Person</c> array that contains the items that match the selection criteria.
     /// </summary>
     /// <param name="firstName">The First Name.</param>
     /// <param name="lastName">The Last Name.</param>
-    /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+    /// <param name="genders">The Genders.</param>
     /// <param name="orderBy">The Order By.</param>
-    /// <returns>The <see cref="PersonCollection"/></returns>
+    /// <returns>The <c>Person</c> array</returns>
     [HttpGet("api/v1/persons", Name="Person_GetByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
@@ -149,13 +149,13 @@ public partial class PersonController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>PersonDetail</c> array that contains the items that match the selection criteria.
     /// </summary>
     /// <param name="firstName">The First Name.</param>
     /// <param name="lastName">The Last Name.</param>
-    /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+    /// <param name="genders">The Genders.</param>
     /// <param name="orderBy">The Order By.</param>
-    /// <returns>The <see cref="PersonDetailCollection"/></returns>
+    /// <returns>The <c>PersonDetail</c> array</returns>
     [HttpGet("api/v1/persons/argsdetail", Name="Person_GetDetailByArgs")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonDetailCollection), (int)HttpStatusCode.OK)]
@@ -167,11 +167,11 @@ public partial class PersonController : ControllerBase
     }
 
     /// <summary>
-    /// Merge first <see cref="Person"/> into second.
+    /// Merge first <c>Person</c> into second.
     /// </summary>
-    /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
-    /// <param name="toId">The to <see cref="Person"/> identifier.</param>
-    /// <returns>A resultant <see cref="Person"/>.</returns>
+    /// <param name="fromId">The from <c>Person</c> identifier.</param>
+    /// <param name="toId">The to <c>Person</c> identifier.</param>
+    /// <returns>A resultant <c>Person</c>.</returns>
     [HttpPost("api/v1/persons/merge", Name="Person_Merge")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -179,7 +179,7 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync<Person>(Request, p => _manager.MergeAsync(fromId, toId), alternateStatusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Update);
 
     /// <summary>
-    /// Mark <see cref="Person"/>.
+    /// Mark <c>Person</c>.
     /// </summary>
     [HttpPost("api/v1/persons/mark", Name="Person_Mark")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
@@ -187,10 +187,10 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync(Request, p => _manager.MarkAsync(), statusCode: HttpStatusCode.Accepted, operationType: CoreEx.OperationType.Update);
 
     /// <summary>
-    /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+    /// Get <c>Person</c> at specified <c>MapCoordinates</c>.
     /// </summary>
-    /// <param name="coordinates">The Coordinates (see <see cref="Business.Entities.MapCoordinates"/>).</param>
-    /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
+    /// <param name="coordinates">The Coordinates.</param>
+    /// <returns>A resultant <c>MapCoordinates</c>.</returns>
     [HttpPost("api/v1/persons/map", Name="Person_Map")]
     [ProducesResponseType(typeof(Common.Entities.MapCoordinates), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -203,7 +203,7 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Get no arguments.
     /// </summary>
-    /// <returns>The selected <see cref="Person"/> where found.</returns>
+    /// <returns>The selected <c>Person</c> where found.</returns>
     [HttpGet("api/v1/persons/noargsforme", Name="Person_GetNoArgs")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -211,10 +211,10 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<Person?>(Request, p => _manager.GetNoArgsAsync());
 
     /// <summary>
-    /// Gets the specified <see cref="PersonDetail"/>.
+    /// Gets the specified <c>PersonDetail</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The selected <c>PersonDetail</c> where found.</returns>
     [HttpGet("api/v1/persons/{id}/detail", Name="Person_GetDetail")]
     [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -222,10 +222,10 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<PersonDetail?>(Request, p => _manager.GetDetailAsync(id));
 
     /// <summary>
-    /// Updates an existing <see cref="PersonDetail"/>.
+    /// Updates an existing <c>PersonDetail</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The updated <see cref="PersonDetail"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The updated <c>PersonDetail</c>.</returns>
     [HttpPut("api/v1/persons/{id}/detail", Name="Person_UpdateDetail")]
     [AcceptsBody(typeof(Common.Entities.PersonDetail))]
     [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
@@ -234,10 +234,10 @@ public partial class PersonController : ControllerBase
         => _webApi.PutAsync<PersonDetail, PersonDetail>(Request, p => _manager.UpdateDetailAsync(p.Value!, id));
 
     /// <summary>
-    /// Patches an existing <see cref="PersonDetail"/>.
+    /// Patches an existing <c>PersonDetail</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The patched <see cref="PersonDetail"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The patched <c>PersonDetail</c>.</returns>
     [HttpPatch("api/v1/persons/{id}/detail", Name="Person_PatchDetail")]
     [AcceptsBody(typeof(Common.Entities.PersonDetail), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.PersonDetail), (int)HttpStatusCode.OK)]
@@ -248,7 +248,7 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Actually validating the FromBody parameter generation.
     /// </summary>
-    /// <param name="person">The Person (see <see cref="Entities.Person"/>).</param>
+    /// <param name="person">The Person.</param>
     [HttpPost("api/v1/persons/fromBody", Name="Person_Add")]
     [ProducesResponseType((int)HttpStatusCode.Created)]
     public Task<IActionResult> Add([FromBody] Person person)
@@ -267,7 +267,7 @@ public partial class PersonController : ControllerBase
     /// </summary>
     /// <param name="name">The Name.</param>
     /// <param name="names">The Names.</param>
-    /// <returns>A resultant <see cref="Person"/>.</returns>
+    /// <returns>A resultant <c>Person</c>.</returns>
     [HttpGet("api/v1/persons/null", Name="Person_GetNull")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -277,7 +277,7 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Validate when an Event is published but not sent.
     /// </summary>
-    /// <returns>The updated <see cref="Person"/>.</returns>
+    /// <returns>The updated <c>Person</c>.</returns>
     [HttpPut("api/v1/persons/publishnosend", Name="Person_EventPublishNoSend")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
@@ -286,13 +286,13 @@ public partial class PersonController : ControllerBase
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.EventPublishNoSendAsync(p.Value!));
 
     /// <summary>
-    /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
+    /// Gets the <c>Person</c> array that contains the items that match the selection criteria.
     /// </summary>
     /// <param name="firstName">The First Name.</param>
     /// <param name="lastName">The Last Name.</param>
-    /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+    /// <param name="genders">The Genders.</param>
     /// <param name="orderBy">The Order By.</param>
-    /// <returns>The <see cref="PersonCollection"/></returns>
+    /// <returns>The <c>Person</c> array</returns>
     [HttpGet("api/v1/persons/args", Name="Person_GetByArgsWithEf")]
     [Paging]
     [ProducesResponseType(typeof(Common.Entities.PersonCollection), (int)HttpStatusCode.OK)]
@@ -314,8 +314,8 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Invoke Api Via Agent.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>A resultant <see cref="string"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>A resultant <c>string</c>.</returns>
     [HttpPost("api/v1/persons/invokeApi", Name="Person_InvokeApiViaAgent")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -332,10 +332,10 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync(Request, p => _manager.ParamCollAsync(addresses), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
 
     /// <summary>
-    /// Gets the specified <see cref="Person"/>.
+    /// Gets the specified <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The selected <see cref="Person"/> where found.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The selected <c>Person</c> where found.</returns>
     [HttpGet("api/v1/persons/ef/{id}", Name="Person_GetWithEf")]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -343,9 +343,9 @@ public partial class PersonController : ControllerBase
         => _webApi.GetAsync<Person?>(Request, p => _manager.GetWithEfAsync(id));
 
     /// <summary>
-    /// Creates a new <see cref="Person"/>.
+    /// Creates a new <c>Person</c>.
     /// </summary>
-    /// <returns>The created <see cref="Person"/>.</returns>
+    /// <returns>The created <c>Person</c>.</returns>
     [HttpPost("api/v1/persons/ef", Name="Person_CreateWithEf")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.Created)]
@@ -353,10 +353,10 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync<Person, Person>(Request, p => _manager.CreateWithEfAsync(p.Value!), statusCode: HttpStatusCode.Created, locationUri: r => new Uri($"/api/v1/persons/ef/{r.Id}", UriKind.Relative));
 
     /// <summary>
-    /// Updates an existing <see cref="Person"/>.
+    /// Updates an existing <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The updated <see cref="Person"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The updated <c>Person</c>.</returns>
     [HttpPut("api/v1/persons/ef/{id}", Name="Person_UpdateWithEf")]
     [AcceptsBody(typeof(Common.Entities.Person))]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
@@ -365,19 +365,19 @@ public partial class PersonController : ControllerBase
         => _webApi.PutAsync<Person, Person>(Request, p => _manager.UpdateWithEfAsync(p.Value!, id));
 
     /// <summary>
-    /// Deletes the specified <see cref="Person"/>.
+    /// Deletes the specified <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
+    /// <param name="id">The <c>Person</c> identifier.</param>
     [HttpDelete("api/v1/persons/ef/{id}", Name="Person_DeleteWithEf")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> DeleteWithEf(Guid id)
         => _webApi.DeleteAsync(Request, p => _manager.DeleteWithEfAsync(id));
 
     /// <summary>
-    /// Patches an existing <see cref="Person"/>.
+    /// Patches an existing <c>Person</c>.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>The patched <see cref="Person"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>The patched <c>Person</c>.</returns>
     [HttpPatch("api/v1/persons/ef/{id}", Name="Person_PatchWithEf")]
     [AcceptsBody(typeof(Common.Entities.Person), HttpConsts.MergePatchMediaTypeName)]
     [ProducesResponseType(typeof(Common.Entities.Person), (int)HttpStatusCode.OK)]
@@ -388,8 +388,8 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Get Documentation.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>A resultant <see cref="FileContentResult"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>A resultant <c>FileContentResult</c>.</returns>
     [HttpGet("api/v1/persons/{id}/documentation", Name="Person_GetDocumentation")]
     [Produces("text/plain")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -400,8 +400,8 @@ public partial class PersonController : ControllerBase
     /// <summary>
     /// Simulate Work.
     /// </summary>
-    /// <param name="id">The <see cref="Person"/> identifier.</param>
-    /// <returns>A resultant <see cref="string"/>.</returns>
+    /// <param name="id">The <c>Person</c> identifier.</param>
+    /// <returns>A resultant <c>string</c>.</returns>
     [HttpGet("api/v1/persons/simulate", Name="Person_SimulateWork")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]

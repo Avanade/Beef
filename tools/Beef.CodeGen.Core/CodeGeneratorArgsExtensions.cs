@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using CoreEx.Database;
+using Beef.CodeGen.OpenApi;
 using DbEx.Migration;
 using OnRamp;
 using System;
@@ -52,5 +52,12 @@ namespace Beef.CodeGen
         /// <param name="args">The arguments.</param>
         /// <param name="migrator">The <see cref="DatabaseMigrationBase"/> instance.</param>
         public static void AddDatabaseMigrator(this ICodeGeneratorArgs args, DatabaseMigrationBase migrator) => args.AddParameter(CodeGenConsole.DatabaseMigratorParamName, migrator ?? throw new ArgumentNullException(nameof(args)));
+
+        /// <summary>
+        /// Gets the <see cref="OpenApiArgs"/>.
+        /// </summary>
+        /// <param name="args">The <see cref="ICodeGeneratorArgs"/>.</param>
+        /// <returns>The <see cref="OpenApiArgs"/>.</returns>
+        public static OpenApiArgs? GetOpenApiArgs(this ICodeGeneratorArgs args) => args.GetParameter<OpenApiArgs>(nameof(OpenApiArgs), false)!;
     }
 }

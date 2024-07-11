@@ -17,7 +17,7 @@ namespace Cdr.Banking.Common.Entities
     public partial class TransactionType : ReferenceDataBase<Guid> { }
 
     /// <summary>
-    /// Represents the <see cref="TransactionType"/> collection.
+    /// Represents the <c>TransactionType</c> collection.
     /// </summary>
     public partial class TransactionTypeCollection : List<TransactionType> { }
 }
