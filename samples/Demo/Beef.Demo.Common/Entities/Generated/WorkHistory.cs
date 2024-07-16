@@ -45,7 +45,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <returns>The primary <see cref="CompositeKey"/>.</returns>
         /// <param name="name">The <see cref="Name"/>.</param>
-        public static CompositeKey CreatePrimaryKey(string? name) => new CompositeKey(name);
+        public static CompositeKey CreatePrimaryKey(string? name) => CompositeKey.Create(name);
 
         /// <summary>
         /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): <see cref="Name"/>).

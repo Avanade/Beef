@@ -281,3 +281,10 @@ entities:
       { name: Ingredient, default: '"special herbs and spices"' }
     ]
   }
+
+- { name: RefDataPrimaryKey, dataModel: true,
+    properties: [
+      { name: Key1, type: ^Gender, primaryKey: true },
+      { name: Other }
+    ]
+  }

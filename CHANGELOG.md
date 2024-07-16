@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.13.1
+- *Fixed:* Model code-generation corrected to explicitly output `Newtonsoft.Json.JsonIgnore`.
+- *Fixed:* Entity and model templates updated to correctly generate the `PrimaryKey` where the property is reference data.
+- *Fixed:* Upgraded dependencies.
+
 ## v5.13.0
 - *Enhancement:* Added `dotnet run openapi` option to perform *basic* parsing of an [OpenAPI](https://spec.openapis.org/oas/latest.html) document generating the corresponding `Entity`, `Operation` and `Property` configuration into a temporary YAML file. The contents are expected to then be copied and pasted into the appropriate YAML destination and further configured as necessary.
   - Execute `dotnet run -- --help` to see all command-line capabilities for this.
