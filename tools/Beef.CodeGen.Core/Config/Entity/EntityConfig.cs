@@ -901,7 +901,7 @@ entities:
         /// </summary>
         [JsonPropertyName("excludeData")]
         [CodeGenProperty("Exclude", Title = "The option to exclude the generation of the `Data` class (`XxxData.cs`).", Options = ["Include", "Exclude", "RequiresMapper"],
-            Description = "Defaults to `Include` indicating _not_ to exlude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
+            Description = "Defaults to `Include` indicating _not_ to exclude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
         public string? ExcludeData { get; set; }
 
         /// <summary>
@@ -1910,8 +1910,6 @@ entities:
         /// <summary>
         /// Create parameter configuration from interface definition.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         internal static ParameterConfig? CreateParameterConfigFromInterface(string text)
         {
             var parts = text.Split("^", StringSplitOptions.RemoveEmptyEntries);

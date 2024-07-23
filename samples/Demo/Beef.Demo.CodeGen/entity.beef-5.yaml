@@ -274,7 +274,7 @@ entities:
     ]
   }
 
-- { name: SpecialSauce, internalOnly: true,
+- { name: SpecialSauce, collection: true, collectionType: Dictionary, internalOnly: true,
     properties: [
       { name: Key1, primaryKey: true },
       { name: Key2, primaryKey: true },

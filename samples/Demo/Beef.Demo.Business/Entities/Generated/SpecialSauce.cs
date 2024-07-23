@@ -54,5 +54,34 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
     }
 }
 
+/// <summary>
+/// Represents the <see cref="SpecialSauce"/> collection.
+/// </summary>
+public partial class SpecialSauceCollection : EntityBaseDictionary<SpecialSauce, SpecialSauceCollection>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpecialSauceCollection"/> class.
+    /// </summary>
+    public SpecialSauceCollection() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpecialSauceCollection"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public SpecialSauceCollection(IEnumerable<SpecialSauce> items) => AddRange(items);
+
+    /// <summary>
+    /// Adds a range of <see cref="SpecialSauce"/> <paramref name="items"/> (inferring the key for each item).
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public void AddRange(IEnumerable<SpecialSauce> items) => items.ForEach(item => Add(item));
+
+    /// <summary>
+    /// Adds the <see cref="SpecialSauce"/> <paramref name="item"/> (inferring the key).
+    /// </summary>
+    /// <param name="item">The item to add.</param>
+    public void Add(SpecialSauce item) => Add(item.PrimaryKey.ToString().ThrowIfNull(), item);
+}
+
 #pragma warning restore
 #nullable restore

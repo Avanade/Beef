@@ -127,7 +127,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("returnTypeNullable")]
         [CodeGenProperty("Key", Title = "Indicates whether the `ReturnType` is nullable for the operation.",
-            Description = "This is only applicable for an `Operation.Type` of `Custom`. Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`.")]
+            Description = "Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`. Additionally a `Type` of `Get` will default to `true` where not specified.")]
         public bool? ReturnTypeNullable { get; set; }
 
         /// <summary>
@@ -752,9 +752,19 @@ operations: [
         public bool HasFromEntityPropertiesParameters => Parameters!.Any(x => x.WebApiFrom == "FromEntityProperties");
 
         /// <summary>
+        /// Indicates whether the <see cref="ValueType"/> is an entity.
+        /// </summary>
+        public bool IsValueTypeEntity => !DotNet.SystemTypes.Contains(ValueType!) && !ValueType!.Contains('.') && !ValueType!.StartsWith("List<") && !ValueType!.StartsWith("Dictionary<");
+
+        /// <summary>
+        /// Gets the value type referencing common namespace where applicable.
+        /// </summary>
+        public string? CommonValueType => CommonizeNamespace(ValueType);
+
+        /// <summary>
         /// Indicates whether the <see cref="ReturnType"/> is an entity.
         /// </summary>
-        public bool IsReturnTypeEntity => !DotNet.SystemTypes.Contains(ReturnType!) && (!ReturnType!.StartsWith("System.") && !ReturnType!.StartsWith("Microsoft."));
+        public bool IsReturnTypeEntity => !DotNet.SystemTypes.Contains(ReturnType!) && !ReturnType!.Contains('.') && !ReturnType!.StartsWith("List<") && !ReturnType!.StartsWith("Dictionary<");
 
         /// <summary>
         /// Gets the fully qualified database stored procedure name.
@@ -855,6 +865,11 @@ operations: [
         /// Gets or sets the base return type.
         /// </summary>
         public string? BaseReturnType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the base return type referencing common where applicable.
+        /// </summary>
+        public string? CommonBaseReturnType => CommonizeNamespace(BaseReturnType);
 
         /// <summary>
         /// Gets or sets the WebAPI return text.
@@ -1058,20 +1073,11 @@ operations: [
                 ReturnTypeNullable = true;
             }
 
-            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () =>
-            {
-                if (Type != "Custom")
-                    ReturnTypeNullable = false;
-
-                return false;
-            });
+            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => Type == "Get");
 
             if (ReturnType == "void")
                 ReturnTypeNullable = false;
             
-            if (Type == "Get")
-                ReturnTypeNullable = true;
-
             ValueType = DefaultWhereNull(ValueType, () => Type switch
             {
                 "Create" => Parent!.EntityName,
@@ -1649,6 +1655,39 @@ operations: [
                 throw new CodeGenException(this, ep.Key, $"The 'patchUpdateOperation' configuration has been renamed to 'webApiUpdateOperation'; please update the configuration accordingly.");
 
             CodeGenConfig.WarnWhereDeprecated(Root!, this, "eventOutbox", "iValidator");
+        }
+
+        private static readonly string[] OtherSystemTypes = ["List", "Dictionary"];
+
+        /// <summary>
+        /// Tear apart a type and reference the common namespace.
+        /// </summary>
+        private string? CommonizeNamespace(string? type)
+        {
+            if (string.IsNullOrEmpty(type))
+                return type;
+
+            if (DotNet.SystemTypes.Contains(type))
+                return type;
+
+            if (OtherSystemTypes.Contains(type))
+                return type;
+
+            if (type.Contains('.'))
+                return type;
+
+            var i = type.IndexOf('<');
+            if (i < 1 || !type.EndsWith('>'))
+                return $"Common.Entities.{type}";
+
+            var root = CommonizeNamespace(type[..i]);
+            List<string> list = [];
+            foreach(var part in type[(i + 1)..^1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                list.Add(CommonizeNamespace(part)!);
+            }
+
+            return $"{root}<{string.Join(", ", list)}>";
         }
     }
 }

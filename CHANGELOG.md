@@ -2,9 +2,10 @@
 
 Represents the **NuGet** versions.
 
-## v5.13.1
+## v5.14.0
 - *Fixed:* Model code-generation corrected to explicitly output `Newtonsoft.Json.JsonIgnore`.
 - *Fixed:* Entity and model templates updated to correctly generate the `PrimaryKey` where the property is reference data.
+- *Fixed:* Entity collection code-generation for Dictionary updated to include capabilities to add items using primary key where specified.
 - *Fixed:* Upgraded dependencies.
 
 ## v5.13.0

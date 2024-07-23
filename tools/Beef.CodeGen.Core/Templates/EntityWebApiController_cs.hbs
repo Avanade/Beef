@@ -79,12 +79,12 @@ public partial class {{Name}}Controller : ControllerBase
     [Paging]
   {{/if}}
   {{#if HasValue}}
-    [AcceptsBody(typeof(Common.Entities.{{ValueType}}){{#ifeq WebApiMethod 'HttpPatch'}}, HttpConsts.MergePatchMediaTypeName{{/ifeq}})]
+    [AcceptsBody(typeof({{CommonValueType}}){{#ifeq WebApiMethod 'HttpPatch'}}, HttpConsts.MergePatchMediaTypeName{{/ifeq}})]
   {{/if}}
   {{#if WebApiProducesContentType}}
     [Produces({{WebApiProducesContentType}})]
   {{/if}}
-    [ProducesResponseType({{#if WebApiProducesResponseType}}{{#if IsWebApiProducesResponseTypeNone}}{{else}}typeof({{WebApiProducesResponseType}}), {{/if}}{{else}}{{#if HasReturnValue}}typeof({{#if IsReturnTypeEntity}}Common.Entities.{{/if}}{{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}{{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
+    [ProducesResponseType({{#if WebApiProducesResponseType}}{{#if IsWebApiProducesResponseTypeNone}}{{else}}typeof({{WebApiProducesResponseType}}), {{/if}}{{else}}{{#if HasReturnValue}}typeof({{CommonBaseReturnType}}{{#ifeq Type 'GetColl'}}Collection{{/ifeq}}), {{/if}}{{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
   {{#ifne WebApiAlternateStatus 'none'}}
     [ProducesResponseType((int)HttpStatusCode.{{WebApiAlternateStatus}})]
   {{/ifne}}

@@ -16,7 +16,7 @@ namespace Beef.CodeGen.Config
         public static List<string> SystemTypes => new()
         {
             "void", "bool", "byte", "char", "decimal", "double", "float", "int", "long",
-            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "DateTimeOffset", "TimeSpan", "Guid"
+            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "DateTimeOffset", "TimeSpan", "Guid", "DateOnly", "TimeOnly"
         };
 
         /// <summary>

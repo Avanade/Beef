@@ -312,6 +312,28 @@ public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
     /// <param name="items">The items to add.</param>
     public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(items);
   {{/ifne}}
+  {{#ifeq CollectionType 'Dictionary'}}
+    {{#ifne PrimaryKeyProperties.Count 0}}
+
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items) => AddRange(items);
+
+    /// <summary>
+    /// Adds a range of {{{see-comments Name}}} <paramref name="items"/> (inferring the key for each item).
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public void AddRange(IEnumerable<{{{EntityName}}}> items) => items.ForEach(item => Add(item));
+
+    /// <summary>
+    /// Adds the {{{see-comments Name}}} <paramref name="item"/> (inferring the key).
+    /// </summary>
+    /// <param name="item">The item to add.</param>
+    public void Add(SpecialSauce item) => Add(item.PrimaryKey.ToString().ThrowIfNull(), item);
+    {{/ifne}}
+  {{/ifeq}}
 {{/if}}
 {{! ===== CollectionResult ===== }}
 {{#if CollectionResult}}
