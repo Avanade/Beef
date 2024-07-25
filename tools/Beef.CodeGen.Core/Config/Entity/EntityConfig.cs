@@ -1140,7 +1140,7 @@ entities:
         /// <summary>
         /// Gets the EntityDataSvc <see cref="OperationConfig"/> collection where the DataSvc is not custom.
         /// </summary>
-        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => IsFalse(x.ExcludeDataSvc) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
+        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => IsFalse(x.ExcludeDataSvc) && new string[] { "Partial", "None" }.Contains(x.DataSvcCustom)).ToList();
 
         /// <summary>
         /// Indicates where there are any <see cref="OperationConfig.ManagerExtensions"/>.
@@ -1317,7 +1317,7 @@ entities:
         /// <summary>
         /// Indicates whether at least one operation needs a Data.
         /// </summary>
-        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations!.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
+        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations!.Any(x => CompareNullOrValue(x.IsDataSvcCustomFull, false));
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event within the DataSvc-layer. 
@@ -1386,7 +1386,7 @@ entities:
         /// <summary>
         /// Indicates whether the DataSvc needs a DataSvc using statement.
         /// </summary>
-        public bool DataSvcNeedsUsingData => Operations!.Any(x => x.DataSvcCustom == null || x.DataSvcCustom == false);
+        public bool DataSvcNeedsUsingData => Operations!.Any(x => x.IsDataSvcCustomFull == false);
 
         /// <summary>
         /// Gets the Cosmos PartitionKey as C# code.

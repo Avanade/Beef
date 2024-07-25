@@ -370,11 +370,12 @@ operations: [
         #region DataSvc
 
         /// <summary>
-        /// Indicates whether the `DataSvc`-layer is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
+        /// Gets or set the option that indicates the level of `DataSvc` customization.
         /// </summary>
         [JsonPropertyName("dataSvcCustom")]
-        [CodeGenProperty("DataSvc", Title = "Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.", IsImportant = true)]
-        public bool? DataSvcCustom { get; set; }
+        [CodeGenProperty("DataSvc", Title = "The option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer).", IsImportant = true, Options = ["Full", "Partial", "None"],
+            Description = "`Full` indicates the logic is fully customized (only invocation is code-generated). `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. `None` indicates data-layer invocation with _no_ custom invocation (default).")]
+        public string? DataSvcCustom { get; set; }
 
         /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.
@@ -388,7 +389,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("dataSvcInvoker")]
         [CodeGenProperty("DataSvc", Title = "Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.",
-            Description = "Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then orchestration will default to `true`.")]
+            Description = "Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then the orchestration will default to `true`.")]
         public bool? DataSvcInvoker { get; set; }
 
         /// <summary>
@@ -674,12 +675,12 @@ operations: [
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
         /// </summary>
-        public List<ParameterConfig> ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) || x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+        public List<ParameterConfig> ValidateParameters => [.. Parameters!.Where(x => CompareValue(x.IsMandatory, true) || x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg)];
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation that have either a Validator or ValidatorCode specified (exclude IsMandatory only).
         /// </summary>
-        public List<ParameterConfig> ValidatorParameters => Parameters!.Where(x => x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+        public List<ParameterConfig> ValidatorParameters => [.. Parameters!.Where(x => x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg)];
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered where mandatory and without value.
@@ -725,6 +726,11 @@ operations: [
         /// Gets the parameter that is <see cref="ParameterConfig.IsPagingArgs"/>.
         /// </summary>
         public ParameterConfig? PagingParameter => Parameters!.Where(x => x.IsPagingArgs).FirstOrDefault();
+
+        /// <summary>
+        /// Indicates whether there is full custom DataSvc-layer logic being invoked.
+        /// </summary>
+        public bool IsDataSvcCustomFull => CompareValue(DataSvcCustom, "Full");
 
         /// <summary>
         /// Indicates whether the <see cref="CoreParameters"/> are the same as the entity primary key.
@@ -894,7 +900,7 @@ operations: [
         /// <summary>
         /// Indicates whether the operation supports caching.
         /// </summary>
-        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.PrimaryKeyPropertiesIncludeInherited.Count > 0 && CompareNullOrValue(DataSvcCustom, false);
+        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.PrimaryKeyPropertiesIncludeInherited.Count > 0 && CompareNullOrValue(IsDataSvcCustomFull, false);
 
         /// <summary>
         /// Gets or sets the data arguments.
@@ -1196,6 +1202,7 @@ operations: [
             if (DataTransaction!.Value || CompareValue(EventPublish, "Data") || CompareValue(DataExtensions, true))
                 DataInvoker = true;
 
+            DataSvcCustom = DefaultWhereNull(DataSvcCustom, () => "None");
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
             DataSvcInvoker = DefaultWhereNull(DataSvcInvoker, () => false);
             if (DataSvcTransaction!.Value || CompareValue(EventPublish, "DataSvc"))
@@ -1662,7 +1669,7 @@ operations: [
         /// <summary>
         /// Tear apart a type and reference the common namespace.
         /// </summary>
-        private string? CommonizeNamespace(string? type)
+        private static string? CommonizeNamespace(string? type)
         {
             if (string.IsNullOrEmpty(type))
                 return type;

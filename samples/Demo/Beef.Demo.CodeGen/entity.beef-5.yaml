@@ -64,7 +64,7 @@ entities:
           { name: Person, type: Person, nullable: false, webApiFrom: FromBody }
         ]
       },
-      { name: DataSvcCustom, type: Custom, text: Validate a DataSvc Custom generation, returnType: int, dataSvcCustom: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
+      { name: DataSvcCustom, type: Custom, text: Validate a DataSvc Custom generation, returnType: int, dataSvcCustom: Partial, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
       { name: ManagerCustom, type: Get, text: Validate a Manager Custom generation, managerCustom: true, excludeIDataSvc: true, excludeDataSvc: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
       { name: CustomManagerOnly, type: CustomManagerOnly, text: "Validate CustomManagerOnly", webApiMethod: HttpPost, webApiRoute: "cmo" },
       { name: GetNull, type: Custom, returnType: 'Person?', webApiRoute: 'null', webApiMethod: HttpGet, webApiAlternateStatus: NotFound,
@@ -73,7 +73,7 @@ entities:
           { name: Names, type: 'List<string>', default: default }
         ]
       },
-      { name: EventPublishNoSend, type: Update, text: Validate when an Event is published but not sent, webApiRoute: publishnosend, eventPublish: None, dataSvcCustom: true, excludeData: true, excludeIData: true },
+      { name: EventPublishNoSend, type: Update, text: Validate when an Event is published but not sent, webApiRoute: publishnosend, eventPublish: None, dataSvcCustom: Full, excludeData: true, excludeIData: true },
       # Entity Framework
       { name: GetByArgsWithEf, type: GetColl, paging: true, webApiRoute: args, autoImplement: EntityFramework,
         parameters: [
@@ -82,7 +82,7 @@ entities:
       },
       { name: ThrowError, type: Custom, returnType: void, webApiRoute: error, autoImplement: None, managerTransaction: true },
       { name: InvokeApiViaAgent, type: Custom, returnType: string, primaryKey: true, webApiRoute: invokeApi, autoImplement: None, webApiAlternateStatus: NotFound },
-      { name: ParamColl, type: Custom, returnType: void, webApiRoute: paramcoll, dataSvcCustom: true, excludeIData: true, excludeData: true,
+      { name: ParamColl, type: Custom, returnType: void, webApiRoute: paramcoll, dataSvcCustom: Full, excludeIData: true, excludeData: true,
         parameters: [
           { name: Addresses, type: AddressCollection, validator: AddressCollectionValidator, webApiFrom: FromBody }
         ]
@@ -177,7 +177,7 @@ entities:
       { name: ChangeLog, type: ChangeLog, isEntity: true, grpcFieldNo: 7 }
     ],
     operations: [
-      { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', grpc: true, text: +Get the R-O-B-O-T },
+      { name: Get, type: Get, primaryKey: true, webApiRoute: '{id}', grpc: true, text: +Get the R-O-B-O-T, dataSvcCustom: Partial },
       { name: Create, type: Create, webApiLocation: ^Get, grpc: true },
       { name: Update, type: Update, primaryKey: true, webApiRoute: '{id}', grpc: true },
       { name: Patch, type: Patch, primaryKey: true, webApiRoute: '{id}' },

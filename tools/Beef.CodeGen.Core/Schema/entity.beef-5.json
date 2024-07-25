@@ -908,7 +908,7 @@
         "excludeData": {
           "type": "string",
           "title": "The option to exclude the generation of the \u0060Data\u0060 class (\u0060XxxData.cs\u0060).",
-          "description": "Defaults to \u0060Include\u0060 indicating _not_ to exlude. A value of \u0060Exclude\u0060 indicates to exclude all output; alternatively, \u0060RequiresMapper\u0060 indicates to at least output the corresponding \u0060Mapper\u0060 class.",
+          "description": "Defaults to \u0060Include\u0060 indicating _not_ to exclude. A value of \u0060Exclude\u0060 indicates to exclude all output; alternatively, \u0060RequiresMapper\u0060 indicates to at least output the corresponding \u0060Mapper\u0060 class.",
           "enum": [
             "Include",
             "Exclude",
@@ -1337,7 +1337,7 @@
         "returnTypeNullable": {
           "type": "boolean",
           "title": "Indicates whether the \u0060ReturnType\u0060 is nullable for the operation.",
-          "description": "This is only applicable for an \u0060Operation.Type\u0060 of \u0060Custom\u0060. Will be inferred where the \u0060ReturnType\u0060 is denoted as nullable; i.e. suffixed by a \u0060?\u0060."
+          "description": "Will be inferred where the \u0060ReturnType\u0060 is denoted as nullable; i.e. suffixed by a \u0060?\u0060. Additionally a \u0060Type\u0060 of \u0060Get\u0060 will default to \u0060true\u0060 where not specified."
         },
         "returnText": {
           "type": "string",
@@ -1494,8 +1494,14 @@
           "description": "This can be overridden within the \u0060CodeGeneration\u0060 and \u0060Entity\u0060."
         },
         "dataSvcCustom": {
-          "type": "boolean",
-          "title": "Indicates whether the \u0060DataSvc\u0060 logic is a custom implementation; i.e. no auto-\u0060DataSvc\u0060 invocation logic is to be generated."
+          "type": "string",
+          "title": "The option that indicates the level of \u0060DataSvc\u0060 customization (invokes \u0060*OnImplementationAsync\u0060 method) vs code-generation (automatically invokes data-layer).",
+          "description": "\u0060Full\u0060 indicates the logic is fully customized (only invocation is code-generated). \u0060Partial\u0060 indicates combination of surrounding code-generation with final custom invocation versus data-layer. \u0060None\u0060 indicates data-layer invocation with _no_ custom invocation (default).",
+          "enum": [
+            "Full",
+            "Partial",
+            "None"
+          ]
         },
         "dataSvcTransaction": {
           "type": "boolean",
@@ -1504,7 +1510,7 @@
         "dataSvcInvoker": {
           "type": "boolean",
           "title": "Indicates whether a \u0060DataSvcInvoker\u0060 should orchestrate the \u0060DataSvc\u0060-layer.",
-          "description": "Where \u0060DataSvcTransaction\u0060 or \u0060EventPublish\u0060 is \u0060DataSvc\u0060 then orchestration will default to \u0060true\u0060."
+          "description": "Where \u0060DataSvcTransaction\u0060 or \u0060EventPublish\u0060 is \u0060DataSvc\u0060 then the orchestration will default to \u0060true\u0060."
         },
         "dataSvcExtensions": {
           "type": "boolean",

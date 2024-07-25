@@ -301,7 +301,7 @@ Property | Description
 **`excludeEntity`** | Indicates whether to exclude the generation of the `Entity` class (`Xxx.cs`).
 **`excludeAll`** | Indicates whether to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class.<br/>&dagger; Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to exclude.
 `excludeIData` | Indicates whether to exclude the generation of the `Data` interface (`IXxxData.cs`).
-`excludeData` | The option to exclude the generation of the `Data` class (`XxxData.cs`). Valid options are: `Include`, `Exclude`, `RequiresMapper`.<br/>&dagger; Defaults to `Include` indicating _not_ to exlude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.
+`excludeData` | The option to exclude the generation of the `Data` class (`XxxData.cs`). Valid options are: `Include`, `Exclude`, `RequiresMapper`.<br/>&dagger; Defaults to `Include` indicating _not_ to exclude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.
 `excludeIDataSvc` | Indicates whether to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`).
 `excludeDataSvc` | Indicates whether to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`).
 `excludeIManager` | Indicates whether to exclude the generation of the `Manager` interface (`IXxxManager.cs`).

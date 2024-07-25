@@ -3,6 +3,12 @@
 Represents the **NuGet** versions.
 
 ## v5.14.0
+- *Enhancement:* `Operation.DataSvcCustom` changed from boolean to an option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer). 
+  - Valid values are:
+    - `Full` indicates the logic is fully customized (only invocation is code-generated). 
+    - `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. 
+    - `None` indicates data-layer invocation with _no_ custom invocation (default).
+  - Existing configurations of `dataSvcCustom: true` should be changed to `dataSvcCustom: Full` to achieve same behavior. Where not changed a code-generation runtime error will occur.
 - *Fixed:* Model code-generation corrected to explicitly output `Newtonsoft.Json.JsonIgnore`.
 - *Fixed:* Entity and model templates updated to correctly generate the `PrimaryKey` where the property is reference data.
 - *Fixed:* Entity collection code-generation for Dictionary updated to include capabilities to add items using primary key where specified.

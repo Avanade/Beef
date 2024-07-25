@@ -28,7 +28,7 @@ public partial class RobotDataSvc : IRobotDataSvc
     partial void RobotDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
-    public Task<Result<Robot?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => _data.GetAsync(id));
+    public Task<Result<Robot?>> GetAsync(Guid id) => Result.Go().CacheGetOrAddAsync(_cache, id, () => GetOnImplementationAsync(id));
 
     /// <inheritdoc/>
     public Task<Result<Robot>> CreateAsync(Robot value) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>

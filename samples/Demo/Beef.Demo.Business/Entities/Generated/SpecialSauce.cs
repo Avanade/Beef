@@ -74,13 +74,13 @@ public partial class SpecialSauceCollection : EntityBaseDictionary<SpecialSauce,
     /// Adds a range of <see cref="SpecialSauce"/> <paramref name="items"/> (inferring the key for each item).
     /// </summary>
     /// <param name="items">The items to add.</param>
-    public void AddRange(IEnumerable<SpecialSauce> items) => items.ForEach(item => Add(item));
+    public void AddRange(IEnumerable<SpecialSauce> items) => items.ForEach(Add);
 
     /// <summary>
     /// Adds the <see cref="SpecialSauce"/> <paramref name="item"/> (inferring the key).
     /// </summary>
     /// <param name="item">The item to add.</param>
-    public void Add(SpecialSauce item) => Add(item.PrimaryKey.ToString().ThrowIfNull(), item);
+    public void Add(SpecialSauce item) => Add(((IEntityKey)item).EntityKey.ToString().ThrowIfNull(), item);
 }
 
 #pragma warning restore

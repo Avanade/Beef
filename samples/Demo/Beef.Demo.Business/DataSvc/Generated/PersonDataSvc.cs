@@ -32,6 +32,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     private Func<Person?, Task>? _getNoArgsOnAfterAsync;
     private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
     private Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
+    private Func<int, Task>? _dataSvcCustomOnAfterAsync;
     private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
     private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
     private Func<Task>? _throwErrorOnAfterAsync;
@@ -196,7 +197,12 @@ public partial class PersonDataSvc : IPersonDataSvc
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 
     /// <inheritdoc/>
-    public Task<int> DataSvcCustomAsync() => DataSvcCustomOnImplementationAsync();
+    public async Task<int> DataSvcCustomAsync()
+    {
+        var r = await DataSvcCustomOnImplementationAsync().ConfigureAwait(false);
+        await Invoker.InvokeAsync(_dataSvcCustomOnAfterAsync?.Invoke(r)).ConfigureAwait(false);
+        return r;
+    }
 
     /// <inheritdoc/>
     public async Task<Person?> GetNullAsync(string? name, List<string>? names)
