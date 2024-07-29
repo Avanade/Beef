@@ -105,8 +105,8 @@ entities:
 
 - { name: PersonArgs, text: '{{Person}} arguments', excludeAll: true,
     properties: [
-      { name: FirstName, type: string },
-      { name: LastName, type: string },
+      { name: FirstName, type: string, cacheKey: true },
+      { name: LastName, type: string, cacheKey: true },
       { name: Genders, type: Gender, refDataType: string, refDataList: true },
       { name: OrderBy, type: Common.Entities.OrderBy }
     ]
@@ -278,6 +278,7 @@ entities:
     properties: [
       { name: Key1, primaryKey: true },
       { name: Key2, primaryKey: true },
+      { name: Selected, type: bool, default: 'true' },
       { name: Ingredient, default: '"special herbs and spices"' }
     ]
   }

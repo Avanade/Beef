@@ -5,6 +5,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.22.0" />
+    <PackageReference Include="CoreEx" Version="3.23.1" />
   </ItemGroup>
 </Project>

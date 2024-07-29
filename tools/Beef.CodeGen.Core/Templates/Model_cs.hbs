@@ -13,17 +13,12 @@
 using System;{{set-value 'HasUsingStatement' true}}
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-  {{#ifeq JsonSerializer 'SystemText'}}
 using System.Text.Json.Serialization;
-  {{/ifeq}}
 using CoreEx.Entities;
   {{#ifval RefDataType}}
 using CoreEx.RefData;
   {{/ifval}}
 {{/unless}}
-{{#ifeq JsonSerializer 'Newtonsoft'}}
-using Newtonsoft.Json;{{set-value 'HasUsingStatement' true}}
-{{/ifeq}}
 {{#unless Root.IsDataModel}}
   {{#if Root.UsingNamespace1}}
 using {{Root.UsingNamespace1}};{{set-value 'HasUsingStatement' true}}
@@ -70,11 +65,10 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryRefDataText}}{{else}}{{SummaryRefDataText}}{{/ifeq}}
         /// </summary>
             {{#ifval JsonName}}
-              {{#ifeq Parent.JsonSerializer 'SystemText'}}
-        [JsonPropertyName("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
-              {{else}}
-        [JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
+              {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+        [Newtonsoft.Json.JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
               {{/ifeq}}
+        [JsonPropertyName("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
             {{/ifval}}
         public string? {{RefDataTextName}} { get; set; }
 
@@ -88,30 +82,30 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// </summary>
   {{#if Root.IsDataModel}}   
     {{#if DataModelSerializationIgnore}}
+      {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+        [Newtonsoft.Json.JsonIgnore]
+      {{/ifeq}}
         [JsonIgnore]
     {{else}}
       {{#ifval JsonDataModelName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonDataModelName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
-        {{else}}
-        [JsonPropertyName("{{JsonDataModelName}}")]
+        [Newtonsoft.Json.JsonProperty("{{JsonDataModelName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{/ifeq}}
+        [JsonPropertyName("{{JsonDataModelName}}")]
       {{/ifval}}
-      {{#ifeq Parent.JsonSerializer 'SystemText'}}
-        {{#if SerializationAlwaysInclude}}
-        [JsonIgnore(Condition=JsonIgnoreCondition.Never)]
-        {{/if}}
-      {{else}}
-        {{#ifnull JsonDataModelName}}
-          {{#if SerializationAlwaysInclude}}
+      {{#if SerializationAlwaysInclude}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+        [Newtonsoft.Json.JsonIgnore(Condition=JsonIgnoreCondition.Never)]
+        {{/ifeq}}
         [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
-          {{/if}}
-        {{/ifnull}}
-      {{/ifeq}}
+      {{/if}}
     {{/if}}
   {{else}}
     {{#if SerializationIgnore}}
-        [{{#ifeq Parent.JsonSerializer 'Newtonsoft'}}Newtonsoft.Json.{{/ifeq}}JsonIgnore]
+      {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+        [Newtonsoft.Json.JsonIgnore]
+      {{/ifeq}}
+        [JsonIgnore]
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
@@ -120,17 +114,12 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
       {{/ifval}}
-      {{#ifeq Parent.JsonSerializer 'SystemText'}}
-        {{#if SerializationAlwaysInclude}}
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        {{/if}}
-      {{else}}
-        {{#ifnull JsonName}}
-          {{#if SerializationAlwaysInclude}}
+      {{#if SerializationAlwaysInclude}}
+        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
         [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
-          {{/if}}
-        {{/ifnull}}
-      {{/ifeq}}
+        {{/ifeq}}
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+      {{/if}}
     {{/if}}
   {{/if}}
     {{#unless Root.IsDataModel}}
@@ -162,7 +151,10 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// <summary>
         /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
-        [{{#ifeq JsonSerializer 'Newtonsoft'}}Newtonsoft.Json.{{/ifeq}}JsonIgnore]
+      {{#ifeq JsonSerializer 'Newtonsoft'}}
+        [Newtonsoft.Json.JsonIgnore]
+      {{/ifeq}}
+        [JsonIgnore]
         public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{Name}}{{/each}});
     {{/ifne}}
   {{/unless}}

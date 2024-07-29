@@ -14,6 +14,7 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
 {
     private string? _key1;
     private string? _key2;
+    private bool _selected = true;
     private string? _ingredient = "special herbs and spices";
 
     /// <summary>
@@ -25,6 +26,11 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
     /// Gets or sets the Key2.
     /// </summary>
     public string? Key2 { get => _key2; set => SetValue(ref _key2, value); }
+
+    /// <summary>
+    /// Indicates whether Selected.
+    /// </summary>
+    public bool Selected { get => _selected; set => SetValue(ref _selected, value); }
 
     /// <summary>
     /// Gets or sets the Ingredient.
@@ -50,6 +56,7 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
     {
         yield return CreateProperty(nameof(Key1), Key1, v => Key1 = v);
         yield return CreateProperty(nameof(Key2), Key2, v => Key2 = v);
+        yield return CreateProperty(nameof(Selected), Selected, v => Selected = v, true);
         yield return CreateProperty(nameof(Ingredient), Ingredient, v => Ingredient = v, "special herbs and spices");
     }
 }
@@ -69,18 +76,6 @@ public partial class SpecialSauceCollection : EntityBaseDictionary<SpecialSauce,
     /// </summary>
     /// <param name="items">The items to add.</param>
     public SpecialSauceCollection(IEnumerable<SpecialSauce> items) => AddRange(items);
-
-    /// <summary>
-    /// Adds a range of <see cref="SpecialSauce"/> <paramref name="items"/> (inferring the key for each item).
-    /// </summary>
-    /// <param name="items">The items to add.</param>
-    public void AddRange(IEnumerable<SpecialSauce> items) => items.ForEach(Add);
-
-    /// <summary>
-    /// Adds the <see cref="SpecialSauce"/> <paramref name="item"/> (inferring the key).
-    /// </summary>
-    /// <param name="item">The item to add.</param>
-    public void Add(SpecialSauce item) => Add(((IEntityKey)item).EntityKey.ToString().ThrowIfNull(), item);
 }
 
 #pragma warning restore

@@ -197,6 +197,14 @@ properties: [
         public bool? PartitionKey { get; set; }
 
         /// <summary>
+        /// Indicates whether the property is considered part of the Cache Key.
+        /// </summary>
+        [JsonPropertyName("cacheKey")]
+        [CodeGenProperty("Property", Title = "Indicates whether the property is considered part of the Cache Key.",
+            Description = "This will implement `ICacheKey` for the generated entity.")]
+        public bool? CacheKey { get; set; }
+
+        /// <summary>
         /// Indicates whether the property is for internal use only; declared in the Business entities only.
         /// </summary>
         [JsonPropertyName("internalOnly")]
@@ -687,7 +695,7 @@ properties: [
         protected override Task PrepareAsync()
         {
             Type = DefaultWhereNull(Type, () => "string");
-            if (Type!.StartsWith("^"))
+            if (Type!.StartsWith('^'))
                 Type = $"RefDataNamespace.{Type[1..]}";
 
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
@@ -696,7 +704,7 @@ properties: [
             if (RefDataType != null && !Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 Type = $"RefDataNamespace.{Type}";
 
-            if (Type!.EndsWith("?", StringComparison.InvariantCulture))
+            if (Type!.EndsWith('?'))
             {
                 Type = Type[0..^1];
                 Nullable = true;

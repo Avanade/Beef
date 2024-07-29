@@ -1016,6 +1016,11 @@ entities:
         public List<PropertyConfig>? PartitionKeyProperties => Properties!.Where(x => (x.PartitionKey.HasValue && x.PartitionKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
+        /// Gets the list of properties that form the cache key.
+        /// </summary>
+        public List<PropertyConfig>? CacheKeyProperties => Properties!.Where(x => (x.CacheKey.HasValue && x.CacheKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+
+        /// <summary>
         /// Gets the list of properties that are sub-entities.
         /// </summary>
         public List<PropertyConfig>? EntityProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && x.IsEntity.HasValue && x.IsEntity.Value).ToList();
@@ -1770,6 +1775,11 @@ entities:
                 implements.Insert(i++, "IPrimaryKey");
                 commonImplements.Insert(c++, "IPrimaryKey");
                 modelImplements.Insert(m++, "IPrimaryKey");
+            }
+
+            if (Properties!.Any(x => CompareValue(x.CacheKey, true) && CompareNullOrValue(x.Inherited, false)))
+            {
+                implements.Insert(i++, "ICacheKey");
             }
 
             if (Properties!.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))

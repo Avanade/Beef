@@ -1097,6 +1097,11 @@
           "title": "Indicates whether the property is considered part of the Partition Key.",
           "description": "This will implement \u0060IPartitionKey\u0060 for the generated entity."
         },
+        "cacheKey": {
+          "type": "boolean",
+          "title": "Indicates whether the property is considered part of the Cache Key.",
+          "description": "This will implement \u0060ICacheKey\u0060 for the generated entity."
+        },
         "internalOnly": {
           "type": "boolean",
           "title": "Indicates whether the property is for internal use only; declared in Business entities only.",
