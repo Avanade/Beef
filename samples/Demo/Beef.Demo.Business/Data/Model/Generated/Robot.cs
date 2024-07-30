@@ -5,8 +5,6 @@
 #nullable enable
 #pragma warning disable
 
-using Newtonsoft.Json;
-
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
@@ -42,7 +40,8 @@ namespace Beef.Demo.Business.Data.Model
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("_etag")]
+        [Newtonsoft.Json.JsonProperty("_etag")]
+        [JsonPropertyName("_etag")]
         public string? ETag { get; set; }
 
         /// <summary>

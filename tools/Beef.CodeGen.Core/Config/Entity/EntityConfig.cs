@@ -901,7 +901,7 @@ entities:
         /// </summary>
         [JsonPropertyName("excludeData")]
         [CodeGenProperty("Exclude", Title = "The option to exclude the generation of the `Data` class (`XxxData.cs`).", Options = ["Include", "Exclude", "RequiresMapper"],
-            Description = "Defaults to `Include` indicating _not_ to exlude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
+            Description = "Defaults to `Include` indicating _not_ to exclude. A value of `Exclude` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
         public string? ExcludeData { get; set; }
 
         /// <summary>
@@ -1014,6 +1014,11 @@ entities:
         /// Gets the list of properties that form the partition key.
         /// </summary>
         public List<PropertyConfig>? PartitionKeyProperties => Properties!.Where(x => (x.PartitionKey.HasValue && x.PartitionKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that form the cache key.
+        /// </summary>
+        public List<PropertyConfig>? CacheKeyProperties => Properties!.Where(x => (x.CacheKey.HasValue && x.CacheKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
         /// Gets the list of properties that are sub-entities.
@@ -1140,7 +1145,7 @@ entities:
         /// <summary>
         /// Gets the EntityDataSvc <see cref="OperationConfig"/> collection where the DataSvc is not custom.
         /// </summary>
-        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => IsFalse(x.ExcludeDataSvc) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
+        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => IsFalse(x.ExcludeDataSvc) && new string[] { "Partial", "None" }.Contains(x.DataSvcCustom)).ToList();
 
         /// <summary>
         /// Indicates where there are any <see cref="OperationConfig.ManagerExtensions"/>.
@@ -1317,7 +1322,7 @@ entities:
         /// <summary>
         /// Indicates whether at least one operation needs a Data.
         /// </summary>
-        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations!.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
+        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations!.Any(x => CompareNullOrValue(x.IsDataSvcCustomFull, false));
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event within the DataSvc-layer. 
@@ -1386,7 +1391,7 @@ entities:
         /// <summary>
         /// Indicates whether the DataSvc needs a DataSvc using statement.
         /// </summary>
-        public bool DataSvcNeedsUsingData => Operations!.Any(x => x.DataSvcCustom == null || x.DataSvcCustom == false);
+        public bool DataSvcNeedsUsingData => Operations!.Any(x => x.IsDataSvcCustomFull == false);
 
         /// <summary>
         /// Gets the Cosmos PartitionKey as C# code.
@@ -1772,6 +1777,11 @@ entities:
                 modelImplements.Insert(m++, "IPrimaryKey");
             }
 
+            if (Properties!.Any(x => CompareValue(x.CacheKey, true) && CompareNullOrValue(x.Inherited, false)))
+            {
+                implements.Insert(i++, "ICacheKey");
+            }
+
             if (Properties!.Any(x => CompareValue(x.PartitionKey, true) && CompareNullOrValue(x.Inherited, false)))
             {
                 implements.Insert(i++, "IPartitionKey");
@@ -1910,8 +1920,6 @@ entities:
         /// <summary>
         /// Create parameter configuration from interface definition.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         internal static ParameterConfig? CreateParameterConfigFromInterface(string text)
         {
             var parts = text.Split("^", StringSplitOptions.RemoveEmptyEntries);

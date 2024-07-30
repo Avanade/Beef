@@ -14,6 +14,7 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
 {
     private string? _key1;
     private string? _key2;
+    private bool _selected = true;
     private string? _ingredient = "special herbs and spices";
 
     /// <summary>
@@ -25,6 +26,11 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
     /// Gets or sets the Key2.
     /// </summary>
     public string? Key2 { get => _key2; set => SetValue(ref _key2, value); }
+
+    /// <summary>
+    /// Indicates whether Selected.
+    /// </summary>
+    public bool Selected { get => _selected; set => SetValue(ref _selected, value); }
 
     /// <summary>
     /// Gets or sets the Ingredient.
@@ -50,8 +56,26 @@ public partial class SpecialSauce : EntityBase, IPrimaryKey
     {
         yield return CreateProperty(nameof(Key1), Key1, v => Key1 = v);
         yield return CreateProperty(nameof(Key2), Key2, v => Key2 = v);
+        yield return CreateProperty(nameof(Selected), Selected, v => Selected = v, true);
         yield return CreateProperty(nameof(Ingredient), Ingredient, v => Ingredient = v, "special herbs and spices");
     }
+}
+
+/// <summary>
+/// Represents the <see cref="SpecialSauce"/> collection.
+/// </summary>
+public partial class SpecialSauceCollection : EntityBaseDictionary<SpecialSauce, SpecialSauceCollection>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpecialSauceCollection"/> class.
+    /// </summary>
+    public SpecialSauceCollection() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpecialSauceCollection"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public SpecialSauceCollection(IEnumerable<SpecialSauce> items) => AddRange(items);
 }
 
 #pragma warning restore

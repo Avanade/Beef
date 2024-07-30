@@ -71,7 +71,7 @@ Property | Description
 **`paging`** | Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.
 `valueType` | The .NET value parameter `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Create` or `Update`.
 `returnType` | The .NET return `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.
-`returnTypeNullable` | Indicates whether the `ReturnType` is nullable for the operation.<br/>&dagger; This is only applicable for an `Operation.Type` of `Custom`. Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`.
+`returnTypeNullable` | Indicates whether the `ReturnType` is nullable for the operation.<br/>&dagger; Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`. Additionally a `Type` of `Get` will default to `true` where not specified.
 `returnText` | The text for use in comments to describe the `ReturnType`.<br/>&dagger; A default will be created where not specified. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.
 `privateName` | The overriding private name.<br/>&dagger; Overrides the `Name` to be used for private usage. By default reformatted from `Name`; e.g. `GetByArgs` as `_getByArgs`.
 `withResult` | Indicates whether to use `CoreEx.Results` (aka Railway-oriented programming).<br/>&dagger; Defaults to `Entity.WilhResult`.
@@ -138,9 +138,9 @@ Provides the _Data Services-layer_ configuration.
 
 Property | Description
 -|-
-**`dataSvcCustom`** | Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
+**`dataSvcCustom`** | The option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer). Valid options are: `Full`, `Partial`, `None`.<br/>&dagger; `Full` indicates the logic is fully customized (only invocation is code-generated). `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. `None` indicates data-layer invocation with _no_ custom invocation (default).
 `dataSvcTransaction` | Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.
-`dataSvcInvoker` | Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.<br/>&dagger; Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then orchestration will default to `true`.
+`dataSvcInvoker` | Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.<br/>&dagger; Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then the orchestration will default to `true`.
 `dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated.<br/>&dagger; Defaults to `Entity.ManagerExtensions`.
 
 <br/>

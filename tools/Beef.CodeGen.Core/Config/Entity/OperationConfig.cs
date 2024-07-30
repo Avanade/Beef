@@ -127,7 +127,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("returnTypeNullable")]
         [CodeGenProperty("Key", Title = "Indicates whether the `ReturnType` is nullable for the operation.",
-            Description = "This is only applicable for an `Operation.Type` of `Custom`. Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`.")]
+            Description = "Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`. Additionally a `Type` of `Get` will default to `true` where not specified.")]
         public bool? ReturnTypeNullable { get; set; }
 
         /// <summary>
@@ -370,11 +370,12 @@ operations: [
         #region DataSvc
 
         /// <summary>
-        /// Indicates whether the `DataSvc`-layer is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
+        /// Gets or set the option that indicates the level of `DataSvc` customization.
         /// </summary>
         [JsonPropertyName("dataSvcCustom")]
-        [CodeGenProperty("DataSvc", Title = "Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.", IsImportant = true)]
-        public bool? DataSvcCustom { get; set; }
+        [CodeGenProperty("DataSvc", Title = "The option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer).", IsImportant = true, Options = ["Full", "Partial", "None"],
+            Description = "`Full` indicates the logic is fully customized (only invocation is code-generated). `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. `None` indicates data-layer invocation with _no_ custom invocation (default).")]
+        public string? DataSvcCustom { get; set; }
 
         /// <summary>
         /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer.
@@ -388,7 +389,7 @@ operations: [
         /// </summary>
         [JsonPropertyName("dataSvcInvoker")]
         [CodeGenProperty("DataSvc", Title = "Indicates whether a `DataSvcInvoker` should orchestrate the `DataSvc`-layer.",
-            Description = "Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then orchestration will default to `true`.")]
+            Description = "Where `DataSvcTransaction` or `EventPublish` is `DataSvc` then the orchestration will default to `true`.")]
         public bool? DataSvcInvoker { get; set; }
 
         /// <summary>
@@ -674,12 +675,12 @@ operations: [
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
         /// </summary>
-        public List<ParameterConfig> ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) || x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+        public List<ParameterConfig> ValidateParameters => [.. Parameters!.Where(x => CompareValue(x.IsMandatory, true) || x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg)];
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation that have either a Validator or ValidatorCode specified (exclude IsMandatory only).
         /// </summary>
-        public List<ParameterConfig> ValidatorParameters => Parameters!.Where(x => x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+        public List<ParameterConfig> ValidatorParameters => [.. Parameters!.Where(x => x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg)];
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered where mandatory and without value.
@@ -727,6 +728,11 @@ operations: [
         public ParameterConfig? PagingParameter => Parameters!.Where(x => x.IsPagingArgs).FirstOrDefault();
 
         /// <summary>
+        /// Indicates whether there is full custom DataSvc-layer logic being invoked.
+        /// </summary>
+        public bool IsDataSvcCustomFull => CompareValue(DataSvcCustom, "Full");
+
+        /// <summary>
         /// Indicates whether the <see cref="CoreParameters"/> are the same as the entity primary key.
         /// </summary>
         public bool IsCoreParametersSameAsPrimaryKey
@@ -752,9 +758,19 @@ operations: [
         public bool HasFromEntityPropertiesParameters => Parameters!.Any(x => x.WebApiFrom == "FromEntityProperties");
 
         /// <summary>
+        /// Indicates whether the <see cref="ValueType"/> is an entity.
+        /// </summary>
+        public bool IsValueTypeEntity => !DotNet.SystemTypes.Contains(ValueType!) && !ValueType!.Contains('.') && !ValueType!.StartsWith("List<") && !ValueType!.StartsWith("Dictionary<");
+
+        /// <summary>
+        /// Gets the value type referencing common namespace where applicable.
+        /// </summary>
+        public string? CommonValueType => CommonizeNamespace(ValueType);
+
+        /// <summary>
         /// Indicates whether the <see cref="ReturnType"/> is an entity.
         /// </summary>
-        public bool IsReturnTypeEntity => !DotNet.SystemTypes.Contains(ReturnType!) && (!ReturnType!.StartsWith("System.") && !ReturnType!.StartsWith("Microsoft."));
+        public bool IsReturnTypeEntity => !DotNet.SystemTypes.Contains(ReturnType!) && !ReturnType!.Contains('.') && !ReturnType!.StartsWith("List<") && !ReturnType!.StartsWith("Dictionary<");
 
         /// <summary>
         /// Gets the fully qualified database stored procedure name.
@@ -857,6 +873,11 @@ operations: [
         public string? BaseReturnType { get; set; }
 
         /// <summary>
+        /// Gets or sets the base return type referencing common where applicable.
+        /// </summary>
+        public string? CommonBaseReturnType => CommonizeNamespace(BaseReturnType);
+
+        /// <summary>
         /// Gets or sets the WebAPI return text.
         /// </summary>
         public string? WebApiReturnText { get; set; }
@@ -879,7 +900,7 @@ operations: [
         /// <summary>
         /// Indicates whether the operation supports caching.
         /// </summary>
-        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.PrimaryKeyPropertiesIncludeInherited.Count > 0 && CompareNullOrValue(DataSvcCustom, false);
+        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type) && Parent.PrimaryKeyPropertiesIncludeInherited.Count > 0 && CompareNullOrValue(IsDataSvcCustomFull, false);
 
         /// <summary>
         /// Gets or sets the data arguments.
@@ -1058,20 +1079,11 @@ operations: [
                 ReturnTypeNullable = true;
             }
 
-            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () =>
-            {
-                if (Type != "Custom")
-                    ReturnTypeNullable = false;
-
-                return false;
-            });
+            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => Type == "Get");
 
             if (ReturnType == "void")
                 ReturnTypeNullable = false;
             
-            if (Type == "Get")
-                ReturnTypeNullable = true;
-
             ValueType = DefaultWhereNull(ValueType, () => Type switch
             {
                 "Create" => Parent!.EntityName,
@@ -1190,6 +1202,7 @@ operations: [
             if (DataTransaction!.Value || CompareValue(EventPublish, "Data") || CompareValue(DataExtensions, true))
                 DataInvoker = true;
 
+            DataSvcCustom = DefaultWhereNull(DataSvcCustom, () => "None");
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
             DataSvcInvoker = DefaultWhereNull(DataSvcInvoker, () => false);
             if (DataSvcTransaction!.Value || CompareValue(EventPublish, "DataSvc"))
@@ -1649,6 +1662,39 @@ operations: [
                 throw new CodeGenException(this, ep.Key, $"The 'patchUpdateOperation' configuration has been renamed to 'webApiUpdateOperation'; please update the configuration accordingly.");
 
             CodeGenConfig.WarnWhereDeprecated(Root!, this, "eventOutbox", "iValidator");
+        }
+
+        private static readonly string[] OtherSystemTypes = ["List", "Dictionary"];
+
+        /// <summary>
+        /// Tear apart a type and reference the common namespace.
+        /// </summary>
+        private static string? CommonizeNamespace(string? type)
+        {
+            if (string.IsNullOrEmpty(type))
+                return type;
+
+            if (DotNet.SystemTypes.Contains(type))
+                return type;
+
+            if (OtherSystemTypes.Contains(type))
+                return type;
+
+            if (type.Contains('.'))
+                return type;
+
+            var i = type.IndexOf('<');
+            if (i < 1 || !type.EndsWith('>'))
+                return $"Common.Entities.{type}";
+
+            var root = CommonizeNamespace(type[..i]);
+            List<string> list = [];
+            foreach(var part in type[(i + 1)..^1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                list.Add(CommonizeNamespace(part)!);
+            }
+
+            return $"{root}<{string.Join(", ", list)}>";
         }
     }
 }

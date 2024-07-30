@@ -42,7 +42,7 @@ public partial class AccountData
     private Task<Result<Balance?>> GetBalanceOnImplementationAsync(string? accountId)
     {
         // Use the 'Account' model and select for the specified id to access the balance property.
-        return Result.GoAsync(_cosmos.Accounts.ModelQuery(q => q.Where(x => x.Id == accountId)).SelectFirstOrDefaultWithResultAsync())
+        return Result.GoAsync(_cosmos.Accounts.ModelContainer.Query(q => q.Where(x => x.Id == accountId)).SelectFirstOrDefaultWithResultAsync())
             .WhenAs(a => a is not null, a =>
             {
                 var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(a!.Balance);

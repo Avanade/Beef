@@ -2,6 +2,19 @@
 
 Represents the **NuGet** versions.
 
+## v5.14.0
+- *Enhancement:* `Operation.DataSvcCustom` changed from boolean to an option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer). 
+  - Valid values are:
+    - `Full` indicates the logic is fully customized (only invocation is code-generated). 
+    - `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. 
+    - `None` indicates data-layer invocation with _no_ custom invocation (default).
+  - Existing configurations of `dataSvcCustom: true` should be changed to `dataSvcCustom: Full` to achieve same behavior. Where not changed a code-generation runtime error will occur.
+- *Enhancement:* Added support for `Property`-based `ICacheKey` support using `cacheKey: true` resulting in corresponding entity code-generation.
+- *Fixed:* Model code-generation corrected to explicitly output `Newtonsoft.Json.JsonIgnore`.
+- *Fixed:* Entity and model templates updated to correctly generate the `PrimaryKey` where the property is reference data.
+- *Fixed:* Entity collection code-generation for Dictionary updated to include capabilities to add items using primary key where specified.
+- *Fixed:* Upgraded dependencies.
+
 ## v5.13.0
 - *Enhancement:* Added `dotnet run openapi` option to perform *basic* parsing of an [OpenAPI](https://spec.openapis.org/oas/latest.html) document generating the corresponding `Entity`, `Operation` and `Property` configuration into a temporary YAML file. The contents are expected to then be copied and pasted into the appropriate YAML destination and further configured as necessary.
   - Execute `dotnet run -- --help` to see all command-line capabilities for this.
@@ -185,12 +198,10 @@ Represents the **NuGet** versions.
 - *Fixed:* Upgraded `CoreEx`, `DbEx` and `UnitTestEx` to latest packages to include all related fixes. Template solution updated to leverage `app.UseReferenceDataOrchestrator()` to specifically include.
 
 ## v5.1.0
-Represents the initial commit for _Beef_ version 5.x. All assemblies/packages now share the same version and change log; i.e. they are now published as a set versus individually versioned (prior releases). This version is a _major_ refactoring from the prior; to achieve largely the same outcomes, in a modernized decoupled manner.
-
-As stated in the [README](./README.md), _Beef_ is _now_ (as of version 5.x) ostensibly the code-generation engine, and solution orchestration, that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof in a standardized (albeit somewhat opinionated) manner:
-- [CoreEx](https://github.com/Avanade/CoreEx) - provides the core runtime capabilities  (extends .NET core);
-- [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing;
-- [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilities ;
-- [OnRamp](https://github.com/Avanade/OnRamp) - provides the underlying code-generation engine functionality.
-
-Prior to version 5.x, _Beef_ was all encompassing. These capabilities have been extracted, simplified and refactored to be first class frameworks in their own right, and made into the repos listed above. This allows them to be used and maintained independently to _Beef_; therefore, offering greater opportunities for reuse versus all-or-nothing.
+- Represents the initial commit for _Beef_ version 5.x. All assemblies/packages now share the same version and change log; i.e. they are now published as a set versus individually versioned (prior releases). This version is a _major_ refactoring from the prior; to achieve largely the same outcomes, in a modernized decoupled manner.
+- As stated in the [README](./README.md), _Beef_ is _now_ (as of version 5.x) ostensibly the code-generation engine, and solution orchestration, that ultimately takes dependencies on the following capabilities to enable the end-to-functionality and testing thereof in a standardized (albeit somewhat opinionated) manner:
+  - [CoreEx](https://github.com/Avanade/CoreEx) - provides the core runtime capabilities  (extends .NET core);
+  - [UnitTestEx](https://github.com/Avanade/UnitTestEx) - provides extended unit and intra-domain integration testing;
+  - [DbEx](https://github.com/Avanade/DbEx) - provides extended database management capabilities ;
+  - [OnRamp](https://github.com/Avanade/OnRamp) - provides the underlying code-generation engine functionality.
+- Prior to version 5.x, _Beef_ was all encompassing. These capabilities have been extracted, simplified and refactored to be first class frameworks in their own right, and made into the repos listed above. This allows them to be used and maintained independently to _Beef_; therefore, offering greater opportunities for reuse versus all-or-nothing.

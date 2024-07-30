@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Entities;
 /// <summary>
 /// Represents the <see cref="Person"/> arguments entity.
 /// </summary>
-public partial class PersonArgs : EntityBase
+public partial class PersonArgs : EntityBase, ICacheKey
 {
     private string? _firstName;
     private string? _lastName;
@@ -44,6 +44,20 @@ public partial class PersonArgs : EntityBase
     /// Gets or sets the Order By.
     /// </summary>
     public Common.Entities.OrderBy? OrderBy { get => _orderBy; set => SetValue(ref _orderBy, value); }
+
+    /// <summary>
+    /// Creates the <see cref="ICacheKey.CacheKey"/>.
+    /// </summary>
+    /// <param name="firstName">The <see cref="FirstName"/>.</param>
+    /// <param name="lastName">The <see cref="LastName"/>.</param>
+    /// <returns>The Cache Key.</returns>
+    public static CompositeKey CreateCacheKey(string? firstName, string? lastName) => CompositeKey.Create(firstName, lastName);
+
+    /// <summary>
+    /// Gets the Cache Key (consists of the following property(s): <see cref="FirstName"/>, <see cref="LastName"/>).
+    /// </summary>
+    [JsonIgnore]
+    public CompositeKey CacheKey => CreateCacheKey(FirstName, LastName);
 
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()

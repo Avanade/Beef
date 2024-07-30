@@ -74,6 +74,7 @@ Property | Description
 `autoCreate` | Indicates whether an instance of the `Type` is to be automatically created/instantiated when the property is first accessed (i.e. lazy instantiation).
 `default` | The C# code to default the value.<br/>&dagger; Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.
 `partitionKey` | Indicates whether the property is considered part of the Partition Key.<br/>&dagger; This will implement `IPartitionKey` for the generated entity.
+`cacheKey` | Indicates whether the property is considered part of the Cache Key.<br/>&dagger; This will implement `ICacheKey` for the generated entity.
 `internalOnly` | Indicates whether the property is for internal use only; declared in Business entities only.<br/>&dagger; In this instance the `Property` will be excluded from the `Common` entity declaration and `Business` JSON serialization.
 
 <br/>

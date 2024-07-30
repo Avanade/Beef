@@ -205,7 +205,7 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
     {{/each}}
     /// <returns>The <see cref="CompositeKey"/>.</returns>
-    public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+    public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{ArgumentName}}{{/each}}) => CompositeKey.Create({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
 
     /// <summary>
     /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
@@ -214,6 +214,26 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
     {{/ifne}}
   {{/unless}}
+{{/unless}}
+{{! ===== CacheKey ===== }}
+{{#unless RefDataType}}
+  {{#ifne CacheKeyProperties.Count 0}}
+
+    /// <summary>
+    /// Creates the <see cref="ICacheKey.CacheKey"/>.
+    /// </summary>
+  {{#each CacheKeyProperties}}
+    /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+  {{/each}}
+    /// <returns>The Cache Key.</returns>
+    public static CompositeKey CreateCacheKey({{#each CacheKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each CacheKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+
+    /// <summary>
+    /// Gets the Cache Key (consists of the following property(s): {{#each CacheKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+    /// </summary>
+    [JsonIgnore]
+    public CompositeKey CacheKey => CreateCacheKey({{#each CacheKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+  {{/ifne}}
 {{/unless}}
 {{! ===== PartitionKey ===== }}
 {{#unless RefDataType}}
@@ -312,6 +332,16 @@ public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
     /// <param name="items">The items to add.</param>
     public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(items);
   {{/ifne}}
+  {{#ifeq CollectionType 'Dictionary'}}
+    {{#ifne PrimaryKeyProperties.Count 0}}
+
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionName}}} class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> items) => AddRange(items);
+    {{/ifne}}
+  {{/ifeq}}
 {{/if}}
 {{! ===== CollectionResult ===== }}
 {{#if CollectionResult}}
