@@ -2,7 +2,7 @@
   "profiles": {
     "Beef.Demo.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "openapi \"https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/CurrentAccount.yaml\" --param \"include=/CurrentAccount/{currentaccountid}/Retrieve,/CurrentAccount/{currentaccountid}/Update\""
+      "commandLineArgs": "entity"
     }
   }
 }
