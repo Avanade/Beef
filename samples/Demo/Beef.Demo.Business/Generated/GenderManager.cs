@@ -34,14 +34,14 @@ public partial class GenderManager : IGenderManager
     public Task<Result<Gender>> CreateAsync(Gender value) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required()
-                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+                     .ThenAsAsync(v => _dataService.CreateAsync(v));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
     public Task<Result<Gender>> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
-                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+                     .ThenAsAsync(v => _dataService.UpdateAsync(v));
     }, InvokerArgs.Update);
 }
 
