@@ -48,7 +48,7 @@ public partial class RobotManager : IRobotManager
     /// <inheritdoc/>
     public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+        return Result.Go(value).Required().Requires(id).Adjusts(v => v.Id = id)
                      .Then(v => Cleaner.CleanUp(v))
                      .ValidateAsync(vc => vc.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.UpdateAsync(v));

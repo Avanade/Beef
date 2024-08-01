@@ -37,7 +37,7 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     /// <inheritdoc/>
     public Task<Result<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required().Then(v => v.EmployeeId = employeeId)
+        return Result.Go(value).Required().Adjusts(v => v.EmployeeId = employeeId)
                      .ValidateAsync(vc => vc.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.CreateAsync(v));
     }, InvokerArgs.Create);
@@ -45,7 +45,7 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     /// <inheritdoc/>
     public Task<Result<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+        return Result.Go(value).Required().Requires(id).Adjusts(v => v.Id = id)
                      .ValidateAsync(vc => vc.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
                      .ThenAsAsync(v => _dataService.UpdateAsync(v));
     }, InvokerArgs.Update);

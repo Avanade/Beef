@@ -21,7 +21,9 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
   {{/each}}
   {{#if DataExtensionsRequired}}
     {{#if HasDataExtensions}}
+      {{#ifne DataCtorParameters.Count 0}}
 
+      {{/ifne}}
     #region Extensions
 
     {{/if}}
@@ -51,17 +53,21 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
         {{/ifne}}
     private Action<Exception>? {{PrivateName}}OnException;
       {{/if}}
-    {{#if HasDataExtensions}}
+    {{#if @last}}
 
     {{/if}}
     {{/each}}
     {{#if HasDataExtensions}}
-
     #endregion
+
     {{/if}}
+  {{else}}
+    {{#ifne DataCtorParameters.Count 0}}
+
+    {{/ifne}} 
   {{/if}}
   {{#unless DataCtorCustom}}
-
+    {{#ifne DataCtorParameters.Count 0}}
     /// <summary>
     /// Initializes a new instance of the <see cref="{{Name}}Data"/> class.
     /// </summary>
@@ -78,12 +84,16 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
   {{/each}}
         {{Name}}DataCtor();
     }
-{{/ifle}}
+  {{/ifle}}
 
     partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
+
+    {{/ifne}}
   {{/unless}}
   {{#each DataOperations}}
+    {{#unless @first}}
 
+    {{/unless}}
     {{#if ExcludeIData}}
     /// <summary>
     /// {{{SummaryText}}}

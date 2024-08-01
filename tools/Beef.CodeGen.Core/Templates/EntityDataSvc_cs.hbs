@@ -34,6 +34,7 @@ public partial class {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Da
 
 {{/if}}
 {{#unless DataSvcCtorCustom}}
+  {{#ifne DataSvcCtorParameters.Count 0}}
     /// <summary>
     /// Initializes a new instance of the <see cref="{{Name}}DataSvc"/> class.
     /// </summary>
@@ -54,6 +55,7 @@ public partial class {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Da
 
     partial void {{Name}}DataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
+  {{/ifne}}
 {{/unless}}
 {{#each DataSvcOperations}}
   {{#unless @first}}

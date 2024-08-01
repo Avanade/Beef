@@ -4,6 +4,8 @@ Represents the **NuGet** versions.
 
 ## v5.14.1
 - *Fixed:* Fixed the manager code-generation to reference parameter `value` as `v`, and output `ThenAsAsync`, correctly. 
+- *Fixed:* Fixed the manager code-generation to use the new `Result<T>.Adjusts` to avoid unintended compiler identified casting when using `Then`.
+- *Fixed:* Fixed the manager, data service and data code-generation to not output a constructor where there are no constructor parameters; i.e. is not required.
 - *Fixed:* Added `ManagerCtorCustom`, `DataSvcCtorCustom` and `DataCtorCustom` to allow the constructor to be implemented as custom, non-generated, by the consuming developer.
 
 ## v5.14.0

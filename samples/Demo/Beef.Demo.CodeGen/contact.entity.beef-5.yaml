@@ -22,4 +22,5 @@ entities:
     properties: [
       { name: Value },
       { name: IsPreferred, type: bool, text: Communication is the preferred (only one) }
-    ]}  
+    ]
+  }

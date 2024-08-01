@@ -1353,12 +1353,12 @@ entities:
         /// <summary>
         /// Indicates whether at least one operation needs a DataSvc.
         /// </summary>
-        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) || Operations!.Any(x => CompareNullOrValue(x.ManagerCustom, false));
+        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) && Operations!.Any(x => CompareNullOrValue(x.ManagerCustom, false));
 
         /// <summary>
         /// Indicates whether at least one operation needs a Data.
         /// </summary>
-        public bool RequiresData => (CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) || Operations!.Any(x => CompareNullOrValue(x.IsDataSvcCustomFull, false));
+        public bool RequiresData => !(CompareValue(ExcludeData, "Exclude") && CompareValue(ExcludeIData, true)) && Operations!.Any(x => CompareValue(x.DataSvcCustom, "None") && CompareValue(x.ExcludeDataSvc, false));
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event within the DataSvc-layer. 

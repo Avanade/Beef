@@ -40,7 +40,7 @@ public partial class GenderManager : IGenderManager
     /// <inheritdoc/>
     public Task<Result<Gender>> UpdateAsync(Gender value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+        return Result.Go(value).Required().Requires(id).Adjusts(v => v.Id = id)
                      .ThenAsAsync(v => _dataService.UpdateAsync(v));
     }, InvokerArgs.Update);
 }
