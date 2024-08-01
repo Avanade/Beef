@@ -38,6 +38,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     #endregion
 
 {{/if}}
+{{#unless ManagerCtorCustom}}
     /// <summary>
     /// Initializes a new instance of the <see cref="{{Name}}Manager"/> class.
     /// </summary>
@@ -58,6 +59,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
 
     partial void {{Name}}ManagerCtor(); // Enables additional functionality to be added to the constructor.
 
+{{/unless}}
 {{#each ManagerOperations}}
   {{#unless @first}}
 
@@ -200,7 +202,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
       {{/if}}
     {{else}}
       {{#if WithResult}}
-                     .Then{{#if HasReturnValue}}As{{/if}}Async({{#if HasValue}}v{{else}}(){{/if}} => _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}));
+                     .Then{{#ifor HasReturnValue HasValue}}As{{/ifor}}Async({{#if HasValue}}v{{else}}(){{/if}} => _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}v{{else}}{{{ArgumentName}}}{{/if}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}));
       {{else}}
         {{#if HasReturnValue}}return {{#if ManagerCleanUp}}Cleaner.Clean({{/if}}{{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{{ArgumentName}}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false){{#if HasReturnValue}}{{#if ManagerCleanUp}}){{/if}}{{/if}};
       {{/if}}

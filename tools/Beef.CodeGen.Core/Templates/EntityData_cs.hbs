@@ -60,6 +60,7 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
     #endregion
     {{/if}}
   {{/if}}
+  {{#unless DataCtorCustom}}
 
     /// <summary>
     /// Initializes a new instance of the <see cref="{{Name}}Data"/> class.
@@ -80,6 +81,7 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
 {{/ifle}}
 
     partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
+  {{/unless}}
   {{#each DataOperations}}
 
     {{#if ExcludeIData}}

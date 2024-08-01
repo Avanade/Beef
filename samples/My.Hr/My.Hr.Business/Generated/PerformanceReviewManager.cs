@@ -39,7 +39,7 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     {
         return Result.Go(value).Required().Then(v => v.EmployeeId = employeeId)
                      .ValidateAsync(vc => vc.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+                     .ThenAsAsync(v => _dataService.CreateAsync(v));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
@@ -47,7 +47,7 @@ public partial class PerformanceReviewManager : IPerformanceReviewManager
     {
         return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
                      .ValidateAsync(vc => vc.Entity().With<PerformanceReviewValidator>(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+                     .ThenAsAsync(v => _dataService.UpdateAsync(v));
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>

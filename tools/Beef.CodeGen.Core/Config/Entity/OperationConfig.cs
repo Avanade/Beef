@@ -1202,13 +1202,15 @@ operations: [
             if (DataTransaction!.Value || CompareValue(EventPublish, "Data") || CompareValue(DataExtensions, true))
                 DataInvoker = true;
 
-            DataSvcCustom = DefaultWhereNull(DataSvcCustom, () => "None");
+            DataSvcCustom = DefaultWhereNull(DataSvcCustom, () => Parent!.DataSvcCustom);
             DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, "DataSvc") && CompareValue(Parent!.EventTransaction, true));
             DataSvcInvoker = DefaultWhereNull(DataSvcInvoker, () => false);
             if (DataSvcTransaction!.Value || CompareValue(EventPublish, "DataSvc"))
                 DataSvcInvoker = true;
 
             DataSvcExtensions = DefaultWhereNull(DataSvcExtensions, () => Parent!.DataSvcExtensions);
+            ManagerCustom = DefaultWhereNull(ManagerCustom, () => Parent!.ManagerCustom);
+
             ExcludeAll = DefaultWhereNull(ExcludeAll, () => false);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true));

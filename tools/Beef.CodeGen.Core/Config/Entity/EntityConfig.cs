@@ -353,6 +353,13 @@ entities:
         public string? DataCtor { get; set; }
 
         /// <summary>
+        /// Indicates whether the `Data` constructor will be implemented as custom; i.e. not generated.
+        /// </summary>
+        [JsonPropertyName("dataCtorCustom")]
+        [CodeGenProperty("Data", Title = "Indicates whether the `Data` constructor will be implemented as custom; i.e. not generated.")]
+        public bool? DataCtorCustom { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.
         /// </summary>
         [JsonPropertyName("dataCtorParams")]
@@ -673,6 +680,21 @@ entities:
         public string? DataSvcCtor { get; set; }
 
         /// <summary>
+        /// Gets or set the option that indicates the level of `DataSvc` customization.
+        /// </summary>
+        [JsonPropertyName("dataSvcCustom")]
+        [CodeGenProperty("DataSvc", Title = "The option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer).", IsImportant = true, Options = ["Full", "Partial", "None"],
+            Description = "`Full` indicates the logic is fully customized (only invocation is code-generated). `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. `None` indicates data-layer invocation with _no_ custom invocation (default).")]
+        public string? DataSvcCustom { get; set; }
+
+        /// <summary>
+        /// Indicates whether the `DataSvc` constructor will be implemented as custom; i.e. not generated.
+        /// </summary>
+        [JsonPropertyName("dataSvcCtorCustom")]
+        [CodeGenProperty("DataSvc", Title = "Indicates whether the `DataSvc` constructor will be implemented as custom; i.e. not generated.")]
+        public bool? DataSvcCtorCustom { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.
         /// </summary>
         [JsonPropertyName("dataSvcCtorParams")]
@@ -725,12 +747,26 @@ entities:
         #region Manager
 
         /// <summary>
+        /// Indicates whether the `Manager`-layer is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
+        /// </summary>
+        [JsonPropertyName("managerCustom")]
+        [CodeGenProperty("Manager", Title = "Indicates whether the `Manager` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.", IsImportant = true)]
+        public bool? ManagerCustom { get; set; }
+
+        /// <summary>
         /// Gets or sets the access modifier for the generated `Manager` constructor.
         /// </summary>
         [JsonPropertyName("managerCtor")]
         [CodeGenProperty("Manager", Title = "The access modifier for the generated `Manager` constructor.", Options = ["Public", "Private", "Protected"],
             Description = "Defaults to `Public`.")]
         public string? ManagerCtor { get; set; }
+
+        /// <summary>
+        /// Indicates whether the `Manager` constructor will be implemented as custom; i.e. not generated.
+        /// </summary>
+        [JsonPropertyName("managerCtorCustom")]
+        [CodeGenProperty("Manager", Title = "Indicates whether the `Manager` constructor will be implemented as custom; i.e. not generated.")]
+        public bool? ManagerCtorCustom { get; set; }
 
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.
@@ -1440,6 +1476,8 @@ entities:
             HttpAgentName = DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName);
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
+            DataSvcCustom = DefaultWhereNull(DataSvcCustom, () => "None");
+            ManagerCustom = DefaultWhereNull(ManagerCustom, () => false);
             EventSource = DefaultWhereNull(EventSource, () => $"{Name!.ToLowerInvariant()}/{{$key}}");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
             EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
