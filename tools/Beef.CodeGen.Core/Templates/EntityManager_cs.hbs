@@ -97,7 +97,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{#each Parent.Properties}}
       {{#if IdentifierGenerator}}
         {{#if Parent.WithResult}}
-                     .ThenAsync(async v => v.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
+                     .AdjustsAsync(async v => v.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
         {{else}}
         value{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
         {{/if}}
