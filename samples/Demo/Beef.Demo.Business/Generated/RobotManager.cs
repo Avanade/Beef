@@ -39,19 +39,19 @@ public partial class RobotManager : IRobotManager
     public Task<Result<Robot>> CreateAsync(Robot value) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required()
-                     .ThenAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
+                     .AdjustsAsync(async v => v.Id = await _identifierGenerator.GenerateIdentifierAsync<Guid, Robot>().ConfigureAwait(false))
                      .Then(v => Cleaner.CleanUp(v))
                      .ValidateAsync(vc => vc.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+                     .ThenAsAsync(v => _dataService.CreateAsync(v));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
     public Task<Result<Robot>> UpdateAsync(Robot value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+        return Result.Go(value).Required().Requires(id).Adjusts(v => v.Id = id)
                      .Then(v => Cleaner.CleanUp(v))
                      .ValidateAsync(vc => vc.Interop(() => FluentValidator.Create<RobotValidator>().Wrap()), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+                     .ThenAsAsync(v => _dataService.UpdateAsync(v));
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>

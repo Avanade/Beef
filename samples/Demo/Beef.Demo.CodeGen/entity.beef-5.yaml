@@ -274,12 +274,15 @@ entities:
     ]
   }
 
-- { name: SpecialSauce, collection: true, collectionType: Dictionary, internalOnly: true,
+- { name: SpecialSauce, collection: true, collectionType: Dictionary, internalOnly: true, excludeWebApi: true, excludeWebApiAgent: true,
     properties: [
       { name: Key1, primaryKey: true },
       { name: Key2, primaryKey: true },
       { name: Selected, type: bool, default: 'true' },
       { name: Ingredient, default: '"special herbs and spices"' }
+    ],
+    operations: [
+      { name: Pour, type: Custom, dataSvcCustom: Partial }
     ]
   }
 

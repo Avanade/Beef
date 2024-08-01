@@ -12,14 +12,6 @@ namespace Beef.Demo.Business;
 /// </summary>
 public partial class ConfigManager : IConfigManager
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigManager"/> class.
-    /// </summary>
-    public ConfigManager()
-        { ConfigManagerCtor(); }
-
-    partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
-
     /// <inheritdoc/>
     public Task<System.Collections.IDictionary> GetEnvVarsAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {

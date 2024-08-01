@@ -32,15 +32,15 @@ public partial class EmployeeManager : IEmployeeManager
     {
         return Result.Go(value).Required()
                      .ValidateAsync(vc => vc.Entity().With<EmployeeValidator>(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.CreateAsync(value));
+                     .ThenAsAsync(v => _dataService.CreateAsync(v));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
     public Task<Result<Employee>> UpdateAsync(Employee value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
-        return Result.Go(value).Required().Requires(id).Then(v => v.Id = id)
+        return Result.Go(value).Required().Requires(id).Adjusts(v => v.Id = id)
                      .ValidateAsync(vc => vc.Entity().With<EmployeeValidator>(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.UpdateAsync(value));
+                     .ThenAsAsync(v => _dataService.UpdateAsync(v));
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
@@ -64,6 +64,6 @@ public partial class EmployeeManager : IEmployeeManager
     {
         return Result.Go(value).Required()
                      .ValidateAsync(vc => vc.Entity().With<TerminationDetailValidator>(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.TerminateAsync(value, id));
+                     .ThenAsAsync(v => _dataService.TerminateAsync(v, id));
     }, InvokerArgs.Update);
 }

@@ -173,7 +173,9 @@ Provides the _Manager-layer_ configuration.
 
 Property | Description
 -|-
+**`managerCustom`** | Indicates whether the `Manager` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.
 `managerCtor` | The access modifier for the generated `Manager` constructor. Valid options are: `Public`, `Private`, `Protected`.<br/>&dagger; Defaults to `Public`.
+`managerCtorCustom` | Indicates whether the `Manager` constructor will be implemented as custom; i.e. not generated.
 **`managerCtorParams`** | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.<br/>&dagger; Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `managerExtensions` | Indicates whether the `Manager` extensions logic should be generated.<br/>&dagger; This can be overridden using `Operation.ManagerExtensions`.
 **`validator`** | The name of the .NET implementing `Type` or interface `Type` that will perform the validation.<br/>&dagger; Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
@@ -190,6 +192,8 @@ Property | Description
 -|-
 `dataSvcCaching` | Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness).<br/>&dagger; Defaults to `true`.
 `dataSvcCtor` | The access modifier for the generated `DataSvc` constructor. Valid options are: `Public`, `Private`, `Protected`.<br/>&dagger; Defaults to `Public`.
+**`dataSvcCustom`** | The option that indicates the level of `DataSvc` customization (invokes `*OnImplementationAsync` method) vs code-generation (automatically invokes data-layer). Valid options are: `Full`, `Partial`, `None`.<br/>&dagger; `Full` indicates the logic is fully customized (only invocation is code-generated). `Partial` indicates combination of surrounding code-generation with final custom invocation versus data-layer. `None` indicates data-layer invocation with _no_ custom invocation (default).
+`dataSvcCtorCustom` | Indicates whether the `DataSvc` constructor will be implemented as custom; i.e. not generated.
 `dataSvcCtorParams` | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.<br/>&dagger; Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated.<br/>&dagger; This can be overridden using `Operation.DataSvcExtensions`.
 
@@ -202,6 +206,7 @@ Property | Description
 -|-
 **`autoImplement`** | The data source auto-implementation option. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `HttpAgent`, `None`.<br/>&dagger; Defaults to `CodeGeneration.AutoImplement` (where `RefDataType` or `EntityFrameworkModel` or `CosmosModel` or `HttpAgent` is not null; otherwise, `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicitly overridden). When selected some of the related attributes will also be required (as documented). Additionally, the `AutoImplement` can be further specified/overridden per `Operation`.
 `dataCtor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`.<br/>&dagger; Defaults to `Public`.
+`dataCtorCustom` | Indicates whether the `Data` constructor will be implemented as custom; i.e. not generated.
 `dataCtorParams` | The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.<br/>&dagger; Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `dataExtensions` | Indicates whether the `Data` extensions logic should be generated.<br/>&dagger; This can be overridden using `Operation.DataExtensions`.
 

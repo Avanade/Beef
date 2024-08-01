@@ -23,6 +23,7 @@ public static partial class ServiceCollectionsExtension
                        .AddScoped<IRobotManager, RobotManager>()
                        .AddScoped<IConfigManager, ConfigManager>()
                        .AddScoped<IPostalInfoManager, PostalInfoManager>()
+                       .AddScoped<ISpecialSauceManager, SpecialSauceManager>()
                        .AddScoped<IContactManager, ContactManager>();
     }
 }

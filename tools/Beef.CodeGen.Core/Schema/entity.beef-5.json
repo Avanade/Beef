@@ -565,6 +565,10 @@
             "Protected"
           ]
         },
+        "dataCtorCustom": {
+          "type": "boolean",
+          "title": "Indicates whether the \u0060Data\u0060 constructor will be implemented as custom; i.e. not generated."
+        },
         "dataCtorParams": {
           "type": "array",
           "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060Data\u0060 constructor.",
@@ -754,6 +758,20 @@
             "Protected"
           ]
         },
+        "dataSvcCustom": {
+          "type": "string",
+          "title": "The option that indicates the level of \u0060DataSvc\u0060 customization (invokes \u0060*OnImplementationAsync\u0060 method) vs code-generation (automatically invokes data-layer).",
+          "description": "\u0060Full\u0060 indicates the logic is fully customized (only invocation is code-generated). \u0060Partial\u0060 indicates combination of surrounding code-generation with final custom invocation versus data-layer. \u0060None\u0060 indicates data-layer invocation with _no_ custom invocation (default).",
+          "enum": [
+            "Full",
+            "Partial",
+            "None"
+          ]
+        },
+        "dataSvcCtorCustom": {
+          "type": "boolean",
+          "title": "Indicates whether the \u0060DataSvc\u0060 constructor will be implemented as custom; i.e. not generated."
+        },
         "dataSvcCtorParams": {
           "type": "array",
           "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated \u0060DataSvc\u0060 constructor.",
@@ -787,6 +805,10 @@
           "title": "Indicates whether a \u0060System.TransactionScope\u0060 should be created and orchestrated whereever generating event publishing logic.",
           "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an \u0060EventPublish\u0060 error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to \u0060CodeGeneration.EventTransaction\u0060. This essentially defaults the \u0060Operation.DataSvcTransaction\u0060 where not otherwise specified. This should only be used where a transactionally-aware data source is being used."
         },
+        "managerCustom": {
+          "type": "boolean",
+          "title": "Indicates whether the \u0060Manager\u0060 logic is a custom implementation; i.e. no auto-\u0060DataSvc\u0060 invocation logic is to be generated."
+        },
         "managerCtor": {
           "type": "string",
           "title": "The access modifier for the generated \u0060Manager\u0060 constructor.",
@@ -796,6 +818,10 @@
             "Private",
             "Protected"
           ]
+        },
+        "managerCtorCustom": {
+          "type": "boolean",
+          "title": "Indicates whether the \u0060Manager\u0060 constructor will be implemented as custom; i.e. not generated."
         },
         "managerCtorParams": {
           "type": "array",

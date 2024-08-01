@@ -38,7 +38,7 @@ public partial class PostalInfoManager : IPostalInfoManager
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
                      .ValidatesAsync(country, vc => vc.IsValid(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.CreatePostCodesAsync(value, country, state, city));
+                     .ThenAsAsync(v => _dataService.CreatePostCodesAsync(v, country, state, city));
     }, InvokerArgs.Create);
 
     /// <inheritdoc/>
@@ -47,7 +47,7 @@ public partial class PostalInfoManager : IPostalInfoManager
         return Result.Go(value).Required().Requires(country).Requires(state).Requires(city)
                      .Then(v => Cleaner.CleanUp(v, country, state, city))
                      .ValidatesAsync(country, vc => vc.IsValid(), cancellationToken: ct)
-                     .ThenAsAsync(v => _dataService.UpdatePostCodesAsync(value, country, state, city));
+                     .ThenAsAsync(v => _dataService.UpdatePostCodesAsync(v, country, state, city));
     }, InvokerArgs.Update);
 
     /// <inheritdoc/>
