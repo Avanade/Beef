@@ -8,16 +8,15 @@ namespace Beef.Demo.Business.Data
     /// </summary>
     public class DemoCosmosDb : CosmosDb
     {
+        private readonly Lazy<CosmosDbContainer<Robot, Model.Robot>> _items;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DemoCosmosDb"/> class.
         /// </summary>
-        /// <param name="client">The <see cref="CosmosClient"/>.</param>
-        /// <param name="databaseId">The database identifier.</param>
-        /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
-        /// <param name="throughput">The throughput (RU/S).</param>
-        public DemoCosmosDb(Microsoft.Azure.Cosmos.Database database, IMapper mapper, CosmosDbInvoker? invoker = null) : base(database, mapper, invoker) { }
+        public DemoCosmosDb(Microsoft.Azure.Cosmos.Database database, IMapper mapper, CosmosDbInvoker? invoker = null) : base(database, mapper, invoker)
+            => _items = new(() => Container<Robot, Model.Robot>("Items"));
 
-        public CosmosDbContainer<Robot, Model.Robot> Items => Container<Robot, Model.Robot>("Items");
+        public CosmosDbContainer<Robot, Model.Robot> Items => _items.Value;
 
         ///// <summary>
         ///// System.Text.Json not supported natively; see https://github.com/Azure/azure-cosmos-dotnet-v3/issues/2533 and https://github.com/Azure/azure-cosmos-dotnet-v3/tree/master/Microsoft.Azure.Cosmos.Samples/Usage/SystemTextJson.

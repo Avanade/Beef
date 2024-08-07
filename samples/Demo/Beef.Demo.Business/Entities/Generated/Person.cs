@@ -112,13 +112,13 @@ public partial class Person : EntityBase, IIdentifier<Guid>, IPartitionKey, IETa
     /// </summary>
     /// <param name="eyeColor">The <see cref="EyeColor"/>.</param>
     /// <returns>The Partition Key.</returns>
-    public static string CreatePartitionKey(string? eyeColorSid) => CompositeKey.Create(eyeColorSid).ToString();
+    public static string? CreatePartitionKey(string? eyeColorSid) => CompositeKey.Create(eyeColorSid).ToString();
 
     /// <summary>
     /// Gets the Partition Key (consists of the following property(s): <see cref="EyeColor"/>).
     /// </summary>
     [JsonIgnore]
-    public string PartitionKey => CreatePartitionKey(EyeColorSid);
+    public string? PartitionKey => CreatePartitionKey(EyeColorSid);
 
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()

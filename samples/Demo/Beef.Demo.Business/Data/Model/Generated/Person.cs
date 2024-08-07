@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Data.Model
     /// <summary>
     /// Represents the Person model.
     /// </summary>
-    public partial class Person
+    public partial class Person : IPartitionKey
     {
         /// <summary>
         /// Gets or sets the User Name.
@@ -26,6 +26,19 @@ namespace Beef.Demo.Business.Data.Model
         /// Gets or sets the Last Name.
         /// </summary>
         public string? LastName { get; set; }
+        
+        /// <summary>
+        /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
+        /// </summary>
+        /// <returns>The partition key.</returns>
+        /// <param name="userName">The <see cref="UserName"/>.</param>
+        public static string? CreatePartitionKey(string? userName) => CompositeKey.Create(userName).ToString();
+
+        /// <summary>
+        /// Gets the Partition Key (consists of the following property(s): <see cref="UserName"/>).
+        /// </summary>
+        [JsonIgnore]
+        public string? PartitionKey => CreatePartitionKey(UserName);
     }
 }
 

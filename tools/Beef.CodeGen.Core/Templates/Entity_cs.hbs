@@ -246,13 +246,13 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
     /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
     /// <returns>The Partition Key.</returns>
-    public static string CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}}).ToString();
+    public static string? CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{PropertyArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}}).ToString();
 
     /// <summary>
     /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
     /// </summary>
     [JsonIgnore]
-    public string PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+    public string? PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
   {{/ifne}}
 {{/unless}}
 {{! ===== GetPropertyValues ===== }}

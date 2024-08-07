@@ -118,7 +118,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{else}}
       {{#each ManagerPassingParameters}}
         {{#if @first}}
-                     .Then(v =>
+                     .Adjusts(v =>
                      {
         {{/if}}
                          v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}};
