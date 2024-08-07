@@ -223,4 +223,11 @@
     <Property Name="Name" JsonDataModelName="place name" />
     <Property Name="PostCode" JsonDataModelName="post code" />
   </Entity>
+
+  <Entity Name="TestEnt" ExcludeAll="true">
+    <Property Name="IsSomeSome" Type="bool" Default="false" />
+    <Property Name="IsSomeSome2" Type="bool" Default="true" />
+    <Property Name="Count" Type="int" Default="8" />
+    <Property Name="Text" Type="string" Default="&quot;XXXXX&quot;" />
+  </Entity>
  </CodeGeneration>

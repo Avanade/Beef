@@ -45,7 +45,7 @@
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.1" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="CompareNETObjects" Version="4.83.0" />
-    <PackageReference Include="UnitTestEx.NUnit" Version="4.4.0" />
+    <PackageReference Include="UnitTestEx.NUnit" Version="4.4.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,11 +55,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.27" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.32" />
   </ItemGroup>
   
   <ItemGroup>

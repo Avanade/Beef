@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.40.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
