@@ -270,3 +270,4 @@ launchSettings.json
 
 # Additional ignores...
 packageonly/
+/samples/Demo/Beef.Demo.CodeGen/temp.entity.beef-5.yaml

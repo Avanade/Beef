@@ -81,6 +81,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Operation, "EventPublish", false, (xml) => ConvertEventPublish(xml)),
 
             (ConfigType.Entity, ConfigurationEntity.Property, "Type", false, (xml) => xml != null && xml.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) ? $"^{xml[17..]}" : xml),
+            (ConfigType.Entity, ConfigurationEntity.Property, "Default", false, (xml) => xml is null || (xml.StartsWith('\'') && xml.EndsWith('\'')) ? xml : $"'{xml}'"),
 
             (ConfigType.Entity, ConfigurationEntity.Parameter, "Type", false, (xml) => xml != null && xml.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) ? $"^{xml[17..]}" : xml),
 
@@ -345,10 +346,17 @@ namespace Beef.CodeGen.Config
             if (string.IsNullOrEmpty(value))
                 return null;
 
-            if (value.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
-                value = $"'{value.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
+            var bookends = value.StartsWith('\'') && value.EndsWith('\'');
+            if (bookends)
+                value = value[1..^1];
 
-            if (string.Compare(value, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
+            if (value.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
+            {
+                value = $"'{value.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
+                bookends = false;
+            }
+
+            if (bookends || string.Compare(value, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
                 value = $"'{value}'";
 
             return value;
