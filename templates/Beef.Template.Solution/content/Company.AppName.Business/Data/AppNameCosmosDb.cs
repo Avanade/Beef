@@ -7,11 +7,27 @@ namespace Company.AppName.Business.Data;
 /// </summary>
 /// <param name="database">The <see cref="Database"/>.</param>
 /// <param name="mapper">The <see cref="IMapper"/>.</param>
-/// <param name="invoker">The optional <see cref="CosmosDbInvoker"/>.</param>
-public class AppNameCosmosDb(Database database, IMapper mapper, CosmosDbInvoker? invoker = null) : CoreEx.Cosmos.CosmosDb(database, mapper, invoker) 
+public class AppNameCosmosDb : CosmosDb 
 {
     /// <summary>
-    /// Exposes <see cref="Person"/> entity from the <b>Person</b> container.
+    /// Gets the <c>Person</c> container identifier.
     /// </summary>
-    public CosmosDbContainer<Person, Model.Person> Persons => Container<Person, Model.Person>("Person");
+    public const string PersonContainerId = "Person";
+
+    private readonly Lazy<CosmosDbContainer<Person, Model.Person>> _persons;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppNameCosmosDb"/> class.
+    /// </summary>
+    /// <param name="database">The CosmosDb <see cref="Database"/>.</param>
+    /// <param name="mapper">The <see cref="IMapper"/>.</param>
+    public AppNameCosmosDb(Database database, IMapper mapper) : base(database, mapper)
+    {
+        _persons = new(() => Container<Person, Model.Person>(PersonContainerId));
+    }
+
+    /// <summary>
+    /// Exposes <see cref="Person"/> entity from the <see cref="PersonContainerId"/> container.
+    /// </summary>
+    public CosmosDbContainer<Person, Model.Person> Persons => _persons.Value;
 }

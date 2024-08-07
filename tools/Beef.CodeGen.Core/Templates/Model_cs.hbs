@@ -159,6 +159,30 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
     {{/ifne}}
   {{/unless}}
 {{/unless}}
+{{#if Root.IsDataModel}}
+{{#unless RefDataType}}
+  {{#ifne PartitionKeyProperties.Count 0}}
+        
+        /// <summary>
+        /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
+        /// </summary>
+        /// <returns>The partition key.</returns>
+  {{#each PartitionKeyProperties}}
+        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+  {{/each}}
+        public static string? CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{ArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}).ToString();
+
+        /// <summary>
+        /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+        /// </summary>
+    {{#ifeq JsonSerializer 'Newtonsoft'}}
+        [Newtonsoft.Json.JsonIgnore]
+    {{/ifeq}}
+        [JsonIgnore]
+        public string? PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{Name}}{{/each}});
+  {{/ifne}}
+{{/unless}}
+{{/if}}
 {{#ifnull RefDataType}}
     }
 {{else}}

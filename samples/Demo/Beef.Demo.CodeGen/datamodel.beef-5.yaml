@@ -24,7 +24,7 @@ entities:
 
 - { name: Person,
     properties: [
-      { name: UserName },
+      { name: UserName, partitionKey: true },
       { name: FirstName },
       { name: LastName }
       # The endpoint always fails when Gender is passed; removed for now.

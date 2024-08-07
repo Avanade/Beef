@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.14.2
+- *Fixed:* Fixed the data model code-generation to output the `PartitionKey` where specified.
+- *Fixed:* Fixed the code-generated `PartitionKey` to be a nullable string. 
+- *Fixed:* Fixed the templated `CosmosDb` to ensure lazy-loading of container (versus re-creating on each access). 
+
 ## v5.14.1
 - *Fixed:* Fixed the manager code-generation to reference parameter `value` as `v`, and output `ThenAsAsync`, correctly. 
 - *Fixed:* Fixed the manager code-generation to use the new `Result<T>.Adjusts` to avoid unintended compiler identified casting when using `Then`.
