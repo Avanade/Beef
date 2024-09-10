@@ -25,6 +25,7 @@ jobs:
       Bar_ConnectionStrings__Database: Data Source=localhost,1433;Initial Catalog=Foo.Bar;User id=sa;Password=sAPWD23.^0;TrustServerCertificate=true
       Bam_ConnectionStrings__Database: Server=localhost;Port=3306;Database=Foo.Bam;Uid=ciuser;Pwd=ciStrong#!Password;AllowUserVariables=true;UseAffectedRows=false;
       Bap_ConnectionStrings__Database: Server=localhost;Port=5432;Database=Foo.Bap;User Id=postgres;Pwd=ciStrong#!Password;
+      Bac_CosmosConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
       Cdr_CosmosConnectionString: ${{ secrets.COSMOS_CONNECTION_STRING }}
 
     services:
@@ -329,4 +330,17 @@ jobs:
 
     - name: Template/SqlServer/EfWs services test
       working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Services.Test
+      run: dotnet test
+
+    # Template - CosmosDB
+
+    - name: Template/Cosmos create
+      run: dotnet new beef --company Foo.Co --appname Bac --datasource Cosmos --output Foo.Co.Bac
+
+    - name: Template/Cosmos code-gen
+      working-directory: ./Foo.Co.Bac/Foo.Co.Bac.CodeGen
+      run: dotnet run all
+
+    - name: Template/Cosmos test
+      working-directory: ./Foo.Co.Bac
       run: dotnet test
