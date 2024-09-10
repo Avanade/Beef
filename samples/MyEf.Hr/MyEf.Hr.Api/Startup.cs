@@ -103,6 +103,7 @@ namespace MyEf.Hr.Api
 
                 options.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
                 options.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
+                options.OperationFilter<QueryOperationFilter>();        // Needed to support QueryAttribute where QueryArgs parameter not explicitly defined.
             });
         }
 

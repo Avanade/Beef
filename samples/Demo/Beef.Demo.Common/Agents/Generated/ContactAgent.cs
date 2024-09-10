@@ -58,6 +58,10 @@ namespace Beef.Demo.Common.Agents
         /// <inheritdoc/>
         public Task<HttpResult> RaiseEventAsync(bool throwError, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/contacts/raise", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<bool>("throwError", throwError)), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<HttpResult<ContactCollectionResult>> GetQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<ContactCollectionResult>("api/v1/contacts/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
     }
 }
 

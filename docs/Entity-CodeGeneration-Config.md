@@ -135,7 +135,7 @@ Provides the _Database Data-layer_ configuration.
 
 Property | Description
 -|-
-**`databaseName`** | The .NET database interface name (used where `Operation.AutoImplement` is `Database`).<br/>&dagger; Defaults to `IDatabase`. This can be overridden within the `Entity`(s).
+**`databaseType`** | The .NET database type and optional name (used where `Operation.AutoImplement` is `Database`).<br/>&dagger; Defaults to `IDatabase`. Should be formatted as `Type` + `^` + `Name`; e.g. `IDatabase^Db`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).
 **`databaseSchema`** | The default database schema name.<br/>&dagger; Defaults to `dbo`.
 **`databaseProvider`** | The default database schema name. Valid options are: `SqlServer`, `MySQL`, `Postgres`.<br/>&dagger; Defaults to `SqlServer`. Enables specific database provider functionality/formatting/etc. where applicable.
 `databaseMapperEx` | Indicates that a `DatabaseMapperEx` will be used; versus, `DatabaseMapper` (which uses Reflection internally).<br/>&dagger; Defaults to `true`. The `DatabaseMapperEx` essentially replaces the `DatabaseMapper` as it is more performant (extended/explicit); this option can be used where leagcy/existing behavior is required.
@@ -147,7 +147,7 @@ Provides the _Entity Framewotrk (EF) Data-layer_ configuration.
 
 Property | Description
 -|-
-`entityFrameworkName` | The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.<br/>&dagger; Defaults to `IEfDb`. This can be overridden within the `Entity`(s).
+`entityFrameworkType` | The .NET Entity Framework type and optional name (used where `Operation.AutoImplement` is `EntityFramework`).<br/>&dagger; Defaults to `IEfDb`. Should be formatted as `Type` + `^` + `Name`; e.g. `IEfDb^Ef`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).
 
 <br/>
 
@@ -156,7 +156,7 @@ Provides the _CosmosDB Data-layer_ configuration.
 
 Property | Description
 -|-
-**`cosmosName`** | The .NET Entity Framework interface name used where `Operation.AutoImplement` is `Cosmos`.<br/>&dagger; Defaults to `ICosmosDb`. This can be overridden within the `Entity`(s).
+**`cosmosType`** | The .NET Cosmos DB type and name (used where `Operation.AutoImplement` is `Cosmos`).<br/>&dagger; Defaults to `ICosmosDb`. Should be formatted as `Type` + `^` + `Name`; e.g. `ICosmosDb^Cosmos`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).
 
 <br/>
 
@@ -165,7 +165,7 @@ Provides the _OData Data-layer_ configuration.
 
 Property | Description
 -|-
-**`odataName`** | The .NET OData interface name used where `Operation.AutoImplement` is `OData`.<br/>&dagger; Defaults to `IOData`. This can be overridden within the `Entity`(s).
+**`odataType`** | The .NET OData interface name used where `Operation.AutoImplement` is `OData`.<br/>&dagger; Defaults to `IOData`. Should be formatted as `Type` + `^` + `Name`; e.g. `IOData^OData`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).
 
 <br/>
 
@@ -174,7 +174,7 @@ Provides the _HTTP Agent Data-layer_ configuration.
 
 Property | Description
 -|-
-**`httpAgentName`** | The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).
+**`httpAgentType`** | The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; Defaults to `IHttpAgent`. Should be formatted as `Type` + `^` + `Name`; e.g. `IHttpAgent^HttpAgent`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).
 
 <br/>
 

@@ -27,7 +27,7 @@ namespace Cdr.Banking.Test
         [Test]
         public void B110_GetAccounts_User1()
         {
-            var v = this.Agent<AccountAgent, AccountCollectionResult>()
+            var v = Agent<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
@@ -97,7 +97,6 @@ namespace Cdr.Banking.Test
             });
             Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890" }));
         }
-
 
         [Test]
         public void B220_GetAccounts_ProductCategory()
@@ -192,6 +191,99 @@ namespace Cdr.Banking.Test
                 Assert.That(v!.Items, Is.Not.Null);
                 Assert.That(v.Items, Is.Empty);
             });
+        }
+
+        #endregion
+
+        #region GetAccountsQuery
+
+        [Test]
+        public void B510_GetAccountsQuery_User1()
+        {
+            var v = Agent<AccountAgent, AccountCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAccountsQueryAsync(null)).Value;
+
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(3));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890", "45678901" }));
+        }
+
+        [Test]
+        public void B520_GetAccountsQuery_OpenStatus()
+        {
+            var v = Agent<AccountAgent, AccountCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAccountsQueryAsync(QueryArgs.Create("openstatus eq 'open'"))).Value;
+
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890" }));
+        }
+
+        [Test]
+        public void B521_GetAccountsQuery_OpenStatus_All()
+        {
+            Agent<AccountAgent, AccountCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectError("Field 'openstatus' with value 'all' is invalid: Value not valid for filtering.")
+                .Run(a => a.GetAccountsQueryAsync(QueryArgs.Create("openstatus eq 'all'")));
+        }
+
+        [Test]
+        public void B230_GetAccountsQuery_ProductCategory()
+        {
+            var v = Agent<AccountAgent, AccountCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAccountsQueryAsync(QueryArgs.Create("productcategory eq 'CRED_AND_CHRG_CARDS'"))).Value;
+
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "34567890" }));
+        }
+
+        [Test]
+        public void B240_GetAccountsQuery_IsOwned()
+        {
+            var v = Agent<AccountAgent, AccountCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAccountsQueryAsync(QueryArgs.Create("isowned eq true"))).Value;
+
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(2));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "12345678", "34567890" }));
+        }
+
+        [Test]
+        public void B250_GetAccountsQuery_NotIsOwned()
+        {
+            var v = Agent<AccountAgent, AccountCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAccountsQueryAsync(QueryArgs.Create("isowned eq false"))).Value;
+
+            Assert.That(v, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(v!.Items, Is.Not.Null);
+                Assert.That(v.Items, Has.Count.EqualTo(1));
+            });
+            Assert.That(v.Items.Select(x => x.Id).ToArray(), Is.EqualTo(new string[] { "45678901" }));
         }
 
         #endregion

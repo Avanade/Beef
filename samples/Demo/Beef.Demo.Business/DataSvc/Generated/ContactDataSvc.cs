@@ -54,6 +54,9 @@ public partial class ContactDataSvc : IContactDataSvc
 
     /// <inheritdoc/>
     public Task RaiseEventAsync(bool throwError) => _data.RaiseEventAsync(throwError);
+
+    /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetQueryAsync(QueryArgs? query, PagingArgs? paging) => _data.GetQueryAsync(query, paging);
 }
 
 #pragma warning restore

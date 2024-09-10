@@ -11,6 +11,7 @@ public partial class AccountData : IAccountData
 {
     private readonly ICosmos _cosmos;
     private Func<IQueryable<Model.Account>, AccountArgs?, IQueryable<Model.Account>>? _getAccountsOnQuery;
+    private Func<IQueryable<Model.Account>, QueryArgs?, IQueryable<Model.Account>>? _getAccountsQueryOnQuery;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountData"/> class.
@@ -26,6 +27,10 @@ public partial class AccountData : IAccountData
         => _cosmos.Accounts.Query(q => _getAccountsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<AccountCollectionResult, AccountCollection>();
 
     /// <inheritdoc/>
+    public Task<Result<AccountCollectionResult>> GetAccountsQueryAsync(QueryArgs? query, PagingArgs? paging)
+        => _cosmos.Accounts.Query(q => _getAccountsQueryOnQuery?.Invoke(q, query) ?? q).WithPaging(paging).SelectResultWithResultAsync<AccountCollectionResult, AccountCollection>();
+
+    /// <inheritdoc/>
     public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId)
         => _cosmos.AccountDetails.GetWithResultAsync(accountId);
 
@@ -36,7 +41,7 @@ public partial class AccountData : IAccountData
     public Task<Result<FileContentResult?>> GetStatementAsync(string? accountId) => GetStatementOnImplementationAsync(accountId);
 
     /// <summary>
-    /// Provides the <see cref="Account"/> to Entity Framework <see cref="Model.Account"/> mapping.
+    /// Provides the <see cref="Account"/> to Cosmos <see cref="Model.Account"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<Account, Model.Account>
     {
@@ -61,7 +66,7 @@ public partial class AccountData : IAccountData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.Account"/> to <see cref="Account"/> mapping.
+    /// Provides the Cosmos <see cref="Model.Account"/> to <see cref="Account"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.Account, Account>
     {

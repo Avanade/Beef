@@ -30,11 +30,17 @@ public class Startup
                 .AddValidators<AccountManager>();
 
         // Add the cosmos database.
-        services.AddSingleton<ICosmos>(sp =>
+        services.AddSingleton(sp =>
         {
             var settings = sp.GetRequiredService<BankingSettings>();
             var cco = new AzCosmos.CosmosClientOptions { SerializerOptions = new AzCosmos.CosmosSerializationOptions { PropertyNamingPolicy = AzCosmos.CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
-            return new CosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
+            return new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco);
+        });
+
+        services.AddCosmosDb<ICosmos>(sp =>
+        {
+            var settings = sp.GetRequiredService<BankingSettings>();
+            return new CosmosDb(sp.GetRequiredService<AzCosmos.CosmosClient>().GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
         });
 
         // Add the generated reference data services.
@@ -60,6 +66,7 @@ public class Startup
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Cdr.Banking API", Version = "v1" });
             options.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
             options.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
+            options.OperationFilter<QueryOperationFilter>();        // Needed to support QueryAttribute where QueryArgs parameter not explicitly defined.
         });
     }
 

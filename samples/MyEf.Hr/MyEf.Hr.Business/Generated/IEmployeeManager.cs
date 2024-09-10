@@ -46,6 +46,14 @@ public partial interface IEmployeeManager
     Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging);
 
     /// <summary>
+    /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
+    /// </summary>
+    /// <param name="query">The <see cref="QueryArgs"/>.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    /// <returns>The <see cref="EmployeeBaseCollectionResult"/>.</returns>
+    Task<Result<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query, PagingArgs? paging);
+
+    /// <summary>
     /// Terminates an existing <see cref="Employee"/>.
     /// </summary>
     /// <param name="value">The <see cref="TerminationDetail"/>.</param>

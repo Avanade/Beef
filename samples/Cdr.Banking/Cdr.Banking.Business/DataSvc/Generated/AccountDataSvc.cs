@@ -26,6 +26,9 @@ public partial class AccountDataSvc : IAccountDataSvc
     public Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging) => _data.GetAccountsAsync(args, paging);
 
     /// <inheritdoc/>
+    public Task<Result<AccountCollectionResult>> GetAccountsQueryAsync(QueryArgs? query, PagingArgs? paging) => _data.GetAccountsQueryAsync(query, paging);
+
+    /// <inheritdoc/>
     public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => Result.Go().CacheGetOrAddAsync(_cache, accountId, () => _data.GetDetailAsync(accountId));
 
     /// <inheritdoc/>

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-
-namespace Cdr.Banking.Business.Data;
+﻿namespace Cdr.Banking.Business.Data;
 
 /// <summary>
 /// Represents the CosmosDb/DocumentDb client.

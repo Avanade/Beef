@@ -18,6 +18,14 @@ public partial interface IAccountData
     Task<Result<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging);
 
     /// <summary>
+    /// Get all accounts.
+    /// </summary>
+    /// <param name="query">The <see cref="QueryArgs"/>.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
+    Task<Result<AccountCollectionResult>> GetAccountsQueryAsync(QueryArgs? query, PagingArgs? paging);
+
+    /// <summary>
     /// Get <see cref="AccountDetail"/>.
     /// </summary>
     /// <param name="accountId">The <see cref="Account"/> identifier.</param>

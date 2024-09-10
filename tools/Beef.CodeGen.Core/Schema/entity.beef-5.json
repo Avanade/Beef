@@ -140,10 +140,10 @@
             "None"
           ]
         },
-        "databaseName": {
+        "databaseType": {
           "type": "string",
-          "title": "The .NET database interface name (used where \u0060Operation.AutoImplement\u0060 is \u0060Database\u0060).",
-          "description": "Defaults to \u0060IDatabase\u0060. This can be overridden within the \u0060Entity\u0060(s)."
+          "title": "The .NET database type and optional name (used where \u0060Operation.AutoImplement\u0060 is \u0060Database\u0060).",
+          "description": "Defaults to \u0060IDatabase\u0060. Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IDatabase^Db\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "databaseSchema": {
           "type": "string",
@@ -165,25 +165,25 @@
           "title": "Indicates that a \u0060DatabaseMapperEx\u0060 will be used; versus, \u0060DatabaseMapper\u0060 (which uses Reflection internally).",
           "description": "Defaults to \u0060true\u0060. The \u0060DatabaseMapperEx\u0060 essentially replaces the \u0060DatabaseMapper\u0060 as it is more performant (extended/explicit); this option can be used where leagcy/existing behavior is required."
         },
-        "entityFrameworkName": {
+        "entityFrameworkType": {
           "type": "string",
-          "title": "The .NET Entity Framework interface name used where \u0060Operation.AutoImplement\u0060 is \u0060EntityFramework\u0060.",
-          "description": "Defaults to \u0060IEfDb\u0060. This can be overridden within the \u0060Entity\u0060(s)."
+          "title": "The .NET Entity Framework type and optional name (used where \u0060Operation.AutoImplement\u0060 is \u0060EntityFramework\u0060).",
+          "description": "Defaults to \u0060IEfDb\u0060. Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IEfDb^Ef\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. This can be overridden within the \u0060Entity\u0060(s)."
         },
-        "cosmosName": {
+        "cosmosType": {
           "type": "string",
-          "title": "The .NET Entity Framework interface name used where \u0060Operation.AutoImplement\u0060 is \u0060Cosmos\u0060.",
-          "description": "Defaults to \u0060ICosmosDb\u0060. This can be overridden within the \u0060Entity\u0060(s)."
+          "title": "The .NET Cosmos DB type and name (used where \u0060Operation.AutoImplement\u0060 is \u0060Cosmos\u0060).",
+          "description": "Defaults to \u0060ICosmosDb\u0060. Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060ICosmosDb^Cosmos\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. This can be overridden within the \u0060Entity\u0060(s)."
         },
-        "odataName": {
+        "odataType": {
           "type": "string",
           "title": "The .NET OData interface name used where \u0060Operation.AutoImplement\u0060 is \u0060OData\u0060.",
-          "description": "Defaults to \u0060IOData\u0060. This can be overridden within the \u0060Entity\u0060(s)."
+          "description": "Defaults to \u0060IOData\u0060. Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IOData^OData\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. This can be overridden within the \u0060Entity\u0060(s)."
         },
-        "httpAgentName": {
+        "httpAgentType": {
           "type": "string",
           "title": "The default .NET HTTP Agent interface name used where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
-          "description": "Defaults to \u0060IHttpAgent\u0060. This can be overridden within the \u0060Entity\u0060(s)."
+          "description": "Defaults to \u0060IHttpAgent\u0060. Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060; e.g. \u0060IHttpAgent^HttpAgent\u0060. Where the \u0060Name\u0060 portion is not specified it will be inferred. This can be overridden within the \u0060Entity\u0060(s)."
         },
         "etagDefaultMapperConverter": {
           "type": "string",
@@ -511,8 +511,8 @@
         },
         "behavior": {
           "type": "string",
-          "title": "Defines the key CRUD-style behavior (operation types), being \u0027C\u0027reate, \u0027G\u0027et (or \u0027R\u0027ead), \u0027U\u0027pdate, \u0027P\u0027atch and \u0027D\u0027elete). Additionally, GetByArgs (\u0027B\u0027) and GetAll (\u0027A\u0027) operations that will be automatically generated where not otherwise explicitly specified.",
-          "description": "Value may only specifiy one or more of the \u0060CGRUDBA\u0060 characters (in any order) to define the automatically generated behavior (operations); for example: \u0060CRUPD\u0060 or \u0060CRUP\u0060 or \u0060rba\u0060 (case insensitive). This is shorthand for setting one or more of the following properties: \u0060Get\u0060, \u0060GetByArgs\u0060, \u0060GetAll\u0060, \u0027Create\u0027, \u0060Update\u0060, \u0060Patch\u0060 and \u0060Delete\u0060. Where one of these properties is set to either \u0060true\u0060 or \u0060false\u0060 this will take precedence over the value set for \u0060Behavior\u0060."
+          "title": "Defines the key CRUD-style behavior (operation types), being \u0027C\u0027reate, \u0027G\u0027et (or \u0027R\u0027ead), \u0027U\u0027pdate, \u0027P\u0027atch, \u0027D\u0027elete and \u0060Q\u0060uery). Additionally, \u0060GetByArgs\u0060 (\u0027B\u0027), \u0060GetAll\u0060 (\u0027A\u0027) and \u0060GetByQuery\u0060 (\u0027Q\u0027) operations configuration will be automatically inferred where not otherwise explicitly specified.",
+          "description": "Value may only specifiy one or more of the \u0060CGRUDBAQ\u0060 characters (in any order) to define the automatically generated behavior (operations); for example: \u0060CRUPD\u0060 or \u0060CRUP\u0060 or \u0060rba\u0060 (case insensitive). This is shorthand for setting one or more of the following properties: \u0060Get\u0060, \u0060GetByArgs\u0060, \u0060GetAll\u0060, \u0027Create\u0027, \u0060Update\u0060, \u0060Patch\u0060 and \u0060Delete\u0060. Where one of these properties is set to either \u0060true\u0060 or \u0060false\u0060 this will take precedence over the value set for \u0060Behavior\u0060."
         },
         "get": {
           "type": "boolean",
@@ -525,6 +525,10 @@
         "getAll": {
           "type": "boolean",
           "title": "Indicates that a \u0060GetAll\u0060 operation will be automatically generated where not otherwise explicitly specified."
+        },
+        "getByQuery": {
+          "type": "boolean",
+          "title": "Indicates that a \u0060GetByQuery\u0060 operation will be automatically generated where not otherwise explicitly specified."
         },
         "create": {
           "type": "boolean",
@@ -617,10 +621,10 @@
           "title": "The Reference Data database stored procedure name.",
           "description": "Defaults to \u0060sp\u0060 (literal) \u002B \u0060Name\u0060 \u002B \u0060GetAll\u0060 (literal)."
         },
-        "databaseName": {
+        "databaseType": {
           "type": "string",
-          "title": "The .NET database interface name (used where \u0060AutoImplement\u0060 is \u0060Database\u0060).",
-          "description": "Defaults to the \u0060CodeGeneration.DatabaseName\u0060 configuration property (its default value is \u0060IDatabase\u0060)."
+          "title": "The .NET database type and optional name (used where \u0060AutoImplement\u0060 is \u0060Database\u0060).",
+          "description": "Defaults to the \u0060CodeGeneration.DatabaseName\u0060 configuration property (its default value is \u0060IDatabase\u0060). Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060."
         },
         "databaseSchema": {
           "type": "string",
@@ -641,10 +645,10 @@
           "title": "Indicates that a \u0060DatabaseMapperEx\u0060 (extended/explicit) will be used; versus, \u0060DatabaseMapper\u0060 (which uses Reflection internally).",
           "description": "Defaults to \u0060CodeGeneration.DatabaseMapperEx\u0060 (its default value is \u0060true\u0060). The \u0060DatabaseMapperEx\u0060 essentially replaces the \u0060DatabaseMapper\u0060 as it is more performant; this option can be used where leagcy/existing behavior is required."
         },
-        "entityFrameworkName": {
+        "entityFrameworkType": {
           "type": "string",
-          "title": "The .NET Entity Framework interface name used where \u0060AutoImplement\u0060 is \u0060EntityFramework\u0060.",
-          "description": "Defaults to \u0060CodeGeneration.EntityFrameworkName\u0060."
+          "title": "The .NET Entity Framework type and optyional name used where \u0060AutoImplement\u0060 is \u0060EntityFramework\u0060.",
+          "description": "Defaults to \u0060CodeGeneration.EntityFrameworkName\u0060. Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060."
         },
         "entityFrameworkModel": {
           "type": "string",
@@ -659,10 +663,10 @@
           "type": "string",
           "title": "The EntityFramework data-layer name that should be used for base mappings."
         },
-        "cosmosName": {
+        "cosmosType": {
           "type": "string",
-          "title": "The .NET Cosmos interface name used where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060.",
-          "description": "Defaults to the \u0060CodeGeneration.CosmosName\u0060 configuration property (its default value is \u0060ICosmosDb\u0060)."
+          "title": "The .NET Cosmos DB type and optional name used where \u0060AutoImplement\u0060 is \u0060Cosmos\u0060.",
+          "description": "Defaults to the \u0060CodeGeneration.CosmosName\u0060 configuration property (its default value is \u0060ICosmosDb\u0060). Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060."
         },
         "cosmosModel": {
           "type": "string",
@@ -690,10 +694,10 @@
           "type": "string",
           "title": "The Cosmos data-layer name that should be used for base mappings."
         },
-        "odataName": {
+        "odataType": {
           "type": "string",
-          "title": "The .NET OData interface name used where \u0060AutoImplement\u0060 is \u0060OData\u0060.",
-          "description": "Defaults to the \u0060CodeGeneration.ODataName\u0060 configuration property (its default value is \u0060IOData\u0060)."
+          "title": "The .NET OData type and optional name used where \u0060AutoImplement\u0060 is \u0060OData\u0060.",
+          "description": "Defaults to the \u0060CodeGeneration.ODataName\u0060 configuration property (its default value is \u0060IOData\u0060). Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060."
         },
         "odataModel": {
           "type": "string",
@@ -709,10 +713,10 @@
           "title": "Indicates that a custom OData \u0060Mapper\u0060 will be used; i.e. not generated.",
           "description": "Otherwise, by default, a \u0060Mapper\u0060 will be generated."
         },
-        "httpAgentName": {
+        "httpAgentType": {
           "type": "string",
-          "title": "The .NET HTTP Agent interface name used where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
-          "description": "Defaults to \u0060CodeGeneration.HttpAgentName\u0060 configuration property (its default value is \u0060IHttpAgent\u0060)."
+          "title": "The .NET HTTP Agent type and optional name used where \u0060Operation.AutoImplement\u0060 is \u0060HttpAgent\u0060.",
+          "description": "Defaults to \u0060CodeGeneration.HttpAgentName\u0060 configuration property (its default value is \u0060IHttpAgent\u0060). Should be formatted as \u0060Type\u0060 \u002B \u0060^\u0060 \u002B \u0060Name\u0060."
         },
         "httpAgentRoutePrefix": {
           "type": "string",
@@ -1354,6 +1358,10 @@
         "paging": {
           "type": "boolean",
           "title": "Indicates whether a \u0060PagingArgs\u0060 argument is to be added to the operation to enable (standardized) paging related logic."
+        },
+        "query": {
+          "type": "boolean",
+          "title": "Indicates whether a \u0060QueryArgs\u0060 argument is to be added to the operation to enable OData-like $filter and $orderby related logic."
         },
         "valueType": {
           "type": "string",

@@ -1,4 +1,4 @@
-cosmosName: ICosmos
+cosmosType: ICosmos
 entities:
   # Account as per the defined schema, including corresponding collection/result.
   # API route prefixed defined.
@@ -37,6 +37,10 @@ entities:
           { name: Args, type: AccountArgs, validator: AccountArgsValidator }
         ]
       },
+      # Operation to get all Accounts for the user with OData-like $filter.
+      # Supports paging.
+      # Data access will be auto-implemented for Cosmos as defined for the entity.
+      { name: GetAccountsQuery, text: Get all accounts, type: GetColl, query: true, webApiRoute: query, paging: true, webApiTags: [ ^, Accounts ] },
       # Operation to get the AccountDetail for a specified account.
       # Operation attached to Account for logical grouping.
       # Returns AccountDetail (the DataEntityMapper is overridden to ensure correct mapper is used).

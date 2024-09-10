@@ -81,6 +81,16 @@ namespace MyEf.Hr.Common.Agents
         Task<HttpResult<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Gets the <see cref="EmployeeBaseCollectionResult"/> that contains the items that match the selection criteria.
+        /// </summary>
+        /// <param name="query">The <see cref="QueryArgs"/>.</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Terminates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>

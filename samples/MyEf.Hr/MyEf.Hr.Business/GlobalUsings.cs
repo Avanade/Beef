@@ -1,6 +1,7 @@
 ﻿global using CoreEx;
 global using CoreEx.Caching;
 global using CoreEx.Configuration;
+global using CoreEx.Data.Querying;
 global using CoreEx.Database;
 global using CoreEx.Database.SqlServer;
 global using CoreEx.Database.SqlServer.Outbox;

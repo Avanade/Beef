@@ -47,16 +47,16 @@ namespace Beef.CodeGen.Config.Entity
 
             // Data constructors.
             if (UsesDatabase)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Db", Type = Root!.DatabaseName, Text = $"{{{{{Root!.DatabaseName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Db", Type = Root!.DatabaseType, Text = $"{{{{{Root!.DatabaseType}}}}}" });
 
             if (UsesEntityFramework)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Ef", Type = Root!.EntityFrameworkName, Text = $"{{{{{Root!.EntityFrameworkName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Ef", Type = Root!.EntityFrameworkType, Text = $"{{{{{Root!.EntityFrameworkType}}}}}" });
 
             if (UsesCosmos)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = Root!.CosmosName, Text = $"{{{{{Root!.CosmosName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = Root!.CosmosType, Text = $"{{{{{Root!.CosmosType}}}}}" });
 
             if (UsesOData)
-                DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = Root!.ODataName, Text = $"{{{{{Root!.ODataName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = Root!.ODataType, Text = $"{{{{{Root!.ODataType}}}}}" });
 
             EntityConfig.AddConfiguredParameters(Root!.RefDataDataCtorParams, DataCtorParameters);
 

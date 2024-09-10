@@ -11,6 +11,7 @@ public partial class EmployeeData : IEmployeeData
 {
     private readonly IEfDb _ef;
     private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
+    private Func<IQueryable<EfModel.Employee>, QueryArgs?, IQueryable<EfModel.Employee>>? _getByQueryOnQuery;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmployeeData"/> class.
@@ -40,6 +41,10 @@ public partial class EmployeeData : IEmployeeData
     /// <inheritdoc/>
     public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging)
         => _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
+
+    /// <inheritdoc/>
+    public Task<Result<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query, PagingArgs? paging)
+        => _ef.Query<EmployeeBase, EfModel.Employee>(q => _getByQueryOnQuery?.Invoke(q, query) ?? q).WithPaging(paging).SelectResultWithResultAsync<EmployeeBaseCollectionResult, EmployeeBaseCollection>();
 
     /// <inheritdoc/>
     public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => TerminateOnImplementationAsync(value, id);

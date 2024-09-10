@@ -2,6 +2,18 @@
 
 public partial class EmployeeData
 {
+    private static readonly QueryArgsConfig _config = QueryArgsConfig.Create()
+        .WithFilter(filter => filter
+            .AddField<string>(nameof(Employee.LastName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
+            .AddField<string>(nameof(Employee.FirstName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
+            .AddReferenceDataField<Gender>(nameof(Employee.Gender), nameof(EfModel.Employee.GenderCode))
+            .AddField<DateTime>(nameof(Employee.StartDate))
+            .AddNullField(nameof(Employee.Termination), nameof(EfModel.Employee.TerminationDate), c => c.Default(new QueryStatement($"{nameof(EfModel.Employee.TerminationDate)} == null"))))
+        .WithOrderBy(orderby => orderby
+            .AddField(nameof(Employee.LastName))
+            .AddField(nameof(Employee.FirstName))
+            .WithDefault($"{nameof(Employee.LastName)}, {nameof(Employee.FirstName)}"));
+
     partial void EmployeeDataCtor()
     {
         // Implement the GetByArgs OnQuery search/filtering logic.
@@ -18,6 +30,9 @@ public partial class EmployeeData
 
             return q.IgnoreAutoIncludes().OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.StartDate);
         };
+
+        // Implement the GetByQuery OnQuery search/filtering logic using OData-like query syntax.
+        _getByQueryOnQuery = (q, args) => q.IgnoreAutoIncludes().Where(_config, args).OrderBy(_config, args);
     }
 
     /// <summary>
@@ -30,5 +45,5 @@ public partial class EmployeeData
             .When(e => e.Termination is not null, _ => Result.ValidationError("An Employee can not be terminated more than once."))
             .When(e => value.Date < e.StartDate, _ => Result.ValidationError("An Employee can not be terminated prior to their start date."))
             .Then(e => e.Termination = value)
-            .ThenAsAsync(e => UpdateAsync(e));
+            .ThenAsAsync(UpdateAsync);
 }

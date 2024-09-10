@@ -26,7 +26,7 @@ public partial class TransactionData : ITransactionData
         => _cosmos.Transactions.Query(new Mac.PartitionKey(accountId), q => _getTransactionsOnQuery?.Invoke(q, accountId, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<TransactionCollectionResult, TransactionCollection>();
 
     /// <summary>
-    /// Provides the <see cref="Transaction"/> to Entity Framework <see cref="Model.Transaction"/> mapping.
+    /// Provides the <see cref="Transaction"/> to Cosmos <see cref="Model.Transaction"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<Transaction, Model.Transaction>
     {
@@ -58,7 +58,7 @@ public partial class TransactionData : ITransactionData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.Transaction"/> to <see cref="Transaction"/> mapping.
+    /// Provides the Cosmos <see cref="Model.Transaction"/> to <see cref="Transaction"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.Transaction, Transaction>
     {

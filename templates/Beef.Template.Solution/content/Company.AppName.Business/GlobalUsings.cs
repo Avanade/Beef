@@ -4,6 +4,9 @@ global using CoreEx.Configuration;
 #if (implement_cosmos)
 global using CoreEx.Cosmos;
 #endif
+#if (implement_entityframework | implement_cosmos)
+global using CoreEx.Data.Querying;     
+#endif
 #if (implement_database || implement_entityframework)
 global using CoreEx.Database;
 #endif

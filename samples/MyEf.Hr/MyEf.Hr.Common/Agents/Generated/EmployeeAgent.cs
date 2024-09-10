@@ -53,6 +53,10 @@ namespace MyEf.Hr.Common.Agents
             => GetAsync<EmployeeBaseCollectionResult>("employees", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
         /// <inheritdoc/>
+        public Task<HttpResult<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<EmployeeBaseCollectionResult>("employees/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
         public Task<HttpResult<Employee>> TerminateAsync(TerminationDetail value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync<TerminationDetail, Employee>("employees/{id}/terminate", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
     }
