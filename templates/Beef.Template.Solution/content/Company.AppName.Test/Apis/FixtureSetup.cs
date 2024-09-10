@@ -42,6 +42,9 @@ public class FixtureSetUp
                 using var test = ApiTester.Create<Startup>();
                 var cosmosDb = test.Services.GetRequiredService<AppNameCosmosDb>();
 
+                // Create the Cosmos Db (where not exists).
+                await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
+
                 // Create 'Person' container.
                 var cdp = cosmosDb.Database.DefineContainer(cosmosDb.Persons.Container.Id, "/_partitionKey")
                     .WithIndexingPolicy()
