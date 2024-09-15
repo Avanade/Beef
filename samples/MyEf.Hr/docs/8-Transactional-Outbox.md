@@ -14,7 +14,7 @@ The pluggable nature of an [`IEventPublisher`](https://github.com/Avanade/CoreEx
 
 ## Previously generated capabilities
 
-Within [Step 1](./Employee-DB.md) the transactional outbox capabilities, both database and .NET, were generated and included into the solution when performing the [Event outbox](./Employee-DB.md#Event%20outbox).
+Within [Step 2](./2-Employee-DB.md) the transactional outbox capabilities, both database and .NET, were generated and included into the solution when performing the [Event outbox](./Employee-DB.md#Event%20outbox).
 
 There were two tables added to the database [`Outbox.EventOutbox`](../MyEf.Hr.Database/Migrations/20221207-004320-02-create-outbox-eventoutbox-table.sql) and [`Outbox.EventOutboxData`](../MyEf.Hr.Database/Migrations/20221207-004320-03-create-outbox-eventoutboxdata-table.sql) via the corresponding generated migration scripts; these tables provide the underlying transactional persistence.
 
@@ -110,7 +110,7 @@ services.AddScoped<IEventSender, EventOutboxEnqueue>();
 
 ## Unit testing
 
-Back in [Step 3](./3-Employee-Test.md) unit testing of the API surface was introduced. Within these tests there was an `ExpectEvent` and `ExpectEventValue` that verified that a corresponding event was being published and sent; even though we had configured the API with a `NullEventPublisher`.
+Back in [Step 4](./4-Employee-Test.md) unit testing of the API surface was introduced. Within these tests there was an `ExpectEvent` and `ExpectEventValue` that verified that a corresponding event was being published and sent; even though we had configured the API with a `NullEventPublisher`.
 
 Hang on! How was an event verified where configured to discard?
 
