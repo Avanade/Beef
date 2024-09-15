@@ -22,7 +22,7 @@ There were two tables added to the database [`Outbox.EventOutbox`](../MyEf.Hr.Da
 
 ### Enqueue
 
-The following are the key generated Outbox enqueue artefacts; performing the transactional persistence. 
+The following are the key generated Outbox enqueue artefacts; performing the transactional persistence.
 
 Type | Name | Description
 -|-|-
@@ -34,7 +34,7 @@ Class | [EventOutboxEnqueue](../MyEf.Hr.Business/Data/Generated/EventOutboxEnque
 
 ### Dequeue
 
-The following are the key generated Outbox dequeue artefacts. 
+The following are the key generated Outbox dequeue artefacts.
 
 Type | Name | Description
 -|-|-
@@ -58,7 +58,7 @@ public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) =
                  .Then(r => _events.PublishValueEvent(r, new Uri($"myef/hr/employee/{r.Id}", riKind.Relative), $"MyEf.Hr.Employee", "Terminated"))
                  .Then(r => _cache.SetValue(r));
 }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
-``` 
+```
 
 <br/>
 
@@ -110,11 +110,11 @@ services.AddScoped<IEventSender, EventOutboxEnqueue>();
 
 ## Unit testing
 
-Back in [Step 3](./Employee-Test.md) unit testing of the API surface was introduced. Within these tests there was an `ExpectEvent` and `ExpectEventValue` that verified that a corresponding event was being published and sent; even though we had configured the API with a `NullEventPublisher`.
+Back in [Step 3](./3-Employee-Test.md) unit testing of the API surface was introduced. Within these tests there was an `ExpectEvent` and `ExpectEventValue` that verified that a corresponding event was being published and sent; even though we had configured the API with a `NullEventPublisher`.
 
-Hang on! How was an event verified where configured to discard? 
+Hang on! How was an event verified where configured to discard?
 
-The [`FixtureSetup`](../MyEf.Hr.Test/Apis/FixtureSetup.cs) leveraged a _UnitTestEx_ [TestSetUp](https://github.com/Avanade/UnitTestEx/blob/main/src/UnitTestEx/TestSetUp.cs) capability, being the `ExpectedEventsEnabled` property. Where enabled the `IEventPublisher` will be automatically replaced at runtime with the [`ExpectedEventPublisher`](https://github.com/Avanade/UnitTestEx/blob/main/src/UnitTestEx/Expectations/ExpectedEventPublisher.cs) that is used by the `ExpectEvent` to verify the expected events were sent. 
+The [`FixtureSetup`](../MyEf.Hr.Test/Apis/FixtureSetup.cs) leveraged a _UnitTestEx_ [TestSetUp](https://github.com/Avanade/UnitTestEx/blob/main/src/UnitTestEx/TestSetUp.cs) capability, being the `ExpectedEventsEnabled` property. Where enabled the `IEventPublisher` will be automatically replaced at runtime with the [`ExpectedEventPublisher`](https://github.com/Avanade/UnitTestEx/blob/main/src/UnitTestEx/Expectations/ExpectedEventPublisher.cs) that is used by the `ExpectEvent` to verify the expected events were sent.
 
 Therefore, _no_ events will be sent to any external eventing/messaging system during unit testing. This has the advantage of decoupling the test execution from the dependent messaging subsystem, minimizing the need for any additional infrastructure to enable the unit tests.
 

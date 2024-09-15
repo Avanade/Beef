@@ -66,7 +66,7 @@ Service | Description
 [`IServiceBusSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Azure/ServiceBus/IServiceBusSender.cs) | The `AddScoped()` is used to register the [`ServiceBusSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Azure/ServiceBus/ServiceBusSender.cs) as a scoped service.
 [`IHostedService`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostedservice) | The `AddSqlServerEventOutboxHostedService()` registers the [`EventOutboxHostedService`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Database.SqlServer/Outbox/EventOutboxHostedService.cs) as an `IHostedService` that runs in the background for the life of the ASP.NET host. During registeration a new [`EventOutboxDequeue`](../MyEf.Hr.Business/Data/Generated/EventOutboxDequeue.cs) instantiation is defined to set the underlying `EventOutboxDequeueFactory` property; as a new internally managed [_scoped_](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.iservicescopefactory.createscope) instance is required per invocation).
 
-To introduce, append the following within the API [`Startup`](../MyEf.Hr.Api/Startup.cs) class after the earlier event service registration. 
+To introduce, append the following within the API [`Startup`](../MyEf.Hr.Api/Startup.cs) class after the earlier event service registration.
 
 ``` csharp
 // Add transactional event outbox dequeue dependencies.
@@ -120,7 +120,7 @@ Setting | Description
 `ServiceBusSender:QueueOrTopicName`* | The Azure Service Bus Queue or Topic name depending on requirements.
 `EventOutboxHostedService:MaxDequeueSize`* | The maximum number of events to dequeue and send per batch.
 `EventOutboxHostedService:Interval`* | The interval ([TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan)) to poll the queue and send; set to poll every 10 seconds.
- 
+
 ``` json
 {
   "Logging": {
@@ -149,7 +149,7 @@ Setting | Description
 
 There are no specific provisions for the unit testing of the Service Bus Publishing as it requires a dependent messaging subsystem, being Azure Service Bus.
 
-However, to minimize any impact to the other existing unit tests the `EventOutboxHostedService` should be disabled. To disable, add a new `appsettings.unittest.json` file to `MyEf.Hr.Test` project with the following contents. Go to the file properties and set _Copy to Output Directory_ to _Copy if newer_. 
+However, to minimize any impact to the other existing unit tests the `EventOutboxHostedService` should be disabled. To disable, add a new `appsettings.unittest.json` file to `MyEf.Hr.Test` project with the following contents. Go to the file properties and set _Copy to Output Directory_ to _Copy if newer_.
 
 ``` json
 {
@@ -178,4 +178,4 @@ At this stage we now have our events being published to Azure Service Bus. This 
 
 ## Next Step
 
-Next we will create a new _Security_ domain that will perform a [Service Bus Subscribe](./Service-Bus-Subscribe.md) of the _Termination_ related events and proxy [Okta](https://www.okta.com/) (as the fictitious company's identity solution) automatically _Deactivating_ the Employee's account.
+Next we will create a new _Security_ domain that will perform a [Service Bus Subscribe](./10-Service-Bus-Subscribe.md) of the _Termination_ related events and proxy [Okta](https://www.okta.com/) (as the fictitious company's identity solution) automatically _Deactivating_ the Employee's account.
