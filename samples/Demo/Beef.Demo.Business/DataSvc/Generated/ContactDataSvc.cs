@@ -26,6 +26,9 @@ public partial class ContactDataSvc : IContactDataSvc
     partial void ContactDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetByQueryAsync(QueryArgs? query, PagingArgs? paging) => _data.GetByQueryAsync(query, paging);
+
+    /// <inheritdoc/>
     public Task<ContactCollectionResult> GetAllAsync() => _data.GetAllAsync();
 
     /// <inheritdoc/>
@@ -54,9 +57,6 @@ public partial class ContactDataSvc : IContactDataSvc
 
     /// <inheritdoc/>
     public Task RaiseEventAsync(bool throwError) => _data.RaiseEventAsync(throwError);
-
-    /// <inheritdoc/>
-    public Task<ContactCollectionResult> GetQueryAsync(QueryArgs? query, PagingArgs? paging) => _data.GetQueryAsync(query, paging);
 }
 
 #pragma warning restore

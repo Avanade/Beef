@@ -4,11 +4,11 @@ public partial class EmployeeData
 {
     private static readonly QueryArgsConfig _config = QueryArgsConfig.Create()
         .WithFilter(filter => filter
-            .AddField<string>(nameof(Employee.LastName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
-            .AddField<string>(nameof(Employee.FirstName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
+            .AddField<string>(nameof(Employee.LastName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+            .AddField<string>(nameof(Employee.FirstName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
             .AddReferenceDataField<Gender>(nameof(Employee.Gender), nameof(EfModel.Employee.GenderCode))
             .AddField<DateTime>(nameof(Employee.StartDate))
-            .AddNullField(nameof(Employee.Termination), nameof(EfModel.Employee.TerminationDate), c => c.Default(new QueryStatement($"{nameof(EfModel.Employee.TerminationDate)} == null"))))
+            .AddNullField(nameof(Employee.Termination), nameof(EfModel.Employee.TerminationDate), c => c.WithDefault(new QueryStatement($"{nameof(EfModel.Employee.TerminationDate)} == null"))))
         .WithOrderBy(orderby => orderby
             .AddField(nameof(Employee.LastName))
             .AddField(nameof(Employee.FirstName))

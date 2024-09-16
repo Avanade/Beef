@@ -5,8 +5,8 @@ public partial class PersonData
 #if (implement_entityframework | implement_cosmos)
     private static readonly QueryArgsConfig _config = QueryArgsConfig.Create()
         .WithFilter(filter => filter
-            .AddField<string>(nameof(Person.LastName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
-            .AddField<string>(nameof(Person.FirstName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
+            .AddField<string>(nameof(Person.LastName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+            .AddField<string>(nameof(Person.FirstName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
 #if (implement_entityframework)
             .AddReferenceDataField<Gender>(nameof(Person.Gender), nameof(EfModel.Person.GenderCode)))
 #else

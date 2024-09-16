@@ -34,6 +34,18 @@ public partial class ContactController : ControllerBase
     /// Gets the <c>Contact</c> array that contains the items that match the selection criteria.
     /// </summary>
     /// <returns>The <c>Contact</c> array</returns>
+    [HttpGet("api/v1/contacts/query", Name="Contact_GetByQuery")]
+    [Paging]
+    [Query]
+    [ProducesResponseType(typeof(Common.Entities.ContactCollection), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> GetByQuery()
+        => _webApi.GetAsync<ContactCollectionResult>(Request, p => _manager.GetByQueryAsync(p.RequestOptions.Query, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+
+    /// <summary>
+    /// Gets the <c>Contact</c> array that contains the items that match the selection criteria.
+    /// </summary>
+    /// <returns>The <c>Contact</c> array</returns>
     [HttpGet("api/v1/contacts", Name="Contact_GetAll")]
     [ProducesResponseType(typeof(Common.Entities.ContactCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -102,18 +114,6 @@ public partial class ContactController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public Task<IActionResult> RaiseEvent(bool throwError)
         => _webApi.PostAsync(Request, p => _manager.RaiseEventAsync(throwError), statusCode: HttpStatusCode.NoContent, operationType: CoreEx.OperationType.Unspecified);
-
-    /// <summary>
-    /// Gets the <c>Contact</c> array that contains the items that match the selection criteria.
-    /// </summary>
-    /// <returns>The <c>Contact</c> array</returns>
-    [HttpGet("api/v1/contacts/query", Name="Contact_GetQuery")]
-    [Paging]
-    [Query]
-    [ProducesResponseType(typeof(Common.Entities.ContactCollection), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NoContent)]
-    public Task<IActionResult> GetQuery()
-        => _webApi.GetAsync<ContactCollectionResult>(Request, p => _manager.GetQueryAsync(p.RequestOptions.Query, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
 }
 
 #pragma warning restore

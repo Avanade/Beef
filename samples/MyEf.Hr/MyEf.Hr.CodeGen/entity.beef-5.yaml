@@ -83,6 +83,7 @@ entities:
       # - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields).
       # - Paging indicates that paging support is required and to be automatically enabled for the operation.
       # - Query indicates that OData-like $filter/$order support is to be enabled.
+      # - WebApiRoute specifies the route of 'query' to be used for the operation.
       { name: GetByQuery, type: GetColl, query: true, paging: true, returnType: EmployeeBase, webApiRoute: query },
       # Terminate operation
       # - Text is specified to override the default for an Update.

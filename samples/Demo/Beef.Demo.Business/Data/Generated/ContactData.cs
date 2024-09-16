@@ -14,8 +14,8 @@ public partial class ContactData : IContactData
 {
     private readonly IEfDb _sqlEf;
     private readonly IEventPublisher _events;
+    private Func<IQueryable<EfModel.Contact>, QueryArgs?, IQueryable<EfModel.Contact>>? _getByQueryOnQuery;
     private Func<IQueryable<EfModel.Contact>, IQueryable<EfModel.Contact>>? _getAllOnQuery;
-    private Func<IQueryable<EfModel.Contact>, QueryArgs?, IQueryable<EfModel.Contact>>? _getQueryOnQuery;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContactData"/> class.
@@ -26,6 +26,10 @@ public partial class ContactData : IContactData
         { _sqlEf = sqlEf.ThrowIfNull(); _events = events.ThrowIfNull(); ContactDataCtor(); }
 
     partial void ContactDataCtor(); // Enables additional functionality to be added to the constructor.
+
+    /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetByQueryAsync(QueryArgs? query, PagingArgs? paging)
+        => _sqlEf.Query<Contact, EfModel.Contact>(q => _getByQueryOnQuery?.Invoke(q, query) ?? q).WithPaging(paging).SelectResultAsync<ContactCollectionResult, ContactCollection>();
 
     /// <inheritdoc/>
     public Task<ContactCollectionResult> GetAllAsync()
@@ -63,10 +67,6 @@ public partial class ContactData : IContactData
     {
         await RaiseEventOnImplementationAsync(throwError);
     }, new InvokerArgs { EventPublisher = _events });
-
-    /// <inheritdoc/>
-    public Task<ContactCollectionResult> GetQueryAsync(QueryArgs? query, PagingArgs? paging)
-        => _sqlEf.Query<Contact, EfModel.Contact>(q => _getQueryOnQuery?.Invoke(q, query) ?? q).WithPaging(paging).SelectResultAsync<ContactCollectionResult, ContactCollection>();
 
     /// <summary>
     /// Provides the <see cref="Contact"/> to Entity Framework <see cref="EfModel.Contact"/> mapping.

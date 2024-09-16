@@ -6,8 +6,8 @@ namespace Beef.Demo.Business.Data
     {
         private readonly static QueryArgsConfig _config = QueryArgsConfig.Create()
             .WithFilter(filter => filter
-                .AddField<string>(nameof(Contact.LastName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
-                .AddField<string>(nameof(Contact.FirstName), c => c.Operators(QueryFilterTokenKind.AllStringOperators).UseUpperCase())
+                .AddField<string>(nameof(Contact.LastName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+                .AddField<string>(nameof(Contact.FirstName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
                 .AddReferenceDataField<Status>(nameof(Contact.Status), nameof(EfModel.Contact.StatusCode)))
             .WithOrderBy(orderBy => orderBy
                 .AddField(nameof(Contact.LastName))
@@ -16,7 +16,7 @@ namespace Beef.Demo.Business.Data
 
         partial void ContactDataCtor()
         {
-            _getQueryOnQuery = (q, a) => q.Where(_config, a).OrderBy(_config, a);
+            _getByQueryOnQuery = (q, a) => q.Where(_config, a).OrderBy(_config, a);
         }
 
         private Task RaiseEventOnImplementationAsync(bool throwError)

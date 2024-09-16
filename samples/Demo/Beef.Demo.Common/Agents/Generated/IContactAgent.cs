@@ -28,6 +28,16 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
+        /// <param name="query">The <see cref="QueryArgs"/>.</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult<ContactCollectionResult>> GetByQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
+        /// </summary>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
@@ -89,16 +99,6 @@ namespace Beef.Demo.Common.Agents
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
         Task<HttpResult> RaiseEventAsync(bool throwError, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
-        /// </summary>
-        /// <param name="query">The <see cref="QueryArgs"/>.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<ContactCollectionResult>> GetQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
     }
 }
 

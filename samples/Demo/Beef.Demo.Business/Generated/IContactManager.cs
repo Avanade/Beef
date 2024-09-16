@@ -15,6 +15,14 @@ public partial interface IContactManager
     /// <summary>
     /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
     /// </summary>
+    /// <param name="query">The <see cref="QueryArgs"/>.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
+    Task<ContactCollectionResult> GetByQueryAsync(QueryArgs? query, PagingArgs? paging);
+
+    /// <summary>
+    /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
+    /// </summary>
     /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
     Task<ContactCollectionResult> GetAllAsync();
 
@@ -51,14 +59,6 @@ public partial interface IContactManager
     /// </summary>
     /// <param name="throwError">Indicates whether throw a DivideByZero exception.</param>
     Task RaiseEventAsync(bool throwError);
-
-    /// <summary>
-    /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
-    /// </summary>
-    /// <param name="query">The <see cref="QueryArgs"/>.</param>
-    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-    /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
-    Task<ContactCollectionResult> GetQueryAsync(QueryArgs? query, PagingArgs? paging);
 }
 
 #pragma warning restore
