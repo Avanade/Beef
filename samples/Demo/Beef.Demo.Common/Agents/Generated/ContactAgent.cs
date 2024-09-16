@@ -32,6 +32,10 @@ namespace Beef.Demo.Common.Agents
         public ContactAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
+        public Task<HttpResult<ContactCollectionResult>> GetByQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<ContactCollectionResult>("api/v1/contacts/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
         public Task<HttpResult<ContactCollectionResult>> GetAllAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<ContactCollectionResult>("api/v1/contacts", requestOptions: requestOptions, cancellationToken: cancellationToken);
 

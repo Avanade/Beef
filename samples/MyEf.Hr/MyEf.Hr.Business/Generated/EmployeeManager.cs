@@ -60,6 +60,13 @@ public partial class EmployeeManager : IEmployeeManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
+    public Task<Result<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go()
+                     .ThenAsAsync(() => _dataService.GetByQueryAsync(query, paging));
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
     public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go(value).Required().Requires(id)

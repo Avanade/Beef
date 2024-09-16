@@ -44,6 +44,19 @@ public partial class AccountController : ControllerBase
     }
 
     /// <summary>
+    /// Get all accounts.
+    /// </summary>
+    /// <returns>The <c>Account</c> array</returns>
+    [Tags("Banking", "Accounts")]
+    [HttpGet("api/v1/banking/accounts/query", Name="Account_GetAccountsQuery")]
+    [Paging]
+    [Query]
+    [ProducesResponseType(typeof(Common.Entities.AccountCollection), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> GetAccountsQuery()
+        => _webApi.GetWithResultAsync<AccountCollectionResult>(Request, p => _manager.GetAccountsQueryAsync(p.RequestOptions.Query, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+
+    /// <summary>
     /// Get <c>AccountDetail</c>.
     /// </summary>
     /// <param name="accountId">The <c>Account</c> identifier.</param>

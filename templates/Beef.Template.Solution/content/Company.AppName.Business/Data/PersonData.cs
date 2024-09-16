@@ -2,12 +2,31 @@
 
 public partial class PersonData
 {
+#if (implement_entityframework | implement_cosmos)
+    private static readonly QueryArgsConfig _config = QueryArgsConfig.Create()
+        .WithFilter(filter => filter
+            .AddField<string>(nameof(Person.LastName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+            .AddField<string>(nameof(Person.FirstName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+#if (implement_entityframework)
+            .AddReferenceDataField<Gender>(nameof(Person.Gender), nameof(EfModel.Person.GenderCode)))
+#else
+            .AddReferenceDataField<Gender>(nameof(Person.Gender)))
+#endif
+        .WithOrderBy(orderby => orderby
+            .AddField(nameof(Person.LastName))
+            .AddField(nameof(Person.FirstName))
+            .WithDefault($"{nameof(Person.LastName)}, {nameof(Person.FirstName)}"));
+
+#endif
     /// <summary>
     /// Bind the implementation(s) to the corresponding extension(s) for runtime invocation.
     /// </summary>
     partial void PersonDataCtor()
     {
         _getByArgsOnQuery = GetByArgsOnQuery;
+#if (implement_entityframework | implement_cosmos)
+        _getByQueryOnQuery = (q, args) => q.Where(_config, args).OrderBy(_config, args);
+#endif
     }
 
     /// <summary>

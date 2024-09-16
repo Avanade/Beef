@@ -236,7 +236,150 @@ public class EmployeeTest : UsingApiTester<Startup>
         Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.BadRequest)
             .ExpectErrors("Genders contains one or more invalid items.")
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = ["Q"] }));
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = ["Z"] }));
+    }
+
+    #endregion
+
+    #region GetByQuery
+
+    [Test]
+    public void A410_GetByQuery_All()
+    {
+        var v = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync()).Value;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(3));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A420_GetByQuery_All_Paging()
+    {
+        var r = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("termination eq null or termination ne null"), PagingArgs.CreateSkipAndTake(1, 2)));
+
+        var v = r.Value;
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith" }));
+        });
+
+        // Query again with etag and ensure not modified.
+        Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.NotModified)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("termination eq null or termination ne null"), PagingArgs.CreateSkipAndTake(1, 2), new HttpRequestOptions { ETag = r.Response!.Headers!.ETag!.Tag }));
+    }
+
+    [Test]
+    public void A430_GetByQuery_FirstName()
+    {
+        var v = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("contains(firstname, 'a')"))).Value;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A440_GetByQuery_LastName()
+    {
+        var v = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 's')"))).Value;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(1));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A450_GetByQuery_LastName_IncludeTerminated()
+    {
+        var v = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 's') and (termination eq null or termination ne null)"))).Value;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A460_GetByQuery_Gender()
+    {
+        var v = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender in ('f')"))).Value;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
+        });
+    }
+
+    [Test]
+    public void A470_GetByQuery_Empty()
+    {
+        Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 's') and startswith(firstname, 'b') and gender eq 'f'")))
+            .AssertJson("[]");
+    }
+
+    [Test]
+    public void A480_GetByQuery_FieldSelection()
+    {
+        var r = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender eq 'f'").Include("firstname", "lastname")))
+            .AssertJson("[{\"firstName\":\"Rachael\",\"lastName\":\"Browne\"},{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}]");
+    }
+
+    [Test]
+    public void A490_GetByQuery_RefDataText()
+    {
+        var r = Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender eq 'f'"), requestOptions: new HttpRequestOptions { IncludeText = true }));
+
+        Assert.That(r.Value, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(r.Value.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(r.Value.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
+            Assert.That(r.Value.Items.Select(x => x.GenderText).ToArray(), Is.EqualTo(new string[] { "Female", "Female" }));
+        });
+    }
+
+    [Test]
+    public void A500_GetByQuery_ArgsError()
+    {
+        Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.BadRequest)
+            .ExpectErrors("Field 'gender' with value 'z' is invalid: Not a valid Gender.")
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender eq 'z'")));
     }
 
     #endregion

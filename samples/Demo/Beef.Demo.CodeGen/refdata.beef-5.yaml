@@ -25,7 +25,7 @@ entities:
     ]
   }
 
-- { name: EyeColor, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/eyeColors, autoImplement: EntityFramework, databaseSchema: Ref, entityFrameworkModel: EfModel.EyeColor }
+- { name: EyeColor, refDataType: Guid, refDataSortOrder: Code, collection: true, webApiRoutePrefix: api/v1/demo/ref/eyeColors, autoImplement: EntityFramework, databaseSchema: Ref, entityFrameworkModel: EfModel.EyeColor }
 
 - { name: PowerSource, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/powerSources, autoImplement: Cosmos, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.PowerSource, dataModel: true,
     properties: [

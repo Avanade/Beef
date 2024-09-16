@@ -26,6 +26,9 @@ public partial class ContactDataSvc : IContactDataSvc
     partial void ContactDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetByQueryAsync(QueryArgs? query, PagingArgs? paging) => _data.GetByQueryAsync(query, paging);
+
+    /// <inheritdoc/>
     public Task<ContactCollectionResult> GetAllAsync() => _data.GetAllAsync();
 
     /// <inheritdoc/>

@@ -11,7 +11,7 @@ public partial class CreditCardAccountData
 {
 
     /// <summary>
-    /// Provides the <see cref="CreditCardAccount"/> to Entity Framework <see cref="Model.CreditCardAccount"/> mapping.
+    /// Provides the <see cref="CreditCardAccount"/> to Cosmos <see cref="Model.CreditCardAccount"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<CreditCardAccount, Model.CreditCardAccount>
     {
@@ -31,7 +31,7 @@ public partial class CreditCardAccountData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.CreditCardAccount"/> to <see cref="CreditCardAccount"/> mapping.
+    /// Provides the Cosmos <see cref="Model.CreditCardAccount"/> to <see cref="CreditCardAccount"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.CreditCardAccount, CreditCardAccount>
     {

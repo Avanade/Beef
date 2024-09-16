@@ -107,6 +107,13 @@ operations: [
         public bool? Paging { get; set; }
 
         /// <summary>
+        /// Indicates whether a QueryArgs argument is to be added to the operation to enable paging related logic.
+        /// </summary>
+        [JsonPropertyName("query")]
+        [CodeGenProperty("Key", Title = "Indicates whether a `QueryArgs` argument is to be added to the operation to enable OData-like $filter and $orderby related logic.", IsImportant = true)]
+        public bool? Query { get; set; }
+
+        /// <summary>
         /// Gets or sets the .NET value parameter <see cref="System.Type"/> for the operation.
         /// </summary>
         [JsonPropertyName("valueType")]
@@ -665,7 +672,7 @@ operations: [
         /// <summary>
         /// Gets the <see cref="DataParameters"/> without the paging parameter.
         /// </summary>
-        public List<ParameterConfig> PagingLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
+        public List<ParameterConfig> PagingLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false) && CompareNullOrValue(x.IsQueryArgs, false)).ToList();
 
         /// <summary>
         /// Gets the <see cref="DataParameters"/> without the value and paging parameters.
@@ -705,17 +712,17 @@ operations: [
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the paging parameter.
         /// </summary>
-        public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => !x.IsPagingArgs).ToList();
+        public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => !x.IsPagingArgs && !x.IsQueryArgs).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the value and paging parameter.
         /// </summary>
-        public List<ParameterConfig>? CoreParameters => ValueLessParameters!.Where(x => !x.IsPagingArgs).ToList();
+        public List<ParameterConfig>? CoreParameters => ValueLessParameters!.Where(x => !x.IsPagingArgs && !x.IsQueryArgs).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without parameters that do not need cleaning.
         /// </summary>
-        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs && IsTrue(x.Parent!.ManagerCleanUp)).ToList();
+        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs && !x.IsQueryArgs && IsTrue(x.Parent!.ManagerCleanUp)).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection for those parameters marked as ToManager*.
@@ -726,6 +733,11 @@ operations: [
         /// Gets the parameter that is <see cref="ParameterConfig.IsPagingArgs"/>.
         /// </summary>
         public ParameterConfig? PagingParameter => Parameters!.Where(x => x.IsPagingArgs).FirstOrDefault();
+
+        /// <summary>
+        /// Gets the parameter that is <see cref="ParameterConfig.IsQueryArgs"/>.
+        /// </summary>
+        public ParameterConfig? QueryParameter => Parameters!.Where(x => x.IsQueryArgs).FirstOrDefault();
 
         /// <summary>
         /// Indicates whether there is full custom DataSvc-layer logic being invoked.
@@ -1249,7 +1261,7 @@ operations: [
             {
                 "GetColl" => "",
                 "Custom" => "",
-                _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
+                _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs && !x.IsQueryArgs).Select(x => $"{{{x.ArgumentName}}}"))
             });
 
             if (!string.IsNullOrEmpty(WebApiRoute) && WebApiRoute.StartsWith('!'))
@@ -1325,6 +1337,9 @@ operations: [
                     Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = true, LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
                 }
             }
+
+            if (Type == "GetColl" && CompareValue(Query, true))
+                Parameters.Add(new ParameterConfig { Name = "Query", Type = "QueryArgs", Text = "{{QueryArgs}}", IsQueryArgs = true });
 
             if (Type == "GetColl" && CompareValue(Paging, true))
                 Parameters.Add(new ParameterConfig { Name = "Paging", Type = "PagingArgs", Text = "{{PagingArgs}}", IsPagingArgs = true });
@@ -1412,27 +1427,27 @@ operations: [
             switch (AutoImplement != "None" ? AutoImplement : Parent!.AutoImplement)
             {
                 case "Database":
-                    DataArgs.Name = "_db";
+                    DataArgs.Name = Parent?.DatabaseDataParameter?.PrivateName ?? "_db";
                     DataArgs.Type = "IDatabaseArgs";
                     break;
 
                 case "EntityFramework":
-                    DataArgs.Name = "_ef";
+                    DataArgs.Name = Parent?.EntityFrameworkDataParameter?.PrivateName ?? "_ef";
                     DataArgs.Type = "EfDbArgs";
                     break;
 
                 case "Cosmos":
                     DataArgs.Name = "_cosmos";
-                    DataArgs.Type = "CosmosDbArgs";
+                    DataArgs.Type = Parent?.CosmosDataParameter?.PrivateName ?? "CosmosDbArgs";
                     break;
 
                 case "OData":
                     DataArgs.Name = "_odata";
-                    DataArgs.Type = "ODataArgs";
+                    DataArgs.Type = Parent?.ODataDataParameter?.PrivateName ?? "ODataArgs";
                     break;
 
                 case "HttpAgent":
-                    DataArgs.Name = "_httpAgent";
+                    DataArgs.Name = Parent?.HttpAgentDataParameter?.PrivateName ?? "_httpAgent";
                     DataArgs.Type = null;
                     break;
 
@@ -1506,8 +1521,8 @@ operations: [
             {
                 "GetColl" => "",
                 "Custom" => "",
-                "Update" => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{value.{x.Name}}}")),
-                _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
+                "Update" => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs && !x.IsQueryArgs).Select(x => $"{{value.{x.Name}}}")),
+                _ => string.Join(",", Parameters!.Where(x => !x.IsValueArg && !x.IsPagingArgs && !x.IsQueryArgs).Select(x => $"{{{x.ArgumentName}}}"))
             });
 
             if (!string.IsNullOrEmpty(HttpAgentRoute) && HttpAgentRoute.StartsWith('!'))

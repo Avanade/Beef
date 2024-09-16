@@ -121,10 +121,11 @@ Provides the _Operation_ configuration. These primarily provide a shorthand to c
 
 Property | Description
 -|-
-`behavior` | Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch and 'D'elete). Additionally, GetByArgs ('B') and GetAll ('A') operations that will be automatically generated where not otherwise explicitly specified.<br/>&dagger; Value may only specifiy one or more of the `CGRUDBA` characters (in any order) to define the automatically generated behavior (operations); for example: `CRUPD` or `CRUP` or `rba` (case insensitive). This is shorthand for setting one or more of the following properties: `Get`, `GetByArgs`, `GetAll`, 'Create', `Update`, `Patch` and `Delete`. Where one of these properties is set to either `true` or `false` this will take precedence over the value set for `Behavior`.
+`behavior` | Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch, 'D'elete and `Q`uery). Additionally, `GetByArgs` ('B'), `GetAll` ('A') and `GetByQuery` ('Q') operations configuration will be automatically inferred where not otherwise explicitly specified.<br/>&dagger; Value may only specifiy one or more of the `CGRUDBAQ` characters (in any order) to define the automatically generated behavior (operations); for example: `CRUPD` or `CRUP` or `rba` (case insensitive). This is shorthand for setting one or more of the following properties: `Get`, `GetByArgs`, `GetAll`, 'Create', `Update`, `Patch` and `Delete`. Where one of these properties is set to either `true` or `false` this will take precedence over the value set for `Behavior`.
 `get` | Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
 `getByArgs` | Indicates that a `GetByArgs` operation will be automatically generated where not otherwise explicitly specified.
 `getAll` | Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.
+`getByQuery` | Indicates that a `GetByQuery` operation will be automatically generated where not otherwise explicitly specified.
 `create` | Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.
 `update` | Indicates that a `Update` operation will be automatically generated where not otherwise explicitly specified.
 `patch` | Indicates that a `Patch` operation will be automatically generated where not otherwise explicitly specified.
@@ -217,7 +218,7 @@ Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` i
 
 Property | Description
 -|-
-**`databaseName`** | The .NET database interface name (used where `AutoImplement` is `Database`).<br/>&dagger; Defaults to the `CodeGeneration.DatabaseName` configuration property (its default value is `IDatabase`).
+**`databaseType`** | The .NET database type and optional name (used where `AutoImplement` is `Database`).<br/>&dagger; Defaults to the `CodeGeneration.DatabaseName` configuration property (its default value is `IDatabase`). Should be formatted as `Type` + `^` + `Name`.
 **`databaseSchema`** | The database schema name (used where `AutoImplement` is `Database`).<br/>&dagger; Defaults to `dbo`.
 `databaseMapperInheritsFrom` | The name of the `Mapper` that the generated Database `Mapper` inherits from.
 `databaseCustomMapper` | Indicates that a custom Database `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
@@ -230,7 +231,7 @@ Provides the specific _Entity Framework (EF)_ configuration where `AutoImplement
 
 Property | Description
 -|-
-**`entityFrameworkName`** | The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.<br/>&dagger; Defaults to `CodeGeneration.EntityFrameworkName`.
+**`entityFrameworkType`** | The .NET Entity Framework type and optyional name used where `AutoImplement` is `EntityFramework`.<br/>&dagger; Defaults to `CodeGeneration.EntityFrameworkName`. Should be formatted as `Type` + `^` + `Name`.
 **`entityFrameworkModel`** | The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).
 `entityFrameworkCustomMapper` | Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
 `entityFrameworkMapperBase` | The EntityFramework data-layer name that should be used for base mappings.
@@ -242,7 +243,7 @@ Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.
 
 Property | Description
 -|-
-**`cosmosName`** | The .NET Cosmos interface name used where `AutoImplement` is `Cosmos`.<br/>&dagger; Defaults to the `CodeGeneration.CosmosName` configuration property (its default value is `ICosmosDb`).
+**`cosmosType`** | The .NET Cosmos DB type and optional name used where `AutoImplement` is `Cosmos`.<br/>&dagger; Defaults to the `CodeGeneration.CosmosName` configuration property (its default value is `ICosmosDb`). Should be formatted as `Type` + `^` + `Name`.
 **`cosmosModel`** | The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).
 **`cosmosContainerId`** | The Cosmos `ContainerId` required where `AutoImplement` is `Cosmos`.
 `cosmosPartitionKey` | The C# code to be used for setting the optional Cosmos `PartitionKey` where `AutoImplement` is `Cosmos`.<br/>&dagger; The value `PartitionKey.None` can be specified. Literals will need to be quoted.
@@ -258,7 +259,7 @@ Provides the specific _OData_ configuration where `AutoImplement` is `OData`.
 
 Property | Description
 -|-
-**`odataName`** | The .NET OData interface name used where `AutoImplement` is `OData`.<br/>&dagger; Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).
+**`odataType`** | The .NET OData type and optional name used where `AutoImplement` is `OData`.<br/>&dagger; Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`). Should be formatted as `Type` + `^` + `Name`.
 **`odataModel`** | The corresponding OData model name (required where `AutoImplement` is `OData`).
 **`odataCollectionName`** | The name of the underlying OData collection where `AutoImplement` is `OData`.<br/>&dagger; The underlying `Simple.OData.Client` will attempt to infer.
 `odataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated.<br/>&dagger; Otherwise, by default, a `Mapper` will be generated.
@@ -271,7 +272,7 @@ Provides the specific _HTTP Agent_ configuration where `AutoImplement` is `HttpA
 
 Property | Description
 -|-
-**`httpAgentName`** | The .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`).
+**`httpAgentType`** | The .NET HTTP Agent type and optional name used where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`). Should be formatted as `Type` + `^` + `Name`.
 `httpAgentRoutePrefix` | The base HTTP Agent API route where `Operation.AutoImplement` is `HttpAgent`.<br/>&dagger; This is the base (prefix) `URI` for the HTTP Agent endpoint and can be further extended when defining the underlying `Operation`(s).
 **`httpAgentModel`** | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).<br/>&dagger; This can be overridden within the `Operation`(s).
 `httpAgentReturnModel` | The corresponding HTTP Agent model name (required where `AutoImplement` is `HttpAgent`).<br/>&dagger; This can be overridden within the `Operation`(s).

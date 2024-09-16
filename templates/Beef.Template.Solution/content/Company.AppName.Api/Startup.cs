@@ -52,7 +52,11 @@ public class Startup
         {
             var settings = sp.GetRequiredService<AppNameSettings>();
             var cco = new AzCosmos.CosmosClientOptions { SerializerOptions = new AzCosmos.CosmosSerializationOptions { PropertyNamingPolicy = AzCosmos.CosmosPropertyNamingPolicy.CamelCase, IgnoreNullValues = true } };
-            return new AppNameCosmosDb(new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco).GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
+            return new AzCosmos.CosmosClient(settings.CosmosConnectionString, cco);
+        }).AddCosmosDb(sp =>
+        {
+            var settings = sp.GetRequiredService<AppNameSettings>();
+            return new AppNameCosmosDb(sp.GetRequiredService<AzCosmos.CosmosClient>().GetDatabase(settings.CosmosDatabaseId), sp.GetRequiredService<CoreEx.Mapping.IMapper>());
         });
 
 #endif
@@ -126,6 +130,7 @@ public class Startup
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Company.AppName API", Version = "v1" });
             options.OperationFilter<AcceptsBodyOperationFilter>();  // Needed to support AcceptsBodyAttribute where body parameter not explicitly defined.
             options.OperationFilter<PagingOperationFilter>();       // Needed to support PagingAttribute where PagingArgs parameter not explicitly defined.
+            options.OperationFilter<QueryOperationFilter>();        // Needed to support QueryAttribute where QueryArgs parameter not explicitly defined.
         });
     }
 

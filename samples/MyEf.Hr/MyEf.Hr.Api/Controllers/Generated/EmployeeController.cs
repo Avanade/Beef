@@ -99,6 +99,18 @@ public partial class EmployeeController : ControllerBase
     }
 
     /// <summary>
+    /// Gets the <c>EmployeeBase</c> array that contains the items that match the selection criteria.
+    /// </summary>
+    /// <returns>The <c>EmployeeBase</c> array</returns>
+    [HttpGet("employees/query", Name="Employee_GetByQuery")]
+    [Paging]
+    [Query]
+    [ProducesResponseType(typeof(Common.Entities.EmployeeBaseCollection), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public Task<IActionResult> GetByQuery()
+        => _webApi.GetWithResultAsync<EmployeeBaseCollectionResult>(Request, p => _manager.GetByQueryAsync(p.RequestOptions.Query, p.RequestOptions.Paging), alternateStatusCode: HttpStatusCode.NoContent);
+
+    /// <summary>
     /// Terminates an existing <c>Employee</c>.
     /// </summary>
     /// <param name="id">The <c>Employee</c> identifier.</param>

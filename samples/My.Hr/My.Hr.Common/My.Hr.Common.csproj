@@ -4,6 +4,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.24.1" />
+    <PackageReference Include="CoreEx" Version="3.25.1" />
   </ItemGroup>
 </Project>

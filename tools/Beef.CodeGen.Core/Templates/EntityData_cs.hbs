@@ -426,7 +426,7 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
   {{#unless CosmosCustomMapper}}
 
     /// <summary>
-    /// Provides the {{{EntityNameSeeComments}}} to Entity Framework {{{see-comments CosmosModel}}} mapping.
+    /// Provides the {{{EntityNameSeeComments}}} to Cosmos {{{see-comments CosmosModel}}} mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<{{EntityName}}, {{CosmosModel}}>
     {
@@ -448,7 +448,7 @@ public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operation
     }
 
     /// <summary>
-    /// Provides the Entity Framework {{{see-comments CosmosModel}}} to {{{EntityNameSeeComments}}} mapping.
+    /// Provides the Cosmos {{{see-comments CosmosModel}}} to {{{EntityNameSeeComments}}} mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<{{CosmosModel}}, {{EntityName}}>
     {

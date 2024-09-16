@@ -12,32 +12,37 @@ namespace Beef.Demo.Business.Data;
 /// </summary>
 public partial class ContactData : IContactData
 {
-    private readonly IEfDb _ef;
+    private readonly IEfDb _sqlEf;
     private readonly IEventPublisher _events;
+    private Func<IQueryable<EfModel.Contact>, QueryArgs?, IQueryable<EfModel.Contact>>? _getByQueryOnQuery;
     private Func<IQueryable<EfModel.Contact>, IQueryable<EfModel.Contact>>? _getAllOnQuery;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContactData"/> class.
     /// </summary>
-    /// <param name="ef">The <see cref="IEfDb"/>.</param>
+    /// <param name="sqlEf">The <see cref="IEfDb"/>.</param>
     /// <param name="events">The <see cref="IEventPublisher"/>.</param>
-    public ContactData(IEfDb ef, IEventPublisher events)
-        { _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); ContactDataCtor(); }
+    public ContactData(IEfDb sqlEf, IEventPublisher events)
+        { _sqlEf = sqlEf.ThrowIfNull(); _events = events.ThrowIfNull(); ContactDataCtor(); }
 
     partial void ContactDataCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetByQueryAsync(QueryArgs? query, PagingArgs? paging)
+        => _sqlEf.Query<Contact, EfModel.Contact>(q => _getByQueryOnQuery?.Invoke(q, query) ?? q).WithPaging(paging).SelectResultAsync<ContactCollectionResult, ContactCollection>();
+
+    /// <inheritdoc/>
     public Task<ContactCollectionResult> GetAllAsync()
-        => _ef.Query<Contact, EfModel.Contact>(q => _getAllOnQuery?.Invoke(q) ?? q).SelectResultAsync<ContactCollectionResult, ContactCollection>();
+        => _sqlEf.Query<Contact, EfModel.Contact>(q => _getAllOnQuery?.Invoke(q) ?? q).SelectResultAsync<ContactCollectionResult, ContactCollection>();
 
     /// <inheritdoc/>
     public Task<Contact?> GetAsync(Guid id)
-        => _ef.GetAsync<Contact, EfModel.Contact>(id);
+        => _sqlEf.GetAsync<Contact, EfModel.Contact>(id);
 
     /// <inheritdoc/>
     public Task<Contact> CreateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
-        var r = await _ef.CreateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
+        var r = await _sqlEf.CreateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
         _events.PublishValueEvent(r, new Uri($"/contact/{r.Id}", UriKind.Relative), $"Demo.Contact", "Create");
         return r;
     }, new InvokerArgs { EventPublisher = _events });
@@ -45,7 +50,7 @@ public partial class ContactData : IContactData
     /// <inheritdoc/>
     public Task<Contact> UpdateAsync(Contact value) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
-        var r = await _ef.UpdateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
+        var r = await _sqlEf.UpdateAsync<Contact, EfModel.Contact>(value).ConfigureAwait(false);
         _events.PublishValueEvent(r, new Uri($"/contact/{r.Id}", UriKind.Relative), $"Demo.Contact", "Update");
         return r;
     }, new InvokerArgs { EventPublisher = _events });
@@ -53,7 +58,7 @@ public partial class ContactData : IContactData
     /// <inheritdoc/>
     public Task DeleteAsync(Guid id) => DataInvoker.Current.InvokeAsync(this, async (_, __) => 
     {
-        await _ef.DeleteAsync<Contact, EfModel.Contact>(id).ConfigureAwait(false);
+        await _sqlEf.DeleteAsync<Contact, EfModel.Contact>(id).ConfigureAwait(false);
         _events.PublishValueEvent(new Contact { Id = id }, new Uri($"/contact/{id}", UriKind.Relative), $"Demo.Contact", "Delete");
     }, new InvokerArgs { EventPublisher = _events });
 

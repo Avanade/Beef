@@ -2,6 +2,7 @@
 global using CoreEx.Caching;
 global using CoreEx.Configuration;
 global using CoreEx.Cosmos;
+global using CoreEx.Data.Querying;
 global using CoreEx.Entities;
 global using CoreEx.Entities.Extended;
 global using CoreEx.Events;

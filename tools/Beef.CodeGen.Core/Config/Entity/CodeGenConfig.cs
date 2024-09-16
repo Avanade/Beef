@@ -227,10 +227,10 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET database interface name used where `Operation.AutoImplement` is `Database`.
         /// </summary>
-        [JsonPropertyName("databaseName")]
-        [CodeGenProperty("Database", Title = "The .NET database interface name (used where `Operation.AutoImplement` is `Database`).", IsImportant = true,
-            Description = "Defaults to `IDatabase`. This can be overridden within the `Entity`(s).")]
-        public string? DatabaseName { get; set; }
+        [JsonPropertyName("databaseType")]
+        [CodeGenProperty("Database", Title = "The .NET database type and optional name (used where `Operation.AutoImplement` is `Database`).", IsImportant = true,
+            Description = "Defaults to `IDatabase`. Should be formatted as `Type` + `^` + `Name`; e.g. `IDatabase^Db`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).")]
+        public string? DatabaseType { get; set; }
 
         /// <summary>
         /// Gets or sets the default database schema name.
@@ -259,34 +259,34 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.
         /// </summary>
-        [JsonPropertyName("entityFrameworkName")]
-        [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.",
-            Description = "Defaults to `IEfDb`. This can be overridden within the `Entity`(s).")]
-        public string? EntityFrameworkName { get; set; }
+        [JsonPropertyName("entityFrameworkType")]
+        [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework type and optional name (used where `Operation.AutoImplement` is `EntityFramework`).",
+            Description = "Defaults to `IEfDb`. Should be formatted as `Type` + `^` + `Name`; e.g. `IEfDb^Ef`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).")]
+        public string? EntityFrameworkType { get; set; }
 
         /// <summary>
         /// Gets or sets the default .NET Cosmos interface name used where `Operation.AutoImplement` is `Cosmos`.
         /// </summary>
-        [JsonPropertyName("cosmosName")]
-        [CodeGenProperty("Cosmos", Title = "The .NET Entity Framework interface name used where `Operation.AutoImplement` is `Cosmos`.", IsImportant = true,
-            Description = "Defaults to `ICosmosDb`. This can be overridden within the `Entity`(s).")]
-        public string? CosmosName { get; set; }
+        [JsonPropertyName("cosmosType")]
+        [CodeGenProperty("Cosmos", Title = "The .NET Cosmos DB type and name (used where `Operation.AutoImplement` is `Cosmos`).", IsImportant = true,
+            Description = "Defaults to `ICosmosDb`. Should be formatted as `Type` + `^` + `Name`; e.g. `ICosmosDb^Cosmos`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).")]
+        public string? CosmosType { get; set; }
 
         /// <summary>
         /// Gets or sets the default .NET OData interface name used where `Operation.AutoImplement` is `OData`.
         /// </summary>
-        [JsonPropertyName("odataName")]
+        [JsonPropertyName("odataType")]
         [CodeGenProperty("OData", Title = "The .NET OData interface name used where `Operation.AutoImplement` is `OData`.", IsImportant = true,
-            Description = "Defaults to `IOData`. This can be overridden within the `Entity`(s).")]
-        public string? ODataName { get; set; }
+            Description = "Defaults to `IOData`. Should be formatted as `Type` + `^` + `Name`; e.g. `IOData^OData`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).")]
+        public string? ODataType { get; set; }
 
         /// <summary>
         /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.
         /// </summary>
-        [JsonPropertyName("httpAgentName")]
+        [JsonPropertyName("httpAgentType")]
         [CodeGenProperty("HttpAgent", Title = "The default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
-            Description = "Defaults to `IHttpAgent`. This can be overridden within the `Entity`(s).")]
-        public string? HttpAgentName { get; set; }
+            Description = "Defaults to `IHttpAgent`. Should be formatted as `Type` + `^` + `Name`; e.g. `IHttpAgent^HttpAgent`. Where the `Name` portion is not specified it will be inferred. This can be overridden within the `Entity`(s).")]
+        public string? HttpAgentType { get; set; }
 
         /// <summary>
         /// Gets or sets the default ETag to/from RowVersion Mapping Converter used.
@@ -595,6 +595,15 @@ entities:
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
             NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
+            if (ExtraProperties is not null)
+            {
+                DatabaseType ??= ExtraProperties.Where(x => string.Compare(x.Key, "databaseName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                EntityFrameworkType ??= ExtraProperties.Where(x => string.Compare(x.Key, "entityFrameworkName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                CosmosType ??= ExtraProperties.Where(x => string.Compare(x.Key, "cosmosName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                ODataType ??= ExtraProperties.Where(x => string.Compare(x.Key, "odataName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                HttpAgentType ??= ExtraProperties.Where(x => string.Compare(x.Key, "httpAgentName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+            }
+
             WithResult = DefaultWhereNull(WithResult, () => true);
             PreprocessorDirectives = DefaultWhereNull(PreprocessorDirectives, () => false);
             ManagerCleanUp = DefaultWhereNull(ManagerCleanUp, () => false);
@@ -609,12 +618,12 @@ entities:
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DatabaseProvider = DefaultWhereNull(DatabaseProvider, () => "SqlServer");
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => DatabaseProvider == "SqlServer" ? "dbo" : "");
-            DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
+            DatabaseType = DefaultWhereNull(DatabaseType, () => "IDatabase");
             DatabaseMapperEx = DefaultWhereNull(DatabaseMapperEx, () => true);
-            EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");
-            CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
-            ODataName = DefaultWhereNull(ODataName, () => "IOData");
-            HttpAgentName = DefaultWhereNull(HttpAgentName, () => "IHttpAgent");
+            EntityFrameworkType = DefaultWhereNull(EntityFrameworkType, () => "IEfDb");
+            CosmosType = DefaultWhereNull(CosmosType, () => "ICosmosDb");
+            ODataType = DefaultWhereNull(ODataType, () => "IOData");
+            HttpAgentType = DefaultWhereNull(HttpAgentType, () => "IHttpAgent");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "SystemText");
             ETagJsonName = DefaultWhereNull(ETagJsonName, () => "etag");
             ETagDefaultMapperConverter = DefaultWhereNull(ETagDefaultMapperConverter, () => nameof(CoreEx.Mapping.Converters.StringToBase64Converter));
@@ -650,7 +659,7 @@ entities:
                 }
             }
 
-            // Check for any deprecate properties and warn.
+            // Check for any deprecated properties and warn/error.
             WarnWhereDeprecated(this, this,
                 "refDataCache",
                 "refDataAppendToNamespace",
@@ -667,6 +676,13 @@ entities:
                 "eventOutbox",
                 "eventSubjectFormat",
                 "eventCasing");
+
+            WarnWhereDeprecated(this, this,
+                ("databaseName", " Please use 'databaseType' instead.", false),
+                ("entityFrameworkName", " Please use 'entityFrameworkType' instead.", false),
+                ("cosmosName", " Please use 'cosmosType' instead.", false),
+                ("odataName", " Please use 'odataType' instead.", false),
+                ("httpAgentName", " Please use 'httpAgentType' instead.", false));
         }
 
         /// <summary>
@@ -706,7 +722,7 @@ entities:
                     if (IsError)
                         throw new CodeGenException(Property, $"Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and is no longer supported.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
                     else
-                        root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated and will be ignored.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
+                        root.CodeGenArgs?.Logger?.LogWarning("{Deprecated}", $"Warning: Config [{config.BuildFullyQualifiedName(xp.Key)}] has been deprecated.{(string.IsNullOrEmpty(Message) ? string.Empty : Message)}");
                 }
             }
         }

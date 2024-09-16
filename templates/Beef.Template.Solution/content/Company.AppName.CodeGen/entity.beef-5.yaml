@@ -50,8 +50,8 @@ etagDefaultMapperConverter: EncodedStringToUInt32Converter
 //#endif
 refDataText: true
 entities:
-  # The following is an example Entity with CRUD operations defined accessing a database using EntityFramework.
-- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupd, entityFrameworkModel: EfModel.Person,
+  # The following is an example Entity with CRUD and Query operations defined accessing a database using EntityFramework.
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, webApiRoutePrefix: persons, behavior: crupdq, entityFrameworkModel: EfModel.Person,
     properties: [
 //#if (implement_sqlserver)
       { name: Id, type: Guid, primaryKey: true, dataName: PersonId },
@@ -84,7 +84,7 @@ entities:
   }
 //#endif
 //#if (implement_cosmos)
-cosmosName: AppNameCosmosDb
+cosmosType: AppNameCosmosDb
 eventSubjectRoot: Company
 eventActionFormat: PastTense
 eventSourceRoot: Company/AppName
@@ -93,9 +93,9 @@ webApiAutoLocation: true
 autoImplement: Cosmos
 refDataText: true
 entities:
-  # The following is an example Entity with CRUD operations defined accessing a Cosmos DB.
+  # The following is an example Entity with CRUD and Query operations defined accessing a Cosmos DB.
 
-- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, behavior: crupd, cosmosContainerId: Persons, cosmosModel: Model.Person,
+- { name: Person, collection: true, collectionResult: true, validator: PersonValidator, identifierGenerator: true, webApiRoutePrefix: persons, behavior: crupdq, cosmosContainerId: Persons, cosmosModel: Model.Person,
     properties: [
       { name: Id, type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter<Guid>' },
       { name: FirstName },
@@ -129,7 +129,7 @@ eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 webApiAutoLocation: true
 autoImplement: HttpAgent
-httpAgentName: XxxAgent
+httpAgentType: XxxAgent
 refDataText: true
 entities:
   # The following is an example Entity with CRUD operations defined accessing an HTTP endpoint.

@@ -36,13 +36,13 @@ public partial class EyeColorCollection : ReferenceDataCollectionBase<Guid, EyeC
     /// <summary>
     /// Initializes a new instance of the <see cref="EyeColorCollection"/> class.
     /// </summary>
-    public EyeColorCollection() { }
+    public EyeColorCollection() : base(ReferenceDataSortOrder.Code) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EyeColorCollection"/> class with <paramref name="items"/> to add.
     /// </summary>
     /// <param name="items">The items to add.</param>
-    public EyeColorCollection(IEnumerable<EyeColor> items) => AddRange(items);
+    public EyeColorCollection(IEnumerable<EyeColor> items) : this() => AddRange(items);
 }
 
 #pragma warning restore

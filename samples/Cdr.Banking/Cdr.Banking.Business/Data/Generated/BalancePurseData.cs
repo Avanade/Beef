@@ -11,7 +11,7 @@ public partial class BalancePurseData
 {
 
     /// <summary>
-    /// Provides the <see cref="BalancePurse"/> to Entity Framework <see cref="Model.BalancePurse"/> mapping.
+    /// Provides the <see cref="BalancePurse"/> to Cosmos <see cref="Model.BalancePurse"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<BalancePurse, Model.BalancePurse>
     {
@@ -29,7 +29,7 @@ public partial class BalancePurseData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.BalancePurse"/> to <see cref="BalancePurse"/> mapping.
+    /// Provides the Cosmos <see cref="Model.BalancePurse"/> to <see cref="BalancePurse"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.BalancePurse, BalancePurse>
     {

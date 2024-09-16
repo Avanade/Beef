@@ -2,6 +2,7 @@
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using CoreEx.Database;
+using CoreEx.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -201,6 +202,45 @@ namespace Beef.Demo.Test
 
             Assert.That(r2.Response.Headers?.ETag?.Tag, Is.Not.Null);
             Assert.That(r2.Response.Headers?.ETag?.Tag, Is.Not.EqualTo(etag));
+        }
+
+        [Test]
+        public void A155a_GetByQuery()
+        {
+            using var test = ApiTester.Create<Startup>();
+
+            var r = test.Agent().With<ContactAgent, ContactCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 'c')"))).Value;
+
+            Assert.That(r.Items, Has.Count.EqualTo(1));
+
+            r = test.Agent().With<ContactAgent, ContactCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 'm')"))).Value;
+
+            Assert.That(r.Items, Has.Count.EqualTo(0));
+        }
+
+        [Test]
+        public void A155b_GetByQuery()
+        {
+            using var test = ApiTester.Create<Startup>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                var r = test.Agent().With<ContactAgent, ContactCollectionResult>()
+                    .ExpectStatusCode(HttpStatusCode.OK)
+                    .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 'c')"))).Value;
+
+                Assert.That(r.Items, Has.Count.EqualTo(1));
+
+                r = test.Agent().With<ContactAgent, ContactCollectionResult>()
+                    .ExpectStatusCode(HttpStatusCode.OK)
+                    .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 'm')"))).Value;
+
+                Assert.That(r.Items, Has.Count.EqualTo(0));
+            }
         }
 
         [Test]

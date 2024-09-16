@@ -243,7 +243,7 @@ public class EmployeeTest : UsingApiTester<Startup>
         Agent<EmployeeAgent, EmployeeBaseCollectionResult>()
             .ExpectStatusCode(HttpStatusCode.BadRequest)
             .ExpectErrors("Genders contains one or more invalid items.")
-            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "Q" } }));
+            .Run(a => a.GetByArgsAsync(new EmployeeArgs { Genders = new List<string?> { "Z" } }));
     }
 
     #endregion

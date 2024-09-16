@@ -42,21 +42,32 @@ public class FixtureSetUp
                 using var test = ApiTester.Create<Startup>();
                 var cosmosDb = test.Services.GetRequiredService<AppNameCosmosDb>();
 
+                // Create the Cosmos Db (where not exists).
                 await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
 
-                var ac = await cosmosDb.Database.ReplaceOrCreateContainerAsync(new AzCosmos.ContainerProperties
-                {
-                    Id = cosmosDb.Persons.Container.Id,
-                    PartitionKeyPath = "/_partitionKey"
-                }, 400, cancellationToken: ct).ConfigureAwait(false);
+                // Create 'Person' container.
+                var cdp = cosmosDb.Database.DefineContainer(cosmosDb.Persons.Container.Id, "/_partitionKey")
+                    .WithIndexingPolicy()
+                       .WithCompositeIndex()
+                           .Path("/lastName", AzCosmos.CompositePathSortOrder.Ascending)
+                           .Path("/firstName", AzCosmos.CompositePathSortOrder.Ascending)
+                           .Attach()
+                    .Attach()
+                    .Build();
 
-                var rdc = await cosmosDb.Database.ReplaceOrCreateContainerAsync(new AzCosmos.ContainerProperties
-                {
-                    Id = "RefData",
-                    PartitionKeyPath = "/_partitionKey",
-                    UniqueKeyPolicy = new AzCosmos.UniqueKeyPolicy { UniqueKeys = { new AzCosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-                }, 400, cancellationToken: ct).ConfigureAwait(false);
+                var ac = await cosmosDb.Database.ReplaceOrCreateContainerAsync(cdp, cancellationToken: ct).ConfigureAwait(false);
 
+                // Create 'RefData' container.
+                var cdr = cosmosDb.Database.DefineContainer("RefData", "/_partitionKey")
+                    .WithUniqueKey()
+                        .Path("/type")
+                        .Path("/value/code")
+                        .Attach()
+                    .Build();
+
+                var rdc = await cosmosDb.Database.ReplaceOrCreateContainerAsync(cdr, cancellationToken: ct).ConfigureAwait(false);
+
+                // Import the data.
                 var jdr = JsonDataReader.ParseYaml<FixtureSetUp>("Person.yaml");
                 await cosmosDb.Persons.ImportBatchAsync(jdr, cancellationToken: ct).ConfigureAwait(false);
 

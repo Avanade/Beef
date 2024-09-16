@@ -7,7 +7,7 @@ This will walk through the process of creating and testing the employee search c
 ## Functional requirement
 
 The employee search will allow the following criteria to be searched:
-- First and last name using wildcard; e.g. `Smi*`.
+- First and last name using wildcard (starts with, ends with and contains); e.g. `abc*`, `*abc` or `*abc*`.
 - Gender selection; zero, one or more.
 - Start date range (from/to).
 - Option to include terminated employees (default is to exclude).
@@ -147,7 +147,7 @@ public class EmployeeArgsValidator : Validator<EmployeeArgs>
 
 ## End-to-End testing
 
-Now that we've implemented GetByArgs search functionality, we can re-add the appropriate tests. Do so by un-commenting the region `GetByArgs` within `MyEf.Hr.Test/Apis/EmployeeTest.cs`.
+Now that we've implemented `GetByArgs` search functionality, we can re-add the appropriate tests. Do so by un-commenting the region `GetByArgs` within `MyEf.Hr.Test/Apis/EmployeeTest.cs`.
 
 As extra homework, you should also consider implementing unit testing for the validator.
 
@@ -165,7 +165,7 @@ Check the output of code gen tool. There should have been 2 new and 9 updated fi
 MyEf.Hr.CodeGen Complete. [1818ms, Files: Unchanged = 16, Updated = 9, Created = 2, TotalLines = 1584]
 ```
 
-Within test explorer, run the EmployeeTest set of tests and confirm they all pass.
+Within test explorer, run the `EmployeeTest` set of tests and confirm they all pass.
 
 The following tests were newly added and should pass:
 
@@ -181,6 +181,83 @@ A280_GetByArgs_FieldSelection
 A290_GetByArgs_RefDataText
 A300_GetByArgs_ArgsError
 ```
+
+<br/>
+
+## OData-like Query
+
+The above search capability is great and for most use cases is perfectly acceptable; however, it is not as flexible as the likes of OData or GraphQL. 
+
+Therefore, depending on the functional needs a more flexible query capability may be required. There is basic, explicit, OData-like support available where this need arises; this will now be added to the `MyEf.Hr` solution. See [`CoreEx.Data.Querying`](https://github.com/Avanade/CoreEx/tree/main/src/CoreEx.Data#odata-like-querying) for more information on the underlying implementation. 
+
+_Note:_ Where OData and GraphQL are specifically required then they would need to be implemented separately as the Avanade accelerators do not provide this functionality out-of-the-box.
+
+<br/>
+
+### OData-like requirements
+
+A single `query` endpoint will be added to enable, and support the same requirements using OData-like filtering:
+
+Endpoint | Description
+-|-
+`GET /employees/query?$filter=startswith(lastName, 'smi*')` | all employees whose last name starts with `smi`.
+`GET /employees/query?$filter=gender eq 'f'` | all female employees.
+`GET /employees/query?$filter=startdate ge 2000-01-01 and startdate le 2002-12-31` | all employess who started between 01-Jan-2000 and 31-Dec-2002 (inclusive).
+`GET /employees/query?$filter=startswith(lastName, 'smi*') and (terminated eq null || terminated ne null)` | all employees whose last name starts with `smi`, both current and terminated.
+`GET /employees?gender=f&$skip=10&$take25` | all female employees with paging (skipping the first 10 employees and getting the next 25 in sequence).
+
+<br/>
+
+### Code-generation
+
+The following code-gen should be added after the `GetByArgs` configuration; this will add the `query` endpoint to the `Employee` entity.
+
+``` yaml
+      # Query operation
+      # - Type is GetColl that indicates that a collection is the expected result for the query-based operation.
+      # - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields).
+      # - Query indicates that OData-like $filter/$order support is to be enabled.
+      # - Paging indicates that paging support is required and to be automatically enabled for the operation.
+      # - WebApiRoute specifies the route of 'query' to be used for the operation.
+      { name: GetByQuery, type: GetColl, query: true, paging: true, returnType: EmployeeBase, webApiRoute: query }
+```
+
+Execute the code-generation again using the command line (within `MyEf.Hr.CodeGen` base directory) and the various artefacts will be updated (generated).
+
+### Data access logic
+
+The `EmployeeData.cs` partial class (non generated) will need to be extended to support the new `GetByQuery` operation.
+
+Firstly, the `QueryArgsConfig` must be instantiated with the desired configuration. This will explicitly add support for the specified fields to achieve the desired functionality:
+
+``` csharp
+public partial class EmployeeData
+{
+    private static readonly QueryArgsConfig _config = QueryArgsConfig.Create()
+        .WithFilter(filter => filter
+            .AddField<string>(nameof(Employee.LastName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+            .AddField<string>(nameof(Employee.FirstName), c => c.WithOperators(QueryFilterOperator.AllStringOperators).WithUpperCase())
+            .AddReferenceDataField<Gender>(nameof(Employee.Gender), nameof(EfModel.Employee.GenderCode))
+            .AddField<DateTime>(nameof(Employee.StartDate))
+            .AddNullField(nameof(Employee.Termination), nameof(EfModel.Employee.TerminationDate), c => c.WithDefault(new QueryStatement($"{nameof(EfModel.Employee.TerminationDate)} == null"))))
+        .WithOrderBy(orderby => orderby
+            .AddField(nameof(Employee.LastName))
+            .AddField(nameof(Employee.FirstName))
+            .WithDefault($"{nameof(Employee.LastName)}, {nameof(Employee.FirstName)}"));
+```
+
+Secondly, the `GetByQuery` operation must be implemented. Add the following to the end of the `EmployeeDataCtor` method to enable the functionality:
+
+``` csharp
+        // Implement the GetByQuery OnQuery search/filtering logic using OData-like query syntax.
+        _getByQueryOnQuery = (q, args) => q.IgnoreAutoIncludes().Where(_config, args).OrderBy(_config, args);
+```
+
+<br/>
+
+### End-to-End testing
+
+Now that we've implemented `GetByQuery` search functionality, we can re-add the appropriate tests. Do so by un-commenting the region `GetByQuery` within `MyEf.Hr.Test/Apis/EmployeeTest.cs`. Within test explorer, run the `EmployeeTest` set of tests and confirm they all pass.
 
 <br/>
 

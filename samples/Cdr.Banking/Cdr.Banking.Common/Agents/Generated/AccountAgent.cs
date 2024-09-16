@@ -33,6 +33,10 @@ namespace Cdr.Banking.Common.Agents
             => GetAsync<AccountCollectionResult>("api/v1/banking/accounts", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<AccountArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
 
         /// <inheritdoc/>
+        public Task<HttpResult<AccountCollectionResult>> GetAccountsQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => GetAsync<AccountCollectionResult>("api/v1/banking/accounts/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
         public Task<HttpResult<AccountDetail?>> GetDetailAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => GetAsync<AccountDetail?>("api/v1/banking/accounts/{accountId}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
 

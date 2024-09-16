@@ -181,5 +181,5 @@ namespace Beef.Template.Solution.UnitTest
             if (services is not null)
                 Assert.That(ExecuteCommand("dotnet", $"test {company}.{appName}.Services.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Services.Test")).exitCode, Is.Zero, "dotnet test");
         }
-    }
+    } 
 }
