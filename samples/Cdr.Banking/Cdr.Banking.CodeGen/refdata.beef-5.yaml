@@ -1,4 +1,4 @@
-cosmosName: ICosmos
+cosmosType: ICosmos
 webApiRoutePrefix: api/v1/ref
 refDataType: Guid
 autoImplement: Cosmos

@@ -45,7 +45,7 @@ public partial class RobotData : IRobotData
         => _cosmos.Items.Query(q => _getByArgsOnQuery?.Invoke(q, args) ?? q).WithPaging(paging).SelectResultWithResultAsync<RobotCollectionResult, RobotCollection>();
 
     /// <summary>
-    /// Provides the <see cref="Robot"/> to Entity Framework <see cref="Model.Robot"/> mapping.
+    /// Provides the <see cref="Robot"/> to Cosmos <see cref="Model.Robot"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<Robot, Model.Robot>
     {
@@ -68,7 +68,7 @@ public partial class RobotData : IRobotData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.Robot"/> to <see cref="Robot"/> mapping.
+    /// Provides the Cosmos <see cref="Model.Robot"/> to <see cref="Robot"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.Robot, Robot>
     {

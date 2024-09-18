@@ -205,6 +205,114 @@ public class PersonTest : UsingApiTester<Startup>
 
     #endregion
 
+#if (implement_entityframework | implement_cosmos)
+    #region GetByQuery
+
+    [Test]
+    public void A310_GetByQuery_All()
+    {
+        var v = Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(null)).Value!;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(4));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones", "Smith", "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A320_GetByQuery_Paging()
+    {
+        var v = Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(null, PagingArgs.CreateSkipAndTake(1, 2))).Value!;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Jones", "Smith" }));
+        });
+    }
+
+    [Test]
+    public void A330_GetByQuery_FirstName()
+    {
+        var v = Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("contains(firstname, 'a')"))).Value!;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(3));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Smith", "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A340_GetByQuery_LastName()
+    {
+        var v = Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 's')"))).Value!;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Smith", "Smithers" }));
+        });
+    }
+
+    [Test]
+    public void A350_GetByQuery_Gender()
+    {
+        var v = Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender eq 'f'"))).Value!;
+
+        Assert.That(v, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(v!.Items, Is.Not.Null.And.Count.EqualTo(2));
+            Assert.That(v.Items.Select(x => x.LastName).ToArray(), Is.EqualTo(new string[] { "Browne", "Jones" }));
+        });
+    }
+
+    [Test]
+    public void A360_GetByQuery_Empty()
+    {
+        Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("startswith(lastname, 's') and startswith(firstname, 'b') and gender eq 'f'")))
+            .AssertJson("[]");
+    }
+
+    [Test]
+    public void A370_GetByQuery_FieldSelection()
+    {
+        Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender eq 'f'").Include("firstname", "lastname")))
+            .AssertJson("[{\"firstName\":\"Rachael\",\"lastName\":\"Browne\"},{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}]");
+    }
+
+    [Test]
+    public void A880_GetByQuery_RefDataText()
+    {
+        var r = Agent<PersonAgent, PersonCollectionResult>()
+            .ExpectStatusCode(HttpStatusCode.OK)
+            .Run(a => a.GetByQueryAsync(QueryArgs.Create("gender eq 'f'"), requestOptions: new HttpRequestOptions { IncludeText = true }))
+            .AssertJsonFromResource("Person_A280_GetByArgs_Response.json", "etag", "changeLog");
+    }
+
+    #endregion
+
+#endif
     #region Create
 
     [Test]

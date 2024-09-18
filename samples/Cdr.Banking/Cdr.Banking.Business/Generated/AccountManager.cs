@@ -29,6 +29,13 @@ public partial class AccountManager : IAccountManager
     }, InvokerArgs.Read);
 
     /// <inheritdoc/>
+    public Task<Result<AccountCollectionResult>> GetAccountsQueryAsync(QueryArgs? query, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go()
+                     .ThenAsAsync(() => _dataService.GetAccountsQueryAsync(query, paging));
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
     public Task<Result<AccountDetail?>> GetDetailAsync(string? accountId) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
     {
         return Result.Go().Requires(accountId)

@@ -46,7 +46,7 @@ namespace {{Root.NamespaceCommon}}.Agents
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="HttpResult"/>.</returns>
-        {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+        {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#ifor IsPagingArgs IsQueryArgs}} = null{{/ifor}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 {{/each}}
     }
 }{{#if Root.PreprocessorDirectives}}

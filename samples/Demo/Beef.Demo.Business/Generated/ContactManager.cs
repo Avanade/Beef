@@ -24,6 +24,12 @@ public partial class ContactManager : IContactManager
     partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
 
     /// <inheritdoc/>
+    public Task<ContactCollectionResult> GetByQueryAsync(QueryArgs? query, PagingArgs? paging) => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
+    {
+        return await _dataService.GetByQueryAsync(query, paging).ConfigureAwait(false);
+    }, InvokerArgs.Read);
+
+    /// <inheritdoc/>
     public Task<ContactCollectionResult> GetAllAsync() => ManagerInvoker.Current.InvokeAsync(this, async (_, ct) =>
     {
         return await _dataService.GetAllAsync().ConfigureAwait(false);

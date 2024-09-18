@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v5.15.0
+- *Enhancement:* Added `Operation.Query` boolean to enable support for OData-like query syntax. This leverages the underlying `CoreEx.Data.Querying` (`v3.25.1+`) capabilities to enable. The `Operation.Behavior` has also been extended to support a '`Q`'uery as a shorthand to enable a query-based operation. _Note:_ this is an **awesome** new capability.
+- *Enhancement:* Updated the `DatabaseName`, `EntityFrameworkName`, `CosmosName`, `ODataName` and `HttpAgentName` to support both `Type` (existing) and optional `Name` (new). This uses the `Type^Name` syntax supported for other properties with similar purpose. The properties have also had the `Name` suffix renamed to `Type` as this more accurately reflects the property intent (existing names will continue to work with a corresponding warning during code-generation).
+
 ## v5.14.2
 - *Fixed:* Fixed the data model code-generation to output the `PartitionKey` where specified.
 - *Fixed:* Fixed the code-generated `PartitionKey` to be a nullable string. 

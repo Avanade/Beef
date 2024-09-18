@@ -78,6 +78,9 @@ public partial class {{Name}}Controller : ControllerBase
   {{#if Paging}}
     [Paging]
   {{/if}}
+  {{#if Query}}
+    [Query]
+  {{/if}}
   {{#if HasValue}}
     [AcceptsBody(typeof({{CommonValueType}}){{#ifeq WebApiMethod 'HttpPatch'}}, HttpConsts.MergePatchMediaTypeName{{/ifeq}})]
   {{/if}}
@@ -98,7 +101,7 @@ public partial class {{Name}}Controller : ControllerBase
     {{/ifeq}}
   {{/each}}
   {{#ifeq WebApiMethod 'HttpGet'}}
-        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'NotFound'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Read'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}});
+        {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsQueryArgs}}p.RequestOptions.Query{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'NotFound'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Read'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}});
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPost'}}
         {{#if HasFromEntityPropertiesParameters}}return {{else}}=> {{/if}}_webApi.{{ControllerOperationWebApiMethod}}(Request, p => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}p.Value!{{else}}{{#if IsPagingArgs}}p.RequestOptions.Paging{{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}){{#ifne WebApiStatus 'OK'}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{/ifne}}{{#if HasReturnValue}}{{#ifne WebApiAlternateStatus 'none'}}, alternateStatusCode: HttpStatusCode.{{WebApiAlternateStatus}}{{/ifne}}{{/if}}{{#ifne ManagerOperationType 'Create'}}, operationType: CoreEx.OperationType.{{ManagerOperationType}}{{/ifne}}{{#ifval WebApiLocation}}, locationUri: {{#if HasReturnValue}}r{{else}}(){{/if}} => new Uri($"{{WebApiLocation}}", UriKind.Relative){{/ifval}});

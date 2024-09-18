@@ -11,7 +11,7 @@ public partial class BalanceData
 {
 
     /// <summary>
-    /// Provides the <see cref="Balance"/> to Entity Framework <see cref="Model.Balance"/> mapping.
+    /// Provides the <see cref="Balance"/> to Cosmos <see cref="Model.Balance"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<Balance, Model.Balance>
     {
@@ -33,7 +33,7 @@ public partial class BalanceData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.Balance"/> to <see cref="Balance"/> mapping.
+    /// Provides the Cosmos <see cref="Model.Balance"/> to <see cref="Balance"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.Balance, Balance>
     {

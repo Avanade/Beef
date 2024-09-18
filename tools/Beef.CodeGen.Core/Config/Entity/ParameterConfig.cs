@@ -222,7 +222,12 @@ parameters: [
         /// <summary>
         /// Indicates whether the parameter is the auto-enabled <see cref="PagingArgs"/>.
         /// </summary>
-        public bool IsPagingArgs { get; set; } 
+        public bool IsPagingArgs { get; set; }
+
+        /// <summary>
+        /// Indicates whether the parameter is the auto-enabled <c>QueryArgs</c>.
+        /// </summary>
+        public bool IsQueryArgs { get; set; }
 
         /// <summary>
         /// Gets the formatted summary text.
@@ -294,7 +299,7 @@ parameters: [
                 Nullable = true;
             }
 
-            RelatedEntity = Root!.Entities!.FirstOrDefault(x => x.Name == Type);
+            RelatedEntity = Root?.Entities!.FirstOrDefault(x => x.Name == Type);
 
             PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConverter.ToPrivateCase(Name) : pc.Name);
             ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConverter.ToCamelCase(Name) : pc.ArgumentName);
@@ -304,7 +309,7 @@ parameters: [
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverter = PropertyConfig.ReformatDataConverter(DataConverter, Type, RefDataType, null).DataConverter;
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
-            ValidationFramework = DefaultWhereNull(ValidationFramework, () => Parent!.ValidationFramework);
+            ValidationFramework = DefaultWhereNull(ValidationFramework, () => Parent?.ValidationFramework);
 
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);
             if (Type!.StartsWith("^"))
@@ -339,7 +344,7 @@ parameters: [
                 if (string.IsNullOrEmpty(RefDataType) && !string.IsNullOrEmpty(pc?.Text))
                     return pc.Text;
 
-                if (IsValueArg || IsPagingArgs || Type == "ChangeLog")
+                if (IsValueArg || IsPagingArgs || IsQueryArgs || Type == "ChangeLog")
                     return $"{StringConverter.ToSeeComments(Type)}";
 
                 if (RelatedEntity != null)

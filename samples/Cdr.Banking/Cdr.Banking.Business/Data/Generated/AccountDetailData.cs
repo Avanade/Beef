@@ -11,7 +11,7 @@ public partial class AccountDetailData
 {
 
     /// <summary>
-    /// Provides the <see cref="AccountDetail"/> to Entity Framework <see cref="Model.Account"/> mapping.
+    /// Provides the <see cref="AccountDetail"/> to Cosmos <see cref="Model.Account"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<AccountDetail, Model.Account>
     {
@@ -34,7 +34,7 @@ public partial class AccountDetailData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.Account"/> to <see cref="AccountDetail"/> mapping.
+    /// Provides the Cosmos <see cref="Model.Account"/> to <see cref="AccountDetail"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.Account, AccountDetail>
     {

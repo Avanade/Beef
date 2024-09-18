@@ -55,6 +55,9 @@ public partial class EmployeeDataSvc : IEmployeeDataSvc
     public Task<Result<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging) => _data.GetByArgsAsync(args, paging);
 
     /// <inheritdoc/>
+    public Task<Result<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query, PagingArgs? paging) => _data.GetByQueryAsync(query, paging);
+
+    /// <inheritdoc/>
     public Task<Result<Employee>> TerminateAsync(TerminationDetail value, Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.TerminateAsync(value, id))

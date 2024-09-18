@@ -69,6 +69,7 @@ Property | Description
 `text` | The text for use in comments.<br/>&dagger; The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref="XXX"/>` within use moustache shorthand (e.g. {{Xxx}}). To have the text used as-is prefix with a `+` plus-sign character.
 **`primaryKey`** | Indicates whether the properties marked as a primary key (`Property.PrimaryKey`) are to be used as the parameters.<br/>&dagger; This simplifies the specification of these properties as parameters versus having to declare each specifically. Each of the parameters will also be set to be mandatory.
 **`paging`** | Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.
+**`query`** | Indicates whether a `QueryArgs` argument is to be added to the operation to enable OData-like $filter and $orderby related logic.
 `valueType` | The .NET value parameter `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Create` or `Update`.
 `returnType` | The .NET return `Type` for the operation.<br/>&dagger; Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.
 `returnTypeNullable` | Indicates whether the `ReturnType` is nullable for the operation.<br/>&dagger; Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`. Additionally a `Type` of `Get` will default to `true` where not specified.

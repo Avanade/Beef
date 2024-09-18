@@ -11,7 +11,7 @@ public partial class TermDepositAccountData
 {
 
     /// <summary>
-    /// Provides the <see cref="TermDepositAccount"/> to Entity Framework <see cref="Model.TermDepositAccount"/> mapping.
+    /// Provides the <see cref="TermDepositAccount"/> to Cosmos <see cref="Model.TermDepositAccount"/> mapping.
     /// </summary>
     public partial class EntityToModelCosmosMapper : Mapper<TermDepositAccount, Model.TermDepositAccount>
     {
@@ -32,7 +32,7 @@ public partial class TermDepositAccountData
     }
 
     /// <summary>
-    /// Provides the Entity Framework <see cref="Model.TermDepositAccount"/> to <see cref="TermDepositAccount"/> mapping.
+    /// Provides the Cosmos <see cref="Model.TermDepositAccount"/> to <see cref="TermDepositAccount"/> mapping.
     /// </summary>
     public partial class ModelToEntityCosmosMapper : Mapper<Model.TermDepositAccount, TermDepositAccount>
     {

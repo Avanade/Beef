@@ -24,7 +24,7 @@ namespace Beef.CodeGen
     internal class CodeGenerator(ICodeGeneratorArgs args, CodeGenScript scripts) : OnRamp.CodeGenerator(args, scripts)
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "Supporting multi-versions of .NET.")]
-        private static readonly Regex _seeRegex = new(@"<see cref=""(.*?)""/>", RegexOptions.Compiled);
+        private static readonly Regex _seeRegex = new(@"<see cref=""(.*?)""\/>", RegexOptions.Compiled);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "Supporting multi-versions of .NET.")]
         private static readonly Regex _seeRefRegex = new(@" \((.*?)<see cref=""(.*?)""/>\)", RegexOptions.Compiled);

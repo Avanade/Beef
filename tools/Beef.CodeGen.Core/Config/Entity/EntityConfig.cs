@@ -273,11 +273,11 @@ entities:
         #region Operation
 
         /// <summary>
-        /// Gets or sets the key CRUDBA behaviors (operations) will be automatically generated where not otherwise explicitly specified.
+        /// Gets or sets the key CRUDBAQ behaviors (operations) will be automatically generated where not otherwise explicitly specified.
         /// </summary>
         [JsonPropertyName("behavior")]
-        [CodeGenProperty("Operation", Title = "Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch and 'D'elete). Additionally, GetByArgs ('B') and GetAll ('A') operations that will be automatically generated where not otherwise explicitly specified.",
-            Description = "Value may only specifiy one or more of the `CGRUDBA` characters (in any order) to define the automatically generated behavior (operations); for example: `CRUPD` or `CRUP` or `rba` (case insensitive). " +
+        [CodeGenProperty("Operation", Title = "Defines the key CRUD-style behavior (operation types), being 'C'reate, 'G'et (or 'R'ead), 'U'pdate, 'P'atch, 'D'elete and `Q`uery). Additionally, `GetByArgs` ('B'), `GetAll` ('A') and `GetByQuery` ('Q') operations configuration will be automatically inferred where not otherwise explicitly specified.",
+            Description = "Value may only specifiy one or more of the `CGRUDBAQ` characters (in any order) to define the automatically generated behavior (operations); for example: `CRUPD` or `CRUP` or `rba` (case insensitive). " +
                           "This is shorthand for setting one or more of the following properties: `Get`, `GetByArgs`, `GetAll`, 'Create', `Update`, `Patch` and `Delete`. Where one of these properties is set to either `true` or `false` this will take precedence over the value set for `Behavior`.")]
         public string? Behavior { get; set; }
 
@@ -301,6 +301,13 @@ entities:
         [JsonPropertyName("getAll")]
         [CodeGenProperty("Operation", Title = "Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.")]
         public bool? GetAll { get; set; }
+
+        /// <summary>
+        /// Indicates that a `GetByQuery` operation will be automatically generated where not otherwise explicitly specified.
+        /// </summary>
+        [JsonPropertyName("getByQuery")]
+        [CodeGenProperty("Operation", Title = "Indicates that a `GetByQuery` operation will be automatically generated where not otherwise explicitly specified.")]
+        public bool? GetByQuery { get; set; }
 
         /// <summary>
         /// Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.
@@ -439,10 +446,10 @@ entities:
         /// <summary>
         /// Gets or sets the .NET database interface name used where `AutoImplement` is `Database`.
         /// </summary>
-        [JsonPropertyName("databaseName")]
-        [CodeGenProperty("Database", Title = "The .NET database interface name (used where `AutoImplement` is `Database`).", IsImportant = true,
-            Description = "Defaults to the `CodeGeneration.DatabaseName` configuration property (its default value is `IDatabase`).")]
-        public string? DatabaseName { get; set; }
+        [JsonPropertyName("databaseType")]
+        [CodeGenProperty("Database", Title = "The .NET database type and optional name (used where `AutoImplement` is `Database`).", IsImportant = true,
+            Description = "Defaults to the `CodeGeneration.DatabaseName` configuration property (its default value is `IDatabase`). Should be formatted as `Type` + `^` + `Name`.")]
+        public string? DatabaseType { get; set; }
 
         /// <summary>
         /// Gets or sets the database schema name (used where `AutoImplement` is `Database`).
@@ -482,10 +489,10 @@ entities:
         /// <summary>
         /// Gets or sets the .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.
         /// </summary>
-        [JsonPropertyName("entityFrameworkName")]
-        [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework interface name used where `AutoImplement` is `EntityFramework`.", IsImportant = true,
-            Description = "Defaults to `CodeGeneration.EntityFrameworkName`.")]
-        public string? EntityFrameworkName { get; set; }
+        [JsonPropertyName("entityFrameworkType")]
+        [CodeGenProperty("EntityFramework", Title = "The .NET Entity Framework type and optyional name used where `AutoImplement` is `EntityFramework`.", IsImportant = true,
+            Description = "Defaults to `CodeGeneration.EntityFrameworkName`. Should be formatted as `Type` + `^` + `Name`.")]
+        public string? EntityFrameworkType { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding Entity Framework model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
@@ -516,10 +523,10 @@ entities:
         /// <summary>
         /// Gets or sets the .NET Cosmos interface name used where `AutoImplement` is `Cosmos`.
         /// </summary>
-        [JsonPropertyName("cosmosName")]
-        [CodeGenProperty("Cosmos", Title = "The .NET Cosmos interface name used where `AutoImplement` is `Cosmos`.", IsImportant = true,
-            Description = "Defaults to the `CodeGeneration.CosmosName` configuration property (its default value is `ICosmosDb`).")]
-        public string? CosmosName { get; set; }
+        [JsonPropertyName("cosmosType")]
+        [CodeGenProperty("Cosmos", Title = "The .NET Cosmos DB type and optional name used where `AutoImplement` is `Cosmos`.", IsImportant = true,
+            Description = "Defaults to the `CodeGeneration.CosmosName` configuration property (its default value is `ICosmosDb`). Should be formatted as `Type` + `^` + `Name`.")]
+        public string? CosmosType { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding Cosmos model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
@@ -572,10 +579,10 @@ entities:
         /// <summary>
         /// Gets or sets the .NET OData interface name used where `AutoImplement` is `OData`.
         /// </summary>
-        [JsonPropertyName("odataName")]
-        [CodeGenProperty("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.", IsImportant = true,
-            Description = "Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).")]
-        public string? ODataName { get; set; }
+        [JsonPropertyName("odataType")]
+        [CodeGenProperty("OData", Title = "The .NET OData type and optional name used where `AutoImplement` is `OData`.", IsImportant = true,
+            Description = "Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`). Should be formatted as `Type` + `^` + `Name`.")]
+        public string? ODataType { get; set; }
 
         /// <summary>
         /// Gets or sets the corresponding OData model name required where <see cref="AutoImplement"/> is <c>OData</c>.
@@ -607,10 +614,10 @@ entities:
         /// <summary>
         /// Gets or sets the default .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.
         /// </summary>
-        [JsonPropertyName("httpAgentName")]
-        [CodeGenProperty("HttpAgent", Title = "The .NET HTTP Agent interface name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
-            Description = "Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`).")]
-        public string? HttpAgentName { get; set; }
+        [JsonPropertyName("httpAgentType")]
+        [CodeGenProperty("HttpAgent", Title = "The .NET HTTP Agent type and optional name used where `Operation.AutoImplement` is `HttpAgent`.", IsImportant = true,
+            Description = "Defaults to `CodeGeneration.HttpAgentName` configuration property (its default value is `IHttpAgent`). Should be formatted as `Type` + `^` + `Name`.")]
+        public string? HttpAgentType { get; set; }
 
         /// <summary>
         /// Gets or sets the HttpAgent API route prefix where `Operation.AutoImplement` is `HttpAgent`.
@@ -1229,19 +1236,29 @@ entities:
         public List<ParameterConfig> DataCtorParameters { get; } = [];
 
         /// <summary>
-        /// Gets the <see cref="DatabaseName"/> as a <see cref="ParameterConfig"/>.
+        /// Gets the <see cref="DatabaseType"/> as a <see cref="ParameterConfig"/>.
         /// </summary>
         public ParameterConfig? DatabaseDataParameter { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="EntityFrameworkName"/> as a <see cref="ParameterConfig"/>.
+        /// Gets the <see cref="EntityFrameworkType"/> as a <see cref="ParameterConfig"/>.
         /// </summary>
         public ParameterConfig? EntityFrameworkDataParameter { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="CosmosName"/> as a <see cref="ParameterConfig"/>.
+        /// Gets the <see cref="CosmosType"/> as a <see cref="ParameterConfig"/>.
         /// </summary>
         public ParameterConfig? CosmosDataParameter { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="ODataType"/> as a <see cref="ParameterConfig"/>.
+        /// </summary>
+        public ParameterConfig? ODataDataParameter { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="HttpAgentType"/> as a <see cref="ParameterConfig"/>.
+        /// </summary>
+        public ParameterConfig? HttpAgentDataParameter { get; set; }
 
         /// <summary>
         /// Gets the EntityController <see cref="OperationConfig"/> collection.
@@ -1456,6 +1473,15 @@ entities:
                 return words.Length > 1 && Parent!.Entities!.Any(x => x.Name == words[0]) ? string.Join(" ", new string[] { "{{" + words[0] + "}}" }.Concat(words[1..])) : string.Join(" ", words);
             }));
 
+            if (ExtraProperties is not null)
+            {
+                DatabaseType ??= ExtraProperties.Where(x => string.Compare(x.Key, "databaseName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                EntityFrameworkType ??= ExtraProperties.Where(x => string.Compare(x.Key, "entityFrameworkName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                CosmosType ??= ExtraProperties.Where(x => string.Compare(x.Key, "cosmosName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                ODataType ??= ExtraProperties.Where(x => string.Compare(x.Key, "odataName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+                HttpAgentType ??= ExtraProperties.Where(x => string.Compare(x.Key, "httpAgentName", StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Value.ToString()).FirstOrDefault();
+            }
+
             FileName = DefaultWhereNull(FileName, () => Name);
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConverter.ToCamelCase(Name));
@@ -1467,13 +1493,13 @@ entities:
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
             AutoImplement = DefaultWhereNull(AutoImplement, () => RefDataType is not null || EntityFrameworkModel is not null || CosmosModel is not null || ODataModel is not null || HttpAgentModel is not null ? Parent!.AutoImplement : "None");
             DataCtor = DefaultWhereNull(DataCtor, () => "Public");
-            DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
+            DatabaseType = DefaultWhereNull(DatabaseType, () => Parent!.DatabaseType);
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => Parent!.DatabaseSchema);
             DatabaseMapperEx = DefaultWhereNull(DatabaseMapperEx, () => Parent!.DatabaseMapperEx);
-            EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName);
-            CosmosName = DefaultWhereNull(CosmosName, () => Parent!.CosmosName);
-            ODataName = DefaultWhereNull(ODataName, () => Parent!.ODataName);
-            HttpAgentName = DefaultWhereNull(HttpAgentName, () => Parent!.HttpAgentName);
+            EntityFrameworkType = DefaultWhereNull(EntityFrameworkType, () => Parent!.EntityFrameworkType);
+            CosmosType = DefaultWhereNull(CosmosType, () => Parent!.CosmosType);
+            ODataType = DefaultWhereNull(ODataType, () => Parent!.ODataType);
+            HttpAgentType = DefaultWhereNull(HttpAgentType, () => Parent!.HttpAgentType);
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             DataSvcCustom = DefaultWhereNull(DataSvcCustom, () => "None");
@@ -1543,6 +1569,12 @@ entities:
             }
             else
                 WebApiTags ??= [];
+
+            DatabaseDataParameter = CreateParameterConfigFromTypeAndOptionalName(DatabaseType, "Db");
+            EntityFrameworkDataParameter = CreateParameterConfigFromTypeAndOptionalName(EntityFrameworkType, "Ef");
+            CosmosDataParameter = CreateParameterConfigFromTypeAndOptionalName(CosmosType, "Cosmos");
+            ODataDataParameter = CreateParameterConfigFromTypeAndOptionalName(ODataType, "OData");
+            HttpAgentDataParameter = CreateParameterConfigFromTypeAndOptionalName(HttpAgentType, "HttpAgent");
 
             InferInherits();
             Consts = await PrepareCollectionAsync(Consts).ConfigureAwait(false);
@@ -1694,7 +1726,8 @@ entities:
                         case 'd': Delete = DefaultWhereNull(Delete, () => true); break;
                         case 'b': GetByArgs = DefaultWhereNull(GetByArgs, () => true); break;
                         case 'a': GetAll = DefaultWhereNull(GetAll, () => true); break;
-                        default: throw new CodeGenException(this, nameof(Behavior), $"The '{c}' character does not map to a supported underlying behavior (operation) type; valid values are: 'CRGUPDBA' (case-insensitive).");
+                        case 'q': GetByQuery = DefaultWhereNull(GetByQuery, () => true); break;
+                        default: throw new CodeGenException(this, nameof(Behavior), $"The '{c}' character does not map to a supported underlying behavior (operation) type; valid values are: 'CRGUPDBAQ' (case-insensitive).");
                     }
                 }
             }
@@ -1725,6 +1758,9 @@ entities:
 
             if (CompareValue(GetAll, true) && !Operations.Any(x => x.Name == "GetAll"))
                 Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", WebApiRoute = GetByArgs is not null && GetByArgs.Value ? "all" : "" });
+
+            if (CompareValue(GetByQuery, true) && !Operations.Any(x => x.Name == "GetByQuery"))
+                Operations.Insert(0, new OperationConfig { Name = "GetByQuery", Type = "GetColl", Paging = true, Query = true, WebApiRoute = "query" });
 
             // Prepare each operations.
             foreach (var operation in Operations)
@@ -1904,22 +1940,22 @@ entities:
 
             // Data constructors.
             if (UsesDatabase)
-                DataCtorParameters.Add(DatabaseDataParameter = new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
+                DataCtorParameters.Add(DatabaseDataParameter!);
 
             if (UsesEntityFramework)
-                DataCtorParameters.Add(EntityFrameworkDataParameter = new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
+                DataCtorParameters.Add(EntityFrameworkDataParameter!);
 
             if (UsesCosmos)
-                DataCtorParameters.Add(CosmosDataParameter = new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
+                DataCtorParameters.Add(CosmosDataParameter!);
 
             if (UsesOData)
-                DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+                DataCtorParameters.Add(ODataDataParameter!);
 
             if (UsesHttpAgent)
-                DataCtorParameters.Add(new ParameterConfig { Name = "HttpAgent", Type = HttpAgentName, Text = $"{{{{{HttpAgentName}}}}}" });
+                DataCtorParameters.Add(HttpAgentDataParameter!);
 
             if (SupportsDataEvents)
-                DataCtorParameters.Add(new ParameterConfig { Name = "Events", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
+                DataCtorParameters.Add(CreateParameterConfigFromTypeAndOptionalName("IEventPublisher", "Events")!);
 
             AddConfiguredParameters(DataCtorParams, DataCtorParameters);
             foreach (var ctor in DataCtorParameters)
@@ -1949,7 +1985,7 @@ entities:
 
             foreach (var p in configList)
             {
-                var pc = CreateParameterConfigFromInterface(p);
+                var pc = CreateParameterConfigFromTypeAndOptionalName(p);
                 if (pc != null && !paramList.Any(x => x.Name == pc.Name))
                     paramList.Add(pc);
             }
@@ -1958,8 +1994,11 @@ entities:
         /// <summary>
         /// Create parameter configuration from interface definition.
         /// </summary>
-        internal static ParameterConfig? CreateParameterConfigFromInterface(string text)
+        internal static ParameterConfig? CreateParameterConfigFromTypeAndOptionalName(string? text, string? nameOverride = null)
         {
+            if (text is null)
+                return null;
+
             var parts = text.Split("^", StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 0)
                 return null;
@@ -1967,13 +2006,20 @@ entities:
             var pc = new ParameterConfig { Type = parts[0], Text = $"{{{{{parts[0]}}}}}" };
             if (parts.Length == 1)
             {
-                var nsparts = parts[0].Split(".", StringSplitOptions.RemoveEmptyEntries);
-                pc.Name = nsparts.Last().Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
-                if (pc.Name[0] == 'I' && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
-                    pc.Name = pc.Name[1..];
+                if (!string.IsNullOrEmpty(nameOverride))
+                    pc.Name = nameOverride;
+                else
+                {
+                    var nsparts = parts[0].Split(".", StringSplitOptions.RemoveEmptyEntries);
+                    pc.Name = nsparts.Last().Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
+                    if (pc.Name[0] == 'I' && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
+                        pc.Name = pc.Name[1..];
+                }
             }
             else
                 pc.Name = StringConverter.ToPascalCase(parts[1]);
+
+            pc.PrepareAsync(null!, null!).GetAwaiter().GetResult();
 
             return pc;
         }
@@ -1984,7 +2030,7 @@ entities:
         private void CheckDeprecatedProperties() => CodeGenConfig.WarnWhereDeprecated(Root!, this,
             ("entityScope", null, false),
             ("entityUsing", null, false),
-            ("collectionKeyed", " Use the new 'collectionType' property with a value of 'Keyed' to achieve same functionality.", true),
+            ("collectionKeyed", " Please use 'collectionType' with a value of 'Keyed' to achieve same functionality.", true),
             ("refDataStringFormat", null, false),
             ("entityFrameworkMapperInheritsFrom", null, false),
             ("cosmosMapperInheritsFrom", null, false),
@@ -1993,7 +2039,12 @@ entities:
             ("eventSubjectFormat", null, false),
             ("eventCasing", null, false),
             ("iValidator", null, false),
-            ("crud", " Use the new 'behavior' property with a value of 'crupd' to achieve same functionality.", true),
-            ("databaseCustomerMapper", "Use 'databaseCustomMappper' instead; this was a spelling mistake that has now been corrected.", true));
+            ("crud", " Please use 'behavior' with a value of 'crupd' to achieve same functionality.", true),
+            ("databaseCustomerMapper", "Please use 'databaseCustomMappper' instead; was a spelling mistake.", true),
+            ("databaseName", " Please use 'databaseType' instead.", false),
+            ("entityFrameworkName", " Please use 'entityFrameworkType' instead.", false),
+            ("cosmosName", " Please use 'cosmosType' instead.", false),
+            ("odataName", " Please use 'odataType' instead.", false),
+            ("httpAgentName", " Please use 'httpAgentType' instead.", false));
     }
 }

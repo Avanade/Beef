@@ -5,12 +5,19 @@ namespace Cdr.Banking.Business.Data;
 
 public partial class AccountData
 {
+    private static QueryArgsConfig _config = QueryArgsConfig.Create()
+        .WithFilter(filter => filter
+            .AddReferenceDataField<OpenStatus>(nameof(Model.Account.OpenStatus), c => c.WithValue(os => os == OpenStatus.All ? throw new FormatException("Value not valid for filtering.") : os))
+            .AddReferenceDataField<ProductCategory>(nameof(Model.Account.ProductCategory))
+            .AddField<bool>(nameof(Model.Account.IsOwned)));
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountData"/> class setting the required internal configurations.
     /// </summary>
     partial void AccountDataCtor()
     {
         _getAccountsOnQuery = GetAccountsOnQuery;   // Wire up the plug-in to enable filtering. 
+        _getAccountsQueryOnQuery = (q, args) => q.Where(_config, args).OrderBy(x => x.Id);  // Wire up the OData-like query syntax.
     }
 
     /// <summary>

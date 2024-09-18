@@ -38,8 +38,8 @@ namespace {{Root.NamespaceCommon}}.Agents
 {{#each WebApiAgentOperations}}
 
         /// <inheritdoc/>
-        public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}value, {{/if}}requestOptions: requestOptions{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
+        public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#ifor IsPagingArgs IsQueryArgs}} = null{{/ifor}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}value, {{/if}}requestOptions: requestOptions{{#if Query}}.IncludeQuery(query){{/if}}{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
 {{/each}}
     }
 }{{#if Root.PreprocessorDirectives}}
