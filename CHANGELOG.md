@@ -5,6 +5,7 @@ Represents the **NuGet** versions.
 ## v5.15.1
 - *Fixed:* Added option `AcceptsBody` to `Parameter.WebApiFrom` to ensure consistent behaviour with `Create` and `Update` operation types in terms of how a body value is handled within the API Controller.
 - *Fixed:* Fixed the `value` parameter inference where operation type is `Custom` and the `ValueType` is specified; ensures operation is generated correctly.
+- *Fixed:* Fixed the Agent code-generation to enable optional operation parameters where applicable.
 
 ## v5.15.0
 - *Enhancement:* Added `Operation.Query` boolean to enable support for OData-like query syntax. This leverages the underlying `CoreEx.Data.Querying` (`v3.25.1+`) capabilities to enable. The `Operation.Behavior` has also been extended to support a '`Q`'uery as a shorthand to enable a query-based operation. _Note:_ this is an **awesome** new capability.

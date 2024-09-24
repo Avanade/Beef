@@ -24,9 +24,9 @@ namespace MyEf.Hr.Common.Agents
         /// Initializes a new instance of the <see cref="PerformanceReviewAgent"/> class.
         /// </summary>
         /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
-        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
-        public PerformanceReviewAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
+        /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+        public PerformanceReviewAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
         public Task<HttpResult<PerformanceReview?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
