@@ -7,8 +7,8 @@
     <Folder Include="Agents\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.25.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.64.0">
+    <PackageReference Include="CoreEx" Version="3.25.4" />
+    <PackageReference Include="Grpc.Tools" Version="2.66.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

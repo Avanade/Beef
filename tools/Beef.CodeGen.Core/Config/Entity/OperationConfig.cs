@@ -1323,8 +1323,8 @@ operations: [
 
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
-            if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = true, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
+            if (isCreateUpdate || (Type!.StartsWith("Custom") && !string.IsNullOrEmpty(ValueType)))
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = true, Validator = Validator, IsValueArg = true, WebApiFrom = "AcceptsBody" });
 
             if (PrimaryKey.HasValue && PrimaryKey.Value)
             {

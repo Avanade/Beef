@@ -64,6 +64,12 @@ entities:
           { name: Person, type: Person, nullable: false, webApiFrom: FromBody }
         ]
       },
+      { name: Add2, text: Actually validating the AcceptBody parameter generation, type: Custom, webApiRoute: acceptsBody, webApiStatus: Created,
+        parameters: [
+          { name: Person, type: Person, nullable: false, webApiFrom: AcceptsBody }
+        ]
+      },
+      { name: Add3, text: Actually validating the Custom with Value parameter generation, type: Custom, valueType: Person, webApiRoute: acceptsBodyValue, webApiStatus: Created },
       { name: DataSvcCustom, type: Custom, text: Validate a DataSvc Custom generation, returnType: int, dataSvcCustom: Partial, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
       { name: ManagerCustom, type: Get, text: Validate a Manager Custom generation, managerCustom: true, excludeIDataSvc: true, excludeDataSvc: true, excludeData: true, excludeIData: true, excludeWebApi: true, excludeWebApiAgent: true },
       { name: CustomManagerOnly, type: CustomManagerOnly, text: "Validate CustomManagerOnly", webApiMethod: HttpPost, webApiRoute: "cmo" },

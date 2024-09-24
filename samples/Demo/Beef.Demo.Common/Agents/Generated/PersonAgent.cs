@@ -108,6 +108,14 @@ namespace Beef.Demo.Common.Agents
             => PostAsync("api/v1/persons/fromBody", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Person>("person", person, HttpArgType.FromBody)), cancellationToken: cancellationToken);
 
         /// <inheritdoc/>
+        public Task<HttpResult> Add2Async(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<Person>("api/v1/persons/acceptsBody", person, requestOptions: requestOptions, cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<HttpResult> Add3Async(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<Person>("api/v1/persons/acceptsBodyValue", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
         public Task<HttpResult> CustomManagerOnlyAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/persons/cmo", requestOptions: requestOptions, cancellationToken: cancellationToken);
 

@@ -32,6 +32,8 @@ public partial class PersonDataSvc : IPersonDataSvc
     private Func<Person?, Task>? _getNoArgsOnAfterAsync;
     private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
     private Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
+    private Func<Task>? _add2OnAfterAsync;
+    private Func<Task>? _add3OnAfterAsync;
     private Func<int, Task>? _dataSvcCustomOnAfterAsync;
     private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
     private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
@@ -195,6 +197,20 @@ public partial class PersonDataSvc : IPersonDataSvc
         _events.PublishValueEvent(r, new Uri($"/person/{r.Id}", UriKind.Relative), $"Demo.Person", "Update");
         return _cache.SetValue(r);
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+
+    /// <inheritdoc/>
+    public async Task Add2Async(Person person)
+    {
+        await _data.Add2Async(person).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_add2OnAfterAsync?.Invoke()).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task Add3Async(Person value)
+    {
+        await _data.Add3Async(value).ConfigureAwait(false);
+        await Invoker.InvokeAsync(_add3OnAfterAsync?.Invoke()).ConfigureAwait(false);
+    }
 
     /// <inheritdoc/>
     public async Task<int> DataSvcCustomAsync()
