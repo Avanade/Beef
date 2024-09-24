@@ -27,9 +27,9 @@ namespace Beef.Demo.Common.Agents
         /// Initializes a new instance of the <see cref="PersonAgent"/> class.
         /// </summary>
         /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
-        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
-        public PersonAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
+        /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+        public PersonAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
         public Task<HttpResult<Person>> CreateAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
@@ -106,6 +106,14 @@ namespace Beef.Demo.Common.Agents
         /// <inheritdoc/>
         public Task<HttpResult> AddAsync(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
             => PostAsync("api/v1/persons/fromBody", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Person>("person", person, HttpArgType.FromBody)), cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<HttpResult> Add2Async(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<Person>("api/v1/persons/acceptsBody", person, requestOptions: requestOptions, cancellationToken: cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<HttpResult> Add3Async(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+            => PostAsync<Person>("api/v1/persons/acceptsBodyValue", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
 
         /// <inheritdoc/>
         public Task<HttpResult> CustomManagerOnlyAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

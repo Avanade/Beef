@@ -154,5 +154,17 @@ namespace Beef.Demo.Business.Data
         }
 
         Task<Result<string?>> SimulateWorkOnImplementationAsync(Guid id) => Result.Go<string?>($"hello {id}").AsTask();
+
+        private static Task Add2OnImplementationAsync(Person value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            return Task.CompletedTask;
+        }
+
+        private static Task Add3OnImplementationAsync(Person value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            return Task.CompletedTask;
+        }
     }
 }

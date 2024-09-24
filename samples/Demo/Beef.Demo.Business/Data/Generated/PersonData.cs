@@ -166,6 +166,12 @@ public partial class PersonData : IPersonData
     public Task<PersonDetail> UpdateDetailAsync(PersonDetail value) => UpdateDetailOnImplementationAsync(value);
 
     /// <inheritdoc/>
+    public Task Add2Async(Person person) => Add2OnImplementationAsync(person);
+
+    /// <inheritdoc/>
+    public Task Add3Async(Person value) => Add3OnImplementationAsync(value);
+
+    /// <inheritdoc/>
     public Task<Person?> GetNullAsync(string? name, List<string>? names) => GetNullOnImplementationAsync(name, names);
 
     /// <inheritdoc/>

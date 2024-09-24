@@ -189,8 +189,10 @@ parameters: [
         /// Gets or sets the option for how the parameter will be delcared within the Web API Controller.
         /// </summary>
         [JsonPropertyName("webApiFrom")]
-        [CodeGenProperty("WebApi", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = ["FromQuery", "FromBody", "FromRoute", "FromEntityProperties"],
-            Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.")]
+        [CodeGenProperty("WebApi", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = ["FromQuery", "FromBody", "FromRoute", "FromEntityProperties", "AcceptsBody"],
+            Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. " +
+            "Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters." +
+            "An `AcceptsBody` indicates that the _value_ will be passed in the HTTP Request Body and be handled (JSON deserialized) as a `CoreEx.AspNetCore.WebApis.WebWebApiParam` (default behavior for a `Create` or `Update` operation type).")]
         public string? WebApiFrom { get; set; }
 
         /// <summary>
@@ -261,7 +263,7 @@ parameters: [
         /// <summary>
         /// Gets the <see cref="WebApiFrom"/> for use in an Agent.
         /// </summary>
-        public string? WebApiAgentFrom => WebApiFrom switch { "FromBody" => "FromBody", "FromEntityProperties" => "FromUriUseProperties", _ => null };
+        public string? WebApiAgentFrom => WebApiFrom switch { "FromBody" => "FromBody", "AcceptsBody" => "AcceptsBody", "FromEntityProperties" => "FromUriUseProperties", _ => null };
 
         /// <summary>
         /// Gets the parameter argument using the specified converter.
@@ -355,6 +357,13 @@ parameters: [
 
                 return StringConverter.ToSentenceCase(Name);
             });
+
+            if (WebApiFrom == "AcceptsBody")
+            {
+                IsValueArg = true;
+                if (string.IsNullOrEmpty(Parent!.ValueType))
+                    Parent.ValueType = Type;
+            }
 
             GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
             GrpcMapper = DotNet.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
