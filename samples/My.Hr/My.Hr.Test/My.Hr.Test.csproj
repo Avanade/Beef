@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.25.4" />
+    <PackageReference Include="CoreEx" Version="3.25.5" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -42,7 +42,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="3.25.4" />
+    <PackageReference Include="CoreEx.UnitTesting.NUnit" Version="3.25.5" />
   </ItemGroup>
 
   <ItemGroup>

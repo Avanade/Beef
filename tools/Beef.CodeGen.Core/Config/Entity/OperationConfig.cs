@@ -420,6 +420,14 @@ operations: [
         public string? EventPublish { get; set; }
 
         /// <summary>
+        /// Gets or sets the event value override code.
+        /// </summary>
+        [JsonPropertyName("eventValue")]
+        [CodeGenProperty("Events", Title = "The event value override as C# code (is used as-is).",
+            Description = "The event value is automatically inferred where the `Operation.Type` is `Create`, `Update` or  `Delete`.")]
+        public string? EventValue { get; set; }
+
+        /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonPropertyName("eventSource")]
@@ -1413,6 +1421,10 @@ operations: [
                     sb.Append(" }");
                     ed.Value = sb.ToString();
                 }
+
+                // Replace (override) where specifically specified.
+                if (!string.IsNullOrEmpty(EventValue))
+                    ed.Value = EventValue;
 
                 Events.Add(ed);
             }

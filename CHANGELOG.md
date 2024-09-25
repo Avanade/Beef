@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.15.2
+- *Fixed:* Fixed the event value publish code-generation by enabling an override using `Operation.EventValue` where applicable (i.e. no response).
+
 ## v5.15.1
 - *Fixed:* Added option `AcceptsBody` to `Parameter.WebApiFrom` to ensure consistent behaviour with `Create` and `Update` operation types in terms of how a body value is handled within the API Controller.
 - *Fixed:* Fixed the `value` parameter inference where operation type is `Custom` and the `ValueType` is specified; ensures operation is generated correctly.
