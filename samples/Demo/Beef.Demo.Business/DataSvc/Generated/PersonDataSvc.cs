@@ -303,11 +303,12 @@ public partial class PersonDataSvc : IPersonDataSvc
     }
 
     /// <inheritdoc/>
-    public Task<Result<string?>> SimulateWorkAsync(Guid id)
+    public Task<Result<string?>> SimulateWorkAsync(Guid id) => DataSvcInvoker.Current.InvokeAsync(this, (_, __) =>
     {
         return Result.GoAsync(_data.SimulateWorkAsync(id))
-                     .ThenAsync(r => _simulateWorkOnAfterAsync?.Invoke(r, id) ?? Result.SuccessTask);
-    }
+                     .ThenAsync(r => _simulateWorkOnAfterAsync?.Invoke(r, id) ?? Result.SuccessTask)
+                     .Then(r => _events.PublishValueEvent("WorkIt", new Uri($"/person/", UriKind.Relative), $"Work", "Simulated"));
+    }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
 }
 
 #pragma warning restore

@@ -6,8 +6,8 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AspNetCore" Version="3.25.4" />
-    <PackageReference Include="CoreEx.Azure" Version="3.25.4" />
+    <PackageReference Include="CoreEx.AspNetCore" Version="3.25.5" />
+    <PackageReference Include="CoreEx.Azure" Version="3.25.5" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.11" />
     <PackageReference Include="AspNetCore.HealthChecks.Azure.Storage.Blobs" Version="8.0.1" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />

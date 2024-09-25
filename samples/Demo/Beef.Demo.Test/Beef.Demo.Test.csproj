@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx.UnitTesting" Version="3.25.4" />
+    <PackageReference Include="CoreEx.UnitTesting" Version="3.25.5" />
     <PackageReference Include="NUnit.Analyzers" Version="4.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

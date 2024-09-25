@@ -1566,6 +1566,11 @@
             "Data"
           ]
         },
+        "eventValue": {
+          "type": "string",
+          "title": "The event value override as C# code (is used as-is).",
+          "description": "The event value is automatically inferred where the \u0060Operation.Type\u0060 is \u0060Create\u0060, \u0060Update\u0060 or  \u0060Delete\u0060."
+        },
         "eventSource": {
           "type": "string",
           "title": "The Event Source.",
