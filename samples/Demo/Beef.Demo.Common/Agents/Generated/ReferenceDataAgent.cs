@@ -28,9 +28,9 @@ namespace Beef.Demo.Common.Agents
         /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
         /// </summary>
         /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-        /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/>.</param>
-        /// <param name="executionContext">The <see cref="CoreEx.ExecutionContext"/>.</param>
-        public ReferenceDataAgent(HttpClient client, IJsonSerializer jsonSerializer, CoreEx.ExecutionContext executionContext) : base(client, jsonSerializer, executionContext) { }
+        /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+        /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+        public ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 
         /// <inheritdoc/>
         public Task<HttpResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

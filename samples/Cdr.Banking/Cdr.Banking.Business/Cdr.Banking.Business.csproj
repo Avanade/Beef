@@ -12,8 +12,8 @@
     <Folder Include="DataSvc\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx.AspNetCore" Version="3.25.1" />
-    <PackageReference Include="CoreEx.Cosmos" Version="3.25.1" />
-    <PackageReference Include="CoreEx.Validation" Version="3.25.1" />
+    <PackageReference Include="CoreEx.AspNetCore" Version="3.25.5" />
+    <PackageReference Include="CoreEx.Cosmos" Version="3.25.5" />
+    <PackageReference Include="CoreEx.Validation" Version="3.25.5" />
   </ItemGroup>
 </Project>

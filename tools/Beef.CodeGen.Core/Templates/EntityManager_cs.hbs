@@ -85,7 +85,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{set-value 'HasResultCode' false}}public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{{ParameterType}}} {{ArgumentName}}{{#unless @last}}, {{/unless}}{{/each}}{{#if Root.CancellationToken}}, CancellationToken cancellationToken = default{{/if}}) => ManagerInvoker.Current.InvokeAsync(this, {{#unless WithResult}}async {{/unless}}(_, ct) =>
     {
   {{#if WithResult}}
-        return Result.Go{{#if HasValue}}(value){{#if ValueParameter.IsMandatory}}.Required(){{/if}}{{else}}(){{/if}}{{#each ValueLessMandatoryParameters}}.Requires({{ArgumentName}}){{/each}}{{#ifeq ManagerPassingParameters.Count 1}}{{#each ManagerPassingParameters}}.Adjusts(v => v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}}){{/each}}{{/ifeq}}
+        return Result.Go{{#if HasValue}}({{ValueParameter.ArgumentName}}){{#if ValueParameter.IsMandatory}}.Required(){{/if}}{{else}}(){{/if}}{{#each ValueLessMandatoryParameters}}.Requires({{ArgumentName}}){{/each}}{{#ifeq ManagerPassingParameters.Count 1}}{{#each ManagerPassingParameters}}.Adjusts(v => v.{{Name}}{{#ifeq LayerPassing 'ToManagerSet'}} = {{ArgumentName}}{{else}}.ForEach(i => i.{{Name}} = {{ArgumentName}}){{/ifeq}}){{/each}}{{/ifeq}}
   {{/if}}
   {{#ifval AuthRole}}
         {{#if WithResult}}             .UserIsInRole("{{AuthRole}}"){{else}}ExecutionContext.Current.UserIsInRole("{{AuthRole}}").ThrowOnError();{{/if}}
@@ -99,7 +99,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
         {{#if Parent.WithResult}}
                      .AdjustsAsync(async v => v.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false))
         {{else}}
-        value{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
+        {{../ValueParameter.ArgumentName}}{{#ifeq ../../EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = await _identifierGenerator.GenerateIdentifierAsync<{{Type}}, {{../../ValueType}}>({{#if Root.CancellationToken}}ct{{/if}}).ConfigureAwait(false);
         {{/if}}
       {{/if}}
     {{/each}}
@@ -107,10 +107,10 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
   {{#unless WithResult}}
     {{#each ManagerPassingParameters}}
       {{#ifeq LayerPassing 'ToManagerSet'}}
-        value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = {{ArgumentName}};
+        {{../../ValueParameter.ArgumentName}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.{{Name}} = {{ArgumentName}};
       {{/ifeq}}
       {{#ifeq LayerPassing 'ToManagerCollSet'}}
-        value{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.ForEach(i => i.{{Name}} = {{ArgumentName}});
+        {{../../ValueParameter.ArgumentName}}{{#ifeq Parent.EnsureValueCount 0}}.Required(){{/ifeq}}.ForEach(i => i.{{Name}} = {{ArgumentName}});
       {{/ifeq}}
     {{/each}}
   {{else}}
@@ -168,7 +168,7 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
     {{else}}
       {{#if SingleValidateParameters}}
         {{#each ValidateParameters}}
-        await {{ArgumentName}}.Validate({{#ifne ArgumentName 'value'}}{{/ifne}}).Configure(vc => vc{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{else}}{{#if IsMandatory}}.Mandatory(){{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}).ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
+        await {{ArgumentName}}.Validate().Configure(vc => vc{{#if IsValueArg}}{{#ifeq Parent.EnsureValueCount 0}}.Mandatory(){{/ifeq}}{{else}}{{#if IsMandatory}}.Mandatory(){{/if}}{{/if}}{{#ifval Validator}}{{#ifeq ValidationFramework 'FluentValidation'}}.Interop(() => FluentValidator.Create<{{Validator}}>().Wrap()){{else}}.Entity().With<{{Validator}}>(){{/ifeq}}{{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}).ValidateAsync(true{{#if Root.CancellationToken}}, ct{{/if}}).ConfigureAwait(false);
         {{/each}}
       {{else}}
         await MultiValidator.Create()

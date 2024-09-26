@@ -255,6 +255,24 @@ public partial class PersonController : ControllerBase
         => _webApi.PostAsync(Request, p => _manager.AddAsync(person), statusCode: HttpStatusCode.Created, operationType: CoreEx.OperationType.Unspecified);
 
     /// <summary>
+    /// Actually validating the AcceptBody parameter generation.
+    /// </summary>
+    [HttpPost("api/v1/persons/acceptsBody", Name="Person_Add2")]
+    [AcceptsBody(typeof(Common.Entities.Person))]
+    [ProducesResponseType((int)HttpStatusCode.Created)]
+    public Task<IActionResult> Add2()
+        => _webApi.PostAsync<Person>(Request, p => _manager.Add2Async(p.Value!), statusCode: HttpStatusCode.Created, operationType: CoreEx.OperationType.Unspecified);
+
+    /// <summary>
+    /// Actually validating the Custom with Value parameter generation.
+    /// </summary>
+    [HttpPost("api/v1/persons/acceptsBodyValue", Name="Person_Add3")]
+    [AcceptsBody(typeof(Common.Entities.Person))]
+    [ProducesResponseType((int)HttpStatusCode.Created)]
+    public Task<IActionResult> Add3()
+        => _webApi.PostAsync<Person>(Request, p => _manager.Add3Async(p.Value!), statusCode: HttpStatusCode.Created, operationType: CoreEx.OperationType.Unspecified);
+
+    /// <summary>
     /// Validate CustomManagerOnly.
     /// </summary>
     [HttpPost("api/v1/persons/cmo", Name="Person_CustomManagerOnly")]

@@ -204,6 +204,24 @@ namespace Beef.Demo.Common.Agents
         Task<HttpResult> AddAsync(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Actually validating the AcceptBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> Add2Async(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Actually validating the Custom with Value parameter generation.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="HttpResult"/>.</returns>
+        Task<HttpResult> Add3Async(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Validate CustomManagerOnly.
         /// </summary>
         /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>

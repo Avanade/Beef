@@ -1306,6 +1306,7 @@ namespace Beef.Demo.Test
             {
                 AgentTester.Test<PersonAgent, string>()
                     .ExpectStatusCode(HttpStatusCode.OK)
+                    .ExpectEvent("Work", "Simulated")
                     .Run(a => a.SimulateWorkAsync(Guid.NewGuid()));
             }
         }

@@ -420,6 +420,14 @@ operations: [
         public string? EventPublish { get; set; }
 
         /// <summary>
+        /// Gets or sets the event value override code.
+        /// </summary>
+        [JsonPropertyName("eventValue")]
+        [CodeGenProperty("Events", Title = "The event value override as C# code (is used as-is).",
+            Description = "The event value is automatically inferred where the `Operation.Type` is `Create`, `Update` or  `Delete`.")]
+        public string? EventValue { get; set; }
+
+        /// <summary>
         /// Gets or sets the URI event source.
         /// </summary>
         [JsonPropertyName("eventSource")]
@@ -1323,8 +1331,8 @@ operations: [
 
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
-            if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = true, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
+            if (isCreateUpdate || (Type!.StartsWith("Custom") && !string.IsNullOrEmpty(ValueType)))
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = true, Validator = Validator, IsValueArg = true, WebApiFrom = "AcceptsBody" });
 
             if (PrimaryKey.HasValue && PrimaryKey.Value)
             {
@@ -1413,6 +1421,10 @@ operations: [
                     sb.Append(" }");
                     ed.Value = sb.ToString();
                 }
+
+                // Replace (override) where specifically specified.
+                if (!string.IsNullOrEmpty(EventValue))
+                    ed.Value = EventValue;
 
                 Events.Add(ed);
             }

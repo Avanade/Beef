@@ -93,7 +93,7 @@ Provides the _Web API_ configuration.
 
 Property | Description
 -|-
-`webApiFrom` | The option for how the parameter will be delcared within the Web API Controller. Valid options are: `FromQuery`, `FromBody`, `FromRoute`, `FromEntityProperties`.<br/>&dagger; Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.
+`webApiFrom` | The option for how the parameter will be delcared within the Web API Controller. Valid options are: `FromQuery`, `FromBody`, `FromRoute`, `FromEntityProperties`, `AcceptsBody`.<br/>&dagger; Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.An `AcceptsBody` indicates that the _value_ will be passed in the HTTP Request Body and be handled (JSON deserialized) as a `CoreEx.AspNetCore.WebApis.WebWebApiParam` (default behavior for a `Create` or `Update` operation type).
 `webApiText` | The overriding text for use in the Web API comments.<br/>&dagger; By default the `WbeApiText` will be the `Name` reformatted as sentence casing. To have the text used as-is prefix with a `+` plus-sign character.
 
 <br/>

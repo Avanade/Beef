@@ -1566,6 +1566,11 @@
             "Data"
           ]
         },
+        "eventValue": {
+          "type": "string",
+          "title": "The event value override as C# code (is used as-is).",
+          "description": "The event value is automatically inferred where the \u0060Operation.Type\u0060 is \u0060Create\u0060, \u0060Update\u0060 or  \u0060Delete\u0060."
+        },
         "eventSource": {
           "type": "string",
           "title": "The Event Source.",
@@ -1824,12 +1829,13 @@
         "webApiFrom": {
           "type": "string",
           "title": "The option for how the parameter will be delcared within the Web API Controller.",
-          "description": "Defaults to \u0060FromQuery\u0060; unless the parameter \u0060Type\u0060 has also been defined as an \u0060Entity\u0060 within the code-gen config file then it will default to \u0060FromEntityProperties\u0060. Specifies that the parameter will be declared with corresponding \u0060FromQueryAttribute\u0060, \u0060FromBodyAttribute\u0060 or \u0060FromRouteAttribute\u0060 for the Web API method. The \u0060FromEntityProperties\u0060 will declare all properties of the \u0060Entity\u0060 as query parameters.",
+          "description": "Defaults to \u0060FromQuery\u0060; unless the parameter \u0060Type\u0060 has also been defined as an \u0060Entity\u0060 within the code-gen config file then it will default to \u0060FromEntityProperties\u0060. Specifies that the parameter will be declared with corresponding \u0060FromQueryAttribute\u0060, \u0060FromBodyAttribute\u0060 or \u0060FromRouteAttribute\u0060 for the Web API method. The \u0060FromEntityProperties\u0060 will declare all properties of the \u0060Entity\u0060 as query parameters.An \u0060AcceptsBody\u0060 indicates that the _value_ will be passed in the HTTP Request Body and be handled (JSON deserialized) as a \u0060CoreEx.AspNetCore.WebApis.WebWebApiParam\u0060 (default behavior for a \u0060Create\u0060 or \u0060Update\u0060 operation type).",
           "enum": [
             "FromQuery",
             "FromBody",
             "FromRoute",
-            "FromEntityProperties"
+            "FromEntityProperties",
+            "AcceptsBody"
           ]
         },
         "webApiText": {
