@@ -1,8 +1,15 @@
 # Appendix
+
+This appendix includes additional information that might be useful when developing and deploying the sample.
+
+<br/>
+
 ## Azure Resource
+
 If you want to deploy your app to `Azure App Service`, execute the following command.
 
 However, you need change the variables accordingly.
+
 ```
 az login
 
@@ -28,20 +35,27 @@ az servicebus namespace authorization-rule keys list -g <resource group name> --
 ```
 
 If you need to rebuild, execute the following to drop and start again.
+
 ```
 az group delete --name <resource group name>
 ```
 
+<br/>
+
 ## Create Azure Function project
+
 The update project dependencies is invalid because `CoreEx.Azure` and Function project have different version of `Microsoft.Azure.Functions.Worker.Extensions.ServiceBus` .
 
 Therefore, you need to delete the `Microsoft.Azure.Functions.Worker.Extensions.ServiceBus` before adding the `CoreEx.Azure` NuGet package as dependencies.
 
+<br/>
+
 ## Debug Option
-If you don't want to send telemetry to azure monitor using local debug or a service, you must comment out or avoid the following.
+
+If you don't want to send telemetry to azure monitor using local debug or a service, you should include code similar to the following. Alternatively, remove environment variable `APPLICATIONINSIGHTS_CONNECTION_STRING`.
+
 ```csharp
         // Add Azure monitor open telemetry.
-        // using local debug
         if (env.IsProduction())
            services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "MyEf.Hr.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 ```
