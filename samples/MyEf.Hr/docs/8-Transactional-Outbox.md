@@ -14,7 +14,7 @@ The pluggable nature of an [`IEventPublisher`](https://github.com/Avanade/CoreEx
 
 ## Previously generated capabilities
 
-Within [Step 2](./2-Employee-DB.md) the transactional outbox capabilities, both database and .NET, were generated and included into the solution when performing the [Event outbox](./Employee-DB.md#Event%20outbox).
+Within [Step 2](./2-Employee-DB.md) the transactional outbox capabilities, both database and .NET, were generated and included into the solution when performing the [Event outbox](./2-Employee-DB.md#event-outbox).
 
 There were two tables added to the database [`Outbox.EventOutbox`](../MyEf.Hr.Database/Migrations/20221207-004320-02-create-outbox-eventoutbox-table.sql) and [`Outbox.EventOutboxData`](../MyEf.Hr.Database/Migrations/20221207-004320-03-create-outbox-eventoutboxdata-table.sql) via the corresponding generated migration scripts; these tables provide the underlying transactional persistence.
 
@@ -75,7 +75,7 @@ services.AddNullEventPublisher();
 // Add transactional event outbox services.
 services.AddScoped<IEventSender>(sp =>
 {
-    var eoe = new EventOutboxEnqueue(sp.GetRequiredService<IDatabase>(), p.GetRequiredService<ILogger<EventOutboxEnqueue>>());
+    var eoe = new EventOutboxEnqueue(sp.GetRequiredService<IDatabase>(), sp.GetRequiredService<ILogger<EventOutboxEnqueue>>());
     //eoe.SetPrimaryEventSender(/* the primary sender instance; i.e. service bus */); // This is optional.
     return eoe;
 });
