@@ -203,7 +203,7 @@ Endpoint | Description
 `GET /employees/query?$filter=startswith(lastName, 'smi*')` | all employees whose last name starts with `smi`.
 `GET /employees/query?$filter=gender eq 'f'` | all female employees.
 `GET /employees/query?$filter=startdate ge 2000-01-01 and startdate le 2002-12-31` | all employess who started between 01-Jan-2000 and 31-Dec-2002 (inclusive).
-`GET /employees/query?$filter=startswith(lastName, 'smi*') and (terminated eq null || terminated ne null)` | all employees whose last name starts with `smi`, both current and terminated.
+`GET /employees/query?$filter=startswith(lastName, 'smi*') and (terminated eq null \|\| terminated ne null)` | all employees whose last name starts with `smi`, both current and terminated.
 `GET /employees?gender=f&$skip=10&$take25` | all female employees with paging (skipping the first 10 employees and getting the next 25 in sequence).
 
 <br/>
