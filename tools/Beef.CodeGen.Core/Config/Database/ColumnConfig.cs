@@ -223,6 +223,11 @@ namespace Beef.CodeGen.Config.Database
         public bool IncludeColumnOnDelete { get; set; }
 
         /// <summary>
+        /// Gets or sets the JSON name for the column.
+        /// </summary>
+        public string? JsonName { get; set; }
+
+        /// <summary>
         /// Gets the where equality clause.
         /// </summary>
         public string WhereEquals => Name == Parent?.ColumnIsDeleted?.Name ? $"({QualifiedName} IS NULL OR {QualifiedName} = 0)" : $"{QualifiedName} = {ParameterName}";

@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="migrations\20241002-085013-create-beef-user-defined-types.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\tools\Beef.Database.Core\Beef.Database.Core.csproj" />
     <ProjectReference Include="..\..\..\tools\Beef.Database.SqlServer\Beef.Database.SqlServer.csproj" />
   </ItemGroup>

@@ -121,6 +121,14 @@ tables:
         [CodeGenProperty("Additional", Title = "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.")]
         public string? WithHints { get; set; }
 
+        /// <summary>
+        /// Gets or sets the collection type.
+        /// </summary>
+        [JsonPropertyName("collectionType")]
+        [CodeGenProperty("Additional", Title = "The collection type.", IsImportant = true, Options = ["JSON", "UDT"],
+            Description = "Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `Table.CollectionType`.")]
+        public string? CollectionType { get; set; }
+
         #endregion
 
         #region Merge
@@ -291,6 +299,7 @@ tables:
         /// </summary>
         protected override async Task PrepareAsync()
         {
+            CollectionType = DefaultWhereNull(CollectionType, () => Parent!.CollectionType);
             StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"sp{Parent!.Name}{Name}");
             Type = DefaultWhereNull(Type, () => "GetColl");
             OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);

@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Hr].[spEmployeeUpdate]
+CREATE OR ALTER PROCEDURE [Hr].[spEmployeeUpdate]
   @EmployeeId AS UNIQUEIDENTIFIER,
   @Email AS NVARCHAR(250) NULL = NULL,
   @FirstName AS NVARCHAR(100) NULL = NULL,
@@ -13,7 +13,7 @@ CREATE PROCEDURE [Hr].[spEmployeeUpdate]
   @RowVersion AS TIMESTAMP,
   @UpdatedBy AS NVARCHAR(250) NULL = NULL,
   @UpdatedDate AS DATETIME2 NULL = NULL,
-  @EmergencyContactList AS [Hr].[udtEmergencyContactList] READONLY,
+  @EmergencyContactList AS NVARCHAR(MAX),
   @ReselectRecord AS BIT = 0
 AS
 BEGIN

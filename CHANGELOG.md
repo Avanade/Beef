@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v5.16.0
+- *Enhancement:* Database code-generation defaults to the use of [JSON](https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server)-serialized parameters versus UDT/TVP to minimize the need for additional database objects; specifically [User-Defined Types](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql) (UDT).
+  - A new `CollectionType` property has been added to the code-generation configuration for query-based collection passing; supports `JSON` (default) and `UDT` (previous) values. Note that for JSON passing a `NVARCHAR(MAX)` type should be used.
+  - A merge for a sub-collection would previously require a `UDT` to be created; this is now handled using JSON serialization, unless explicitly required (example YAML `udt: true, tvp: WorkHistory`).
+- *Enhancement:* The out-of-the-box _Beef_ `Type` schema objects (`udtBigIntList.sql`, `udtDateTimeList.sql`, `udtIntList.sql`, `udtNVarCharList.sql` and `udtUniqueIdentifierList.sql`) have been removed and will not be automatically included. Where required, these should be manually added to the database project and managed accordingly; use this [`create-beef-user-defined-types.sql`](./tools/Beef.Database.SqlServer/Migrations/create-beef-user-defined-types.sql) migration script to add.
+- *Enhancement:* All code-generated SQL objects have been updated to support replacement, for example `CREATE OR ALTER` versus previous `CREATE`; this potentially minimizes the need to drop and recreate each migration. This _DbEx_ behavior is predicated on not having any `Type` (UDT) schema objects which do not support replacement. It is also therefore recommended that all non-generated schema objects support replacement as they all have to adhere to this pattern to avoid unncessary dropping.
+
 ## v5.15.2
 - *Fixed:* Fixed the event value publish code-generation by enabling an override using `Operation.EventValue` where applicable (i.e. no response).
 

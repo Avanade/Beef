@@ -46,7 +46,7 @@ public partial class EmployeeData
     {
         var sp = _db.StoredProcedure(storedProcedureName)
                     .Params(p => DbMapper.Default.MapToDb(value, p, operationType))
-                    .TableValuedParam("@EmergencyContactList", EmergencyContactData.DbMapper.Default.CreateTableValuedParameter(_db, value.EmergencyContacts!))
+                    .JsonParam("@EmergencyContactList", value.EmergencyContacts)
                     .ReselectRecordParam();
 
         return ExecuteStatementAsync(sp)!;

@@ -113,6 +113,14 @@ tables:
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.")]
         public List<string>? AliasColumns { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of JSON (OPENJSON) `Column` and `Alias` pairs to enable Column/JSON renaming.
+        /// </summary>
+        [JsonPropertyName("jsonAliasColumns")]
+        [CodeGenPropertyCollection("Columns", Title = "The list of JSON `Column` and `JsonAlias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `ProductCode^product`.")]
+        public List<string>? JsonAliasColumns { get; set; }
+
         #endregion
 
         #region CodeGen
@@ -221,6 +229,14 @@ tables:
         [JsonPropertyName("tvp")]
         [CodeGenProperty("UDT", Title = "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.", IsImportant = true)]
         public string? Tvp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection type.
+        /// </summary>
+        [JsonPropertyName("collectionType")]
+        [CodeGenProperty("UDT", Title = "The collection type.", IsImportant = true, Options = ["JSON", "UDT"],
+            Description = "Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `Config.CollectionType`.")]
+        public string? CollectionType { get; set; }
 
         #endregion
 
@@ -491,6 +507,7 @@ tables:
             EfModel = DefaultWhereNull(EfModel, () => Parent!.EfModel);
             EfModelName = DefaultWhereNull(EfModelName, () => Root.RenameForDotNet(Name));
             OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);
+            CollectionType = DefaultWhereNull(CollectionType, () => Parent!.CollectionType);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);
@@ -517,6 +534,16 @@ tables:
                 }
 
                 cc.NameAlias ??= Root.RenameForDotNet(cc.Name);
+
+                var cj = JsonAliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
+                if (cj != null)
+                {
+                    var parts = cj.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2 && parts[1].Length > 0)
+                        cc.JsonName = parts[1];
+                }
+
+                cc.JsonName ??= StringConverter.ToCamelCase(cc.NameAlias);
 
                 await cc.PrepareAsync(Root!, this).ConfigureAwait(false);
 

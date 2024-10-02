@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPersonDelete]
+CREATE OR ALTER PROCEDURE [Demo].[spPersonDelete]
   @PersonId AS UNIQUEIDENTIFIER
 AS
 BEGIN

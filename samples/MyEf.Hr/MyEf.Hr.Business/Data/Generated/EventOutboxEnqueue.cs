@@ -12,8 +12,5 @@ namespace MyEf.Hr.Business.Data;
 public sealed class EventOutboxEnqueue(IDatabase database, ILogger<EventOutboxEnqueue> logger) : EventOutboxEnqueueBase(database, logger)
 {
     /// <inheritdoc/>
-    protected override string DbTvpTypeName => "[Outbox].[udtEventOutboxList]";
-
-    /// <inheritdoc/>
     protected override string EnqueueStoredProcedure => "[Outbox].[spEventOutboxEnqueue]";
 }

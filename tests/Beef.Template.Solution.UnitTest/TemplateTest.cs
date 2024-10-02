@@ -172,6 +172,7 @@ namespace Beef.Template.Solution.UnitTest
             if (datasource == "SqlServerProcs" || datasource == "SqlServer" || datasource == "MySQL" || datasource == "Postgres")
             {
                 Assert.That(ExecuteCommand("dotnet", "run drop --accept-prompts", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run drop [database]");
+                Assert.That(ExecuteCommand("dotnet", "run createmigrateandcodegen", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run all [database]");
                 Assert.That(ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, Is.Zero, "dotnet run all [database]");
             }
 

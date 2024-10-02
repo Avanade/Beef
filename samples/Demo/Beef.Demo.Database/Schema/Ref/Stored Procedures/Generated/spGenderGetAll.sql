@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Ref].[spGenderGetAll]
+CREATE OR ALTER PROCEDURE [Ref].[spGenderGetAll]
 AS
 BEGIN
   /*

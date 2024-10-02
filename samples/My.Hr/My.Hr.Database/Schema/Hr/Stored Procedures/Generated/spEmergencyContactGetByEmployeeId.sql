@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Hr].[spEmergencyContactGetByEmployeeId]
+CREATE OR ALTER PROCEDURE [Hr].[spEmergencyContactGetByEmployeeId]
   @EmployeeId AS UNIQUEIDENTIFIER
 AS
 BEGIN

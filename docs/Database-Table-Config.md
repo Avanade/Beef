@@ -74,6 +74,7 @@ Property | Description
 **`includeColumns`** | The list of `Column` names to be included in the underlying generated output.<br/>&dagger; Where not specified this indicates that all `Columns` are to be included.
 **`excludeColumns`** | The list of `Column` names to be excluded from the underlying generated output.<br/>&dagger; Where not specified this indicates no `Columns` are to be excluded.
 **`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.<br/>&dagger; Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`.
+**`jsonAliasColumns`** | The list of JSON `Column` and `JsonAlias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.<br/>&dagger; Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `ProductCode^product`.
 
 <br/>
 
@@ -111,6 +112,7 @@ Property | Description
 **`udt`** | Indicates whether a `User Defined Table (UDT)` type should be created.
 `udtExcludeColumns` | The list of `Column` names to be excluded from the `User Defined Table (UDT)`.<br/>&dagger; Where not specified this indicates that no `Columns` are to be excluded.
 **`tvp`** | The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
+**`collectionType`** | The collection type. Valid options are: `JSON`, `UDT`.<br/>&dagger; Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `Config.CollectionType`.
 
 <br/>
 

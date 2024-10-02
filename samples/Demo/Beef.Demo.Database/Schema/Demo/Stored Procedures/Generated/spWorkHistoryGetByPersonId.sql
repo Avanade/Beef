@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spWorkHistoryGetByPersonId]
+CREATE OR ALTER PROCEDURE [Demo].[spWorkHistoryGetByPersonId]
   @PersonId AS UNIQUEIDENTIFIER
 AS
 BEGIN

@@ -27,8 +27,7 @@ The following are the key generated Outbox enqueue artefacts; performing the tra
 Type | Name | Description
 -|-|-
 Stored procedure | [spEventOutboxEnqueue](../MyEf.Hr.Database/Schema/Outbox/Stored%20Procedures/Generated/spEventOutboxEnqueue.sql) | The stored procedure used to _enqueue_ zero or more events into the database.
-Used-defined table type | [udtEventOutboxList](../MyEf.Hr.Database/Schema/Outbox/Types/User-Defined%20Table%20Types/Generated/udtEventOutboxList.sql) | The type used during _enqueue_ as the events collection being passed. By design this is the database representation (column from/to property) of the _CoreEx_ .NET [EventData](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventData.cs) class.
-Class | [EventOutboxEnqueue](../MyEf.Hr.Business/Data/Generated/EventOutboxEnqueue.cs) | Provides the [`IEventSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventSender.cs) implementation (inheriting from [EventOutboxEnqueueBase](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Database.SqlServer/Outbox/EventOutboxEnqueueBase.cs)) to perform the _enqueue_ using the `spEventOutboxEnqueue` stored procedure.
+.NET Class | [EventOutboxEnqueue](../MyEf.Hr.Business/Data/Generated/EventOutboxEnqueue.cs) | Provides the [`IEventSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventSender.cs) implementation (inheriting from [EventOutboxEnqueueBase](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Database.SqlServer/Outbox/EventOutboxEnqueueBase.cs)) to perform the _enqueue_ using the `spEventOutboxEnqueue` stored procedure.
 
 <br/>
 
@@ -39,7 +38,7 @@ The following are the key generated Outbox dequeue artefacts.
 Type | Name | Description
 -|-|-
 Stored procedure | [spEventOutboxDequeue](../MyEf.Hr.Database/Schema/Outbox/Stored%20Procedures/Generated/spEventOutboxDequeue.sql) | The stored procedure used to _dequeue_ zero or more events from the database.
-Class | [EventOutboxDequeue](../MyEf.Hr.Business/Data/Generated/EventOutboxDequeue.cs) | Provides the _dequeue_ implementation (inheriting from [EventOutboxDequeueBase](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Database.SqlServer/Outbox/EventOutboxDequeueBase.cs)) using the `spEventOutboxDequeue` stored procedure. This class is then also responsible for sending the dequeued events (via an [`IEventSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventSender.cs)) to the final messaging subsystem. On successful send, the dequeued events will be committed (within Outbox) as sent, guaranteeing as-least once messaging semantics.
+.NET Class | [EventOutboxDequeue](../MyEf.Hr.Business/Data/Generated/EventOutboxDequeue.cs) | Provides the _dequeue_ implementation (inheriting from [EventOutboxDequeueBase](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx.Database.SqlServer/Outbox/EventOutboxDequeueBase.cs)) using the `spEventOutboxDequeue` stored procedure. This class is then also responsible for sending the dequeued events (via an [`IEventSender`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventSender.cs)) to the final messaging subsystem. On successful send, the dequeued events will be committed (within Outbox) as sent, guaranteeing as-least once messaging semantics.
 
 <br/>
 

@@ -79,9 +79,7 @@ namespace Beef.Database
                 return vr;
 
             if (Args.OutputDirectory == null)
-                Args.OutputDirectory = Args.MigrationCommand == DbEx.MigrationCommand.Script
-                    ? new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory())
-                    : new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
+                Args.OutputDirectory = new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
 
             if (Args.MigrationCommand.HasFlag(MigrationCommand.CodeGen))
             {

@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Ref].[spGenderUpdate]
+CREATE OR ALTER PROCEDURE [Ref].[spGenderUpdate]
   @GenderId AS UNIQUEIDENTIFIER,
   @Code AS NVARCHAR(50),
   @Text AS NVARCHAR(250) NULL = NULL,

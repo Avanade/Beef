@@ -316,9 +316,13 @@ jobs:
     - name: Template/SqlServer/EfWs create
       run: dotnet new beef --company Foo.EfWs --appname Bar --datasource SqlServer --services AzFunction --output Foo.EfWs.Bar
 
-    - name: Template/SqlServer/EfWs database
+    - name: Template/SqlServer/EfWs database drop
       working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Database
-      run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
+      run: dotnet run drop --connection-varname Bar_ConnectionStrings__Database --accept-prompts
+
+    - name: Template/SqlServer/EfWs database create-migrate-codegen
+      working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Database
+      run: dotnet run createmigrateandcodegen --connection-varname Bar_ConnectionStrings__Database --accept-prompts
 
     - name: Template/SqlServer/EfWs code-gen
       working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.CodeGen

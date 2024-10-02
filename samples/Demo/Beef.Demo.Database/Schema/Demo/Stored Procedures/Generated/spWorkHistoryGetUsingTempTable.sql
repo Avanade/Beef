@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spWorkHistoryGetUsingTempTable]
+CREATE OR ALTER PROCEDURE [Demo].[spWorkHistoryGetUsingTempTable]
 AS
 BEGIN
   /*

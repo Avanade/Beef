@@ -86,6 +86,7 @@ Property | Description
 `reselectStatement` | The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.<br/>&dagger; Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s).
 `intoTempTable` | Indicates whether to select into a `#TempTable` to allow other statements access to the selected data.<br/>&dagger; A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`.
 `withHints` | the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.
+**`collectionType`** | The collection type. Valid options are: `JSON`, `UDT`.<br/>&dagger; Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `Table.CollectionType`.
 
 <br/>
 

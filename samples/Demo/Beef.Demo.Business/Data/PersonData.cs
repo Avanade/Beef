@@ -14,7 +14,7 @@ namespace Beef.Demo.Business.Data
         {
             p.ParamWithWildcard(args?.FirstName, "FirstName")
              .ParamWithWildcard(args?.LastName, "LastName")
-             .TableValuedParamWith(args?.Genders, "GenderIds", () => _db.CreateTableValuedParameter(args!.Genders!.ToIdList<Guid>()));
+             .JsonParamWith(args?.Genders, "GenderIds", () => args!.Genders!.ToIdList<Guid>());
         }
 
         private IQueryable<EfModel.Person> GetByArgsWithEfOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args)

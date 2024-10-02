@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Test].[spTableUpsert]
+CREATE OR ALTER PROCEDURE [Test].[spTableUpsert]
   @TableId AS UNIQUEIDENTIFIER,
   @Name AS NVARCHAR(50) NULL = NULL,
   @Count AS INT NULL = NULL,

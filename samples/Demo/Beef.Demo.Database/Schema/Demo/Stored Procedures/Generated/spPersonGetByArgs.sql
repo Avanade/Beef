@@ -1,7 +1,7 @@
-CREATE PROCEDURE [Demo].[spPersonGetByArgs]
+CREATE OR ALTER PROCEDURE [Demo].[spPersonGetByArgs]
   @FirstName AS NVARCHAR(50) NULL = NULL,
   @LastName AS NVARCHAR(50) NULL = NULL,
-  @GenderIds AS [dbo].[udtUniqueIdentifierList] READONLY,
+  @GenderIds AS NVARCHAR(MAX) NULL = NULL, -- JSON Array
   @PagingSkip AS INT = 0,
   @PagingTake AS INT = 250,
   @PagingCount AS BIT = NULL
@@ -15,7 +15,7 @@ BEGIN
 
   -- Check list counts.
   DECLARE @GenderIdsCount AS INT
-  SET @GenderIdsCount = (SELECT COUNT(*) FROM @GenderIds)
+  SET @GenderIdsCount = (SELECT COUNT(*) FROM OPENJSON(@GenderIds))
 
   -- Select the requested data.
   SELECT
@@ -37,7 +37,7 @@ BEGIN
     FROM [Demo].[Person] AS [p]
     WHERE (@FirstName IS NULL OR [p].[FirstName] LIKE @FirstName)
       AND (@LastName IS NULL OR [p].[LastName] LIKE @LastName)
-      AND (@GenderIdsCount = 0 OR [p].[GenderId] IN (SELECT [Value] FROM @GenderIds))
+      AND (@GenderIdsCount = 0 OR [p].[GenderId] IN (SELECT VALUE FROM OPENJSON(@GenderIds)))
     ORDER BY [p].[LastName] ASC, [p].[FirstName] ASC
     OFFSET @PagingSkip ROWS FETCH NEXT @PagingTake ROWS ONLY
 
@@ -48,6 +48,6 @@ BEGIN
       FROM [Demo].[Person] AS [p]
       WHERE (@FirstName IS NULL OR [p].[FirstName] LIKE @FirstName)
         AND (@LastName IS NULL OR [p].[LastName] LIKE @LastName)
-        AND (@GenderIdsCount = 0 OR [p].[GenderId] IN (SELECT [Value] FROM @GenderIds)))
+        AND (@GenderIdsCount = 0 OR [p].[GenderId] IN (SELECT VALUE FROM OPENJSON(@GenderIds))))
   END
 END

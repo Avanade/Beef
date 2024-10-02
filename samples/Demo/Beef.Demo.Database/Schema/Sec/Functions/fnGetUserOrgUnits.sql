@@ -1,4 +1,4 @@
-﻿CREATE FUNCTION [Sec].[fnGetUserOrgUnits]()
+﻿CREATE OR ALTER FUNCTION [Sec].[fnGetUserOrgUnits]()
 RETURNS TABLE
 AS
 RETURN

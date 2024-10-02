@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPersonGetDetailByArgs]
+CREATE OR ALTER PROCEDURE [Demo].[spPersonGetDetailByArgs]
   @FirstName AS NVARCHAR(50) NULL = NULL,
   @LastName AS NVARCHAR(50) NULL = NULL,
   @GenderIds AS [dbo].[udtUniqueIdentifierList] READONLY,

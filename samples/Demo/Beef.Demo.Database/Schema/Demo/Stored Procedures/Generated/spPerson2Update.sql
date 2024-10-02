@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPerson2Update]
+CREATE OR ALTER PROCEDURE [Demo].[spPerson2Update]
   @PersonId AS UNIQUEIDENTIFIER,
   @FirstName AS NVARCHAR(50) NULL = NULL,
   @LastName AS NVARCHAR(50) NULL = NULL,

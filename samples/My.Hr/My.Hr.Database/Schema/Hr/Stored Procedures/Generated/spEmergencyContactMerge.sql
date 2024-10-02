@@ -1,6 +1,6 @@
-CREATE PROCEDURE [Hr].[spEmergencyContactMerge]
+CREATE OR ALTER PROCEDURE [Hr].[spEmergencyContactMerge]
   @EmployeeId AS UNIQUEIDENTIFIER,
-  @List AS [Hr].[udtEmergencyContactList] READONLY
+  @List AS NVARCHAR(MAX)
 AS
 BEGIN
   /*
@@ -13,12 +13,21 @@ BEGIN
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
+    -- Convert the JSON to a temporary table.
+    SELECT * INTO #ecList FROM OPENJSON(@List) WITH (
+      [EmergencyContactId] UNIQUEIDENTIFIER '$.id',
+      [EmployeeId] UNIQUEIDENTIFIER '$.employeeId',
+      [FirstName] NVARCHAR(100) '$.firstName',
+      [LastName] NVARCHAR(100) '$.lastName',
+      [PhoneNo] NVARCHAR(50) '$.phoneNo',
+      [RelationshipTypeCode] NVARCHAR(50) '$.relationship')
+
     -- Check valid for merge.
     DECLARE @ListCount INT
-    SET @ListCount = (SELECT COUNT(*) FROM @List WHERE [EmergencyContactId] IS NOT NULL AND [EmergencyContactId] <> CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000'))
+    SET @ListCount = (SELECT COUNT(*) FROM #ecList WHERE [EmergencyContactId] IS NOT NULL AND [EmergencyContactId] <> CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000'))
 
     DECLARE @RecordCount INT
-    SET @RecordCount = (SELECT COUNT(*) FROM @List AS [list]
+    SET @RecordCount = (SELECT COUNT(*) FROM #ecList AS [list]
       INNER JOIN [Hr].[EmergencyContact] AS [ec]
         ON [ec].[EmergencyContactId] = [List].[EmergencyContactId])
 
@@ -29,12 +38,12 @@ BEGIN
 
     -- Merge the records.
     MERGE INTO [Hr].[EmergencyContact] WITH (HOLDLOCK) AS [ec]
-      USING @List AS [list]
+      USING #ecList AS [list]
         ON ([ec].[EmergencyContactId] = [List].[EmergencyContactId])
       WHEN MATCHED AND EXISTS
-         (SELECT [list].[FirstName], [list].[LastName], [list].[PhoneNo], [list].[RelationshipTypeCode]
+         (SELECT [list].[EmployeeId], [list].[FirstName], [list].[LastName], [list].[PhoneNo], [list].[RelationshipTypeCode]
           EXCEPT
-          SELECT [ec].[FirstName], [ec].[LastName], [ec].[PhoneNo], [ec].[RelationshipTypeCode])
+          SELECT [ec].[EmployeeId], [ec].[FirstName], [ec].[LastName], [ec].[PhoneNo], [ec].[RelationshipTypeCode])
         THEN UPDATE SET
           [ec].[EmployeeId] = @EmployeeId,
           [ec].[FirstName] = [list].[FirstName],
