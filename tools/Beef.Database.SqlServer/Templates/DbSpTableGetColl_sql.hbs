@@ -1,7 +1,7 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
+CREATE OR ALTER PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
 {{#each ArgumentParameters}}
-  {{ParameterSql}}{{#if Parent.Paging}},{{else}}{{#unless @last}},{{/unless}}{{/if}}
+  {{ParameterSql}}{{#if Parent.Paging}},{{else}}{{#unless @last}},{{/unless}}{{/if}}{{#if Collection}}{{#ifeq CollectionType 'JSON'}} -- JSON Array{{/ifeq}}{{/if}}
 {{/each}}
 {{#if Paging}}
   @PagingSkip AS INT = 0,
@@ -32,7 +32,7 @@ BEGIN
   -- Check list counts.
   {{/if}}
   DECLARE {{ParameterName}}Count AS INT
-  SET {{ParameterName}}Count = (SELECT COUNT(*) FROM {{ParameterName}})
+  SET {{ParameterName}}Count = (SELECT COUNT(*) FROM {{#ifeq CollectionType 'JSON'}}OPENJSON({{ParameterName}}){{else}}{{ParameterName}}{{/ifeq}})
 
 {{/each}}
 {{#each ExecuteBefore}}

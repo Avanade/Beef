@@ -99,6 +99,15 @@
           "type": "boolean",
           "title": "Indicates whether to use preprocessor directives in the generated output."
         },
+        "collectionType": {
+          "type": "string",
+          "title": "The collection type.",
+          "description": "Values are \u0060JSON\u0060 being a JSON array (preferred) or \u0060UDT\u0060 for a User-Defined Type (legacy). Defaults to \u0060JSON\u0060.",
+          "enum": [
+            "JSON",
+            "UDT"
+          ]
+        },
         "efModel": {
           "type": "boolean",
           "title": "Indicates whether an \u0060Entity Framework\u0060 .NET (C#) model is to be generated for all tables.",
@@ -238,6 +247,14 @@
             "type": "string"
           }
         },
+        "jsonAliasColumns": {
+          "type": "array",
+          "title": "The list of JSON \u0060Column\u0060 and \u0060JsonAlias\u0060 pairs (split by a \u0060^\u0060 lookup character) to enable column aliasing/renaming.",
+          "description": "Each alias value should be formatted as \u0060Column\u0060 \u002B \u0060^\u0060 \u002B \u0060Alias\u0060; e.g. \u0060ProductCode^product\u0060.",
+          "items": {
+            "type": "string"
+          }
+        },
         "get": {
           "type": "boolean",
           "title": "Indicates whether a \u0060Get\u0060 stored procedure is to be automatically generated where not otherwise explicitly specified."
@@ -301,6 +318,15 @@
         "tvp": {
           "type": "string",
           "title": "The name of the .NET entity associated with the \u0060Udt\u0060 so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding \u0060DbMapper\u0060."
+        },
+        "collectionType": {
+          "type": "string",
+          "title": "The collection type.",
+          "description": "Values are \u0060JSON\u0060 being a JSON array (preferred) or \u0060UDT\u0060 for a User-Defined Type (legacy). Defaults to \u0060Config.CollectionType\u0060.",
+          "enum": [
+            "JSON",
+            "UDT"
+          ]
         },
         "permission": {
           "type": "string",
@@ -428,6 +454,15 @@
           "type": "string",
           "title": "the table hints using the SQL Server \u0060WITH()\u0060 statement; the value specified will be used as-is; e.g. \u0060NOLOCK\u0060 will result in \u0060WITH(NOLOCK)\u0060."
         },
+        "collectionType": {
+          "type": "string",
+          "title": "The collection type.",
+          "description": "Values are \u0060JSON\u0060 being a JSON array (preferred) or \u0060UDT\u0060 for a User-Defined Type (legacy). Defaults to \u0060Table.CollectionType\u0060.",
+          "enum": [
+            "JSON",
+            "UDT"
+          ]
+        },
         "mergeOverrideIdentityColumns": {
           "type": "array",
           "title": "The list of \u0060Column\u0060 names to be used in the \u0060Merge\u0060 statement to determine whether to _insert_, _update_ or _delete_.",
@@ -524,6 +559,15 @@
         "collection": {
           "type": "boolean",
           "title": "Indicates whether the parameter is a collection (one or more values to be included \u0060IN\u0060 the query)."
+        },
+        "collectionType": {
+          "type": "string",
+          "title": "The collection type.",
+          "description": "Values are \u0060JSON\u0060 being a JSON array (preferred) or \u0060UDT\u0060 for a User-Defined Type (legacy). Defaults to \u0060StoredProcedure.CollectionType\u0060.",
+          "enum": [
+            "JSON",
+            "UDT"
+          ]
         },
         "operator": {
           "type": "string",

@@ -72,6 +72,7 @@ Property | Description
 -|-
 `autoDotNetRename` | The option to automatically rename the SQL Tables and Columns for use in .NET. Valid options are: `None`, `PascalCase`, `SnakeKebabToPascalCase`.<br/>&dagger; Defaults `SnakeKebabToPascalCase` that will remove any underscores or hyphens separating each word and capitalize the first character of each; e.g. `internal-customer_id` would be renamed as `InternalCustomerId`. The `PascalCase` option will capatilize the first character only.
 `preprocessorDirectives` | Indicates whether to use preprocessor directives in the generated output.
+**`collectionType`** | The collection type. Valid options are: `JSON`, `UDT`.<br/>&dagger; Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `JSON`.
 
 <br/>
 

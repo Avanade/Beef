@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPerson2Delete]
+CREATE OR ALTER PROCEDURE [Demo].[spPerson2Delete]
   @PersonId AS UNIQUEIDENTIFIER,
   @UpdatedBy AS NVARCHAR(250) NULL = NULL,
   @UpdatedDate AS DATETIME2 NULL = NULL

@@ -318,7 +318,7 @@ jobs:
 
     - name: Template/SqlServer/EfWs database
       working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.Database
-      run: dotnet run dropandall --connection-varname Bar_ConnectionStrings__Database --accept-prompts
+      run: dotnet run createmigrateandcodegen --connection-varname Bar_ConnectionStrings__Database --accept-prompts
 
     - name: Template/SqlServer/EfWs code-gen
       working-directory: ./Foo.EfWs.Bar/Foo.EfWs.Bar.CodeGen

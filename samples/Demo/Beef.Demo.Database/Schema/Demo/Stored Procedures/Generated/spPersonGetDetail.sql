@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPersonGetDetail]
+CREATE OR ALTER PROCEDURE [Demo].[spPersonGetDetail]
   @PersonId AS UNIQUEIDENTIFIER
 AS
 BEGIN

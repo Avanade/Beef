@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPerson2GetAll]
+CREATE OR ALTER PROCEDURE [Demo].[spPerson2GetAll]
 AS
 BEGIN
   /*

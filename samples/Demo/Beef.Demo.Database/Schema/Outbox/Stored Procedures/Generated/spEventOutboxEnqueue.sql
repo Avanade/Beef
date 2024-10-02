@@ -1,6 +1,6 @@
-CREATE PROCEDURE [Outbox].[spEventOutboxEnqueue]
+CREATE OR ALTER PROCEDURE [Outbox].[spEventOutboxEnqueue]
   @SetEventsAsDequeued AS BIT = 0,
-  @EventList AS [Outbox].[udtEventOutboxList] READONLY
+  @EventList AS NVARCHAR(MAX)
 AS
 BEGIN
   /*
@@ -24,6 +24,24 @@ BEGIN
     -- Enqueued outbox resultant identifier.
     DECLARE @enqueuedId TABLE([EventOutboxId] BIGINT)
 
+    -- Convert the JSON to a temporary table.
+    SELECT * INTO #eventList FROM OPENJSON(@EventList) WITH (
+      [EventId] NVARCHAR(127) '$.EventId',
+      [EventDequeued] BIT '$.EventDequeued',
+      [Destination] NVARCHAR(127) '$.Destination',
+      [Subject] NVARCHAR(511) '$.Subject',
+      [Action] NVARCHAR(255) '$.Action',
+      [Type] NVARCHAR(1023) '$.Type',
+      [Source] NVARCHAR(1023) '$.Source',
+      [Timestamp] DATETIMEOFFSET '$.Timestamp',
+      [CorrelationId] NVARCHAR(127) '$.CorrelationId',
+      [Key] NVARCHAR(1023) '$.Key',
+      [TenantId] NVARCHAR(127) '$.TenantId',
+      [PartitionKey] NVARCHAR(127) '$.PartitionKey',
+      [ETag] NVARCHAR(127) '$.ETag',
+      [Attributes] VARBINARY(MAX) '$.Attributes',
+      [Data] VARBINARY(MAX) '$.Data')
+
     -- Cursor output variables.
     DECLARE @eventId NVARCHAR(127),
             @eventDequeued BIT,
@@ -43,7 +61,7 @@ BEGIN
 
     -- Declare, open, and fetch first event from cursor.
     DECLARE c CURSOR FORWARD_ONLY
-      FOR SELECT [EventId], [EventDequeued], [Destination], [Subject], [Action], [Type], [Source], [Timestamp], [CorrelationId], [Key], [TenantId], [PartitionKey], [ETag], [Attributes], [Data] FROM @EventList
+      FOR SELECT [EventId], [EventDequeued], [Destination], [Subject], [Action], [Type], [Source], [Timestamp], [CorrelationId], [Key], [TenantId], [PartitionKey], [ETag], [Attributes], [Data] FROM #eventList
 
     OPEN c
     FETCH NEXT FROM c INTO @eventId, @eventDequeued, @destination, @subject, @action, @type, @source, @timestamp, @correlationId, @key, @tenantId, @partitionKey, @etag, @attributes, @data

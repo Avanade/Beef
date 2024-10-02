@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Test].[spTableMerge]
+CREATE OR ALTER PROCEDURE [Test].[spTableMerge]
   @List AS [Test].[udtTableList] READONLY
 AS
 BEGIN

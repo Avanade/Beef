@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spPersonGetAll]
+CREATE OR ALTER PROCEDURE [Demo].[spPersonGetAll]
   @PagingSkip AS INT = 0,
   @PagingTake AS INT = 250,
   @PagingCount AS BIT = NULL

@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Test].[spTableGetAll]
+CREATE OR ALTER PROCEDURE [Test].[spTableGetAll]
 AS
 BEGIN
   /*

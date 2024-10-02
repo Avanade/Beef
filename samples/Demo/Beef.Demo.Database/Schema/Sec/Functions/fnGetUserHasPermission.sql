@@ -1,4 +1,4 @@
-﻿CREATE FUNCTION [Sec].[fnGetUserHasPermission](
+﻿CREATE OR ALTER FUNCTION [Sec].[fnGetUserHasPermission](
   @TenantId UNIQUEIDENTIFIER,
   @UserId UNIQUEIDENTIFIER,
   @Permission NVARCHAR(50),

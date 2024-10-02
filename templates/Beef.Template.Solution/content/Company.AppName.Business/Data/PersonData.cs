@@ -37,7 +37,7 @@ public partial class PersonData
     {
         p.ParamWithWildcard(args?.FirstName, "FirstName")
          .ParamWithWildcard(args?.LastName, "LastName")
-         .TableValuedParamWith(args?.Genders, "GenderCodes", () => _db.CreateTableValuedParameter(args!.Genders!.ToCodeList()));
+         .JsonParamWith(args?.Genders, "GenderCodes", () => args!.Genders!.ToCodeList());
     }
 #endif
 #if (implement_sqlserver || implement_mysql)

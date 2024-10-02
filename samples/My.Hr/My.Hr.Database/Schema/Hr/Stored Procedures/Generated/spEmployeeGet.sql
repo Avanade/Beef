@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Hr].[spEmployeeGet]
+CREATE OR ALTER PROCEDURE [Hr].[spEmployeeGet]
   @EmployeeId AS UNIQUEIDENTIFIER
 AS
 BEGIN

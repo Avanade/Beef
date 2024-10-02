@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Ref].[spCountryGetAll]
+CREATE OR ALTER PROCEDURE [Ref].[spCountryGetAll]
 AS
 BEGIN
   /*

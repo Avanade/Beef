@@ -185,6 +185,14 @@ namespace Beef.CodeGen.Config.Database
         [CodeGenProperty("DotNet", Title = "Indicates whether to use preprocessor directives in the generated output.")]
         public bool? PreprocessorDirectives { get; set; }
 
+        /// <summary>
+        /// Gets or sets the collection type.
+        /// </summary>
+        [JsonPropertyName("collectionType")]
+        [CodeGenProperty("DotNet", Title = "The collection type.", IsImportant = true, Options = ["JSON", "UDT"],
+            Description = "Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `JSON`.")]
+        public string? CollectionType { get; set; }
+
         #endregion
 
         #region EntityFramework
@@ -414,6 +422,7 @@ namespace Beef.CodeGen.Config.Database
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
+            CollectionType = DefaultWhereNull(CollectionType, () => "JSON");
 
             OutboxSchema = DefaultWhereNull(OutboxSchema, () => "Outbox");
             OutboxSchemaCreate = DefaultWhereNull(OutboxSchemaCreate, () => true);

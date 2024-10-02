@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Ref].[spUSStateGetAll]
+CREATE OR ALTER PROCEDURE [Ref].[spUSStateGetAll]
 AS
 BEGIN
   /*

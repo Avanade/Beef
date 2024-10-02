@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Test].[spTestQueryGetByArgs]
+CREATE OR ALTER PROCEDURE [Test].[spTestQueryGetByArgs]
   @Name AS NVARCHAR(50) NULL = NULL
 AS
 BEGIN

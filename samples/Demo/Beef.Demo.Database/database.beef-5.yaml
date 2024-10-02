@@ -2,6 +2,8 @@ schema: Demo
 outbox: true
 outboxSchemaCreate: true
 autoDotNetRename: SnakeKebabToPascalCase
+collectionType: UDT
+
 queries:
   # New "Query" configuration.
 - { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [ CreatedBy,  UpdatedBy ], permission: TestSec,
@@ -73,7 +75,7 @@ tables:
           { name: FirstName, order: Ascending }
         ]
       },
-      { name: GetByArgs, paging: true,
+      { name: GetByArgs, paging: true, collectionType: JSON,
         parameters: [
           { name: FirstName, nullable: true, collection: false, operator: LIKE },
           { name: LastName, nullable: true, collection: false, operator: LIKE },

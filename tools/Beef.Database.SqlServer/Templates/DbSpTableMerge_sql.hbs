@@ -1,9 +1,9 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
+CREATE OR ALTER PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
 {{#each ArgumentParameters}}
   {{ParameterSql}},
 {{/each}}
-  @List AS [{{Parent.Schema}}].[udt{{Parent.Name}}List] READONLY
+  @List AS {{#if Parent.Udt}}[{{Parent.Schema}}].[udt{{Parent.Name}}List] READONLY{{else}}NVARCHAR(MAX){{/if}}
 AS
 BEGIN
   /*
@@ -43,13 +43,21 @@ BEGIN
     EXEC {{Root.CheckUserPermissionSql}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'
 
 {{/ifval}}
+{{#unless Parent.Udt}}
+    -- Convert the JSON to a temporary table.
+    SELECT * INTO #{{Parent.DbTable.Alias}}List FROM OPENJSON(@List) WITH (
+  {{#each Parent.Columns}}
+      [{{Name}}] {{DbColumn.SqlType2}} '$.{{JsonName}}'{{#if @last}}){{else}},{{/if}}
+  {{/each}}
+
+{{/unless}}
 {{#ifeq MergeOverrideIdentityColumns.Count 0}}
     -- Check valid for merge.
     DECLARE @ListCount INT
-    SET @ListCount = (SELECT COUNT(*) FROM @List WHERE {{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Name}}] IS NOT NULL AND [{{Name}}] <> {{SqlInitialValue}}{{/each}})
+    SET @ListCount = (SELECT COUNT(*) FROM {{#if Parent.Udt}}@List{{else}}#{{Parent.DbTable.Alias}}List{{/if}} WHERE {{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Name}}] IS NOT NULL AND [{{Name}}] <> {{SqlInitialValue}}{{/each}})
 
     DECLARE @RecordCount INT
-    SET @RecordCount = (SELECT COUNT(*) FROM @List AS [list]
+    SET @RecordCount = (SELECT COUNT(*) FROM {{#if Parent.Udt}}@List{{else}}#{{Parent.DbTable.Alias}}List{{/if}} AS [list]
       INNER JOIN {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
 {{#each MergeListJoinOn}}
         {{#if @first}}ON{{else}}AND{{/if}} {{{.}}}{{#if @last}}){{/if}}
@@ -72,7 +80,7 @@ BEGIN
 {{/each}}
     -- Merge the records.
     MERGE INTO {{Parent.QualifiedName}}{{#ifval WithHints}} WITH ({{WithHints}}){{else}} WITH (HOLDLOCK){{/ifval}} AS [{{Parent.Alias}}]
-      USING @List AS [list]
+      USING {{#if Parent.Udt}}@List{{else}}#{{Parent.DbTable.Alias}}List{{/if}} AS [list]
 {{#each MergeOn}}
         {{#if @first}}ON ({{else}}AND {{/if}}{{{.}}}{{#if @last}}){{/if}}
 {{/each}}

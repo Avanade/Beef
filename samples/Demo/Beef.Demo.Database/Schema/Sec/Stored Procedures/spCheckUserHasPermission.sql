@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [Sec].[spCheckUserHasPermission]
+﻿CREATE OR ALTER PROCEDURE [Sec].[spCheckUserHasPermission]
   @TenantId UNIQUEIDENTIFIER,
   @UserId UNIQUEIDENTIFIER,
   @Permission NVARCHAR(50),

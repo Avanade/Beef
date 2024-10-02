@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Test].[spTable3Update]
+CREATE OR ALTER PROCEDURE [Test].[spTable3Update]
   @PartA AS NVARCHAR(10),
   @PartB AS NVARCHAR(10),
   @Name AS NVARCHAR(50) NULL = NULL,

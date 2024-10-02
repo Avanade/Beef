@@ -95,6 +95,14 @@ tables:
         public bool? Collection { get; set; }
 
         /// <summary>
+        /// Gets or sets the collection type.
+        /// </summary>
+        [JsonPropertyName("collectionType")]
+        [CodeGenProperty("Key", Title = "The collection type.", IsImportant = true, Options = ["JSON", "UDT"],
+            Description = "Values are `JSON` being a JSON array (preferred) or `UDT` for a User-Defined Type (legacy). Defaults to `StoredProcedure.CollectionType`.")]
+        public string? CollectionType { get; set; }
+
+        /// <summary>
         /// Gets or sets the where clause equality operator.
         /// </summary>
         [JsonPropertyName("operator")]
@@ -140,6 +148,11 @@ tables:
         public bool Output { get; set; }
 
         /// <summary>
+        /// Gets the corresponding <see cref="DbColumnSchema"/>.
+        /// </summary>
+        public DbColumnSchema? DbColumn { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override Task PrepareAsync()
@@ -148,24 +161,32 @@ tables:
                 Name = Name[1..];
 
             Column = DefaultWhereNull(Column, () => Name);
+            DbColumn = (Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn);
+
             Operator = DefaultWhereNull(Operator, () => "EQ");
+            CollectionType = DefaultWhereNull(CollectionType, () => Parent!.CollectionType);
             if (CompareValue(Collection, true))
-                Nullable = false;
+                Nullable = CollectionType == "JSON";
 
             SqlType = DefaultWhereNull(SqlType, () =>
             {
-                var c = (Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn) ?? throw new CodeGenException(this, nameof(Column), $"Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
+                if (DbColumn is null)
+                    throw new CodeGenException(this, nameof(Column), $"Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
+
                 if (CompareValue(Collection, true))
                 {
+                    if (CollectionType == "JSON")
+                        return $"NVARCHAR(MAX)";
+
                     var sb = new StringBuilder();
-                    var udt = c!.Type!.ToUpperInvariant() switch
+                    var udt = DbColumn!.Type!.ToUpperInvariant() switch
                     {
                         "UNIQUEIDENTIFIER" => "UniqueIdentifier",
                         "NVARCHAR" => "NVarChar",
                         "INT" => "Int",
                         "BIGINT" => "BigInt",
                         "DATETIME2" => "DateTime2",
-                        _ => c.Type
+                        _ => DbColumn.Type
                     };
 
                     sb.Append($"[dbo].[udt{udt}List] READONLY");
@@ -173,7 +194,7 @@ tables:
                 }
                 else
                 {
-                    return c.DbTable.Migration.SchemaConfig.ToFormattedSqlType(c, false);
+                    return DbColumn.DbTable.Migration.SchemaConfig.ToFormattedSqlType(DbColumn, false);
                 }
             });
 
@@ -196,7 +217,12 @@ tables:
             WhereSql = DefaultWhereNull(WhereSql, () =>
             {
                 if (CompareValue(Collection, true))
-                    return $"({ParameterName}Count = 0 OR [{Parent!.Parent!.Alias}].[{Column}] IN (SELECT [Value] FROM {ParameterName}))";
+                {
+                    if (CollectionType == "JSON")
+                        return $"({ParameterName}Count = 0 OR [{Parent!.Parent!.Alias}].[{Column}] IN (SELECT VALUE FROM OPENJSON({ParameterName})))";
+                    else
+                        return $"({ParameterName}Count = 0 OR [{Parent!.Parent!.Alias}].[{Column}] IN (SELECT [Value] FROM {ParameterName}))";
+                }
                 else
                 {
                     var sql = TreatColumnNullAs != null ? $"ISNULL([{Parent!.Parent!.Alias}].[{Column}], {TreatColumnNullAs})" : $"[{Parent!.Parent!.Alias}].[{Column}]";

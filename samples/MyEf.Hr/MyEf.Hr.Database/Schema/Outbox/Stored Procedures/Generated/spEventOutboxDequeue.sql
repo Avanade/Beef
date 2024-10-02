@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Outbox].[spEventOutboxDequeue]
+CREATE OR ALTER PROCEDURE [Outbox].[spEventOutboxDequeue]
   @MaxDequeueSize INT = 10,  -- Maximum number of events to dequeue.
   @PartitionKey NVARCHAR(127) NULL = NULL,  -- Partition key; null indicates all.
   @Destination NVARCHAR(127) NULL = NULL  -- Destination (queue or topic); null indicates all.

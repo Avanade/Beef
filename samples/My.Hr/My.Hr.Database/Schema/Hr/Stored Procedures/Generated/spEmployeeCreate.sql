@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Hr].[spEmployeeCreate]
+CREATE OR ALTER PROCEDURE [Hr].[spEmployeeCreate]
   @EmployeeId AS UNIQUEIDENTIFIER = NULL OUTPUT,
   @Email AS NVARCHAR(250) NULL = NULL,
   @FirstName AS NVARCHAR(100) NULL = NULL,
@@ -12,7 +12,7 @@ CREATE PROCEDURE [Hr].[spEmployeeCreate]
   @AddressJson AS NVARCHAR(500) NULL = NULL,
   @CreatedBy AS NVARCHAR(250) NULL = NULL,
   @CreatedDate AS DATETIME2 NULL = NULL,
-  @EmergencyContactList AS [Hr].[udtEmergencyContactList] READONLY,
+  @EmergencyContactList AS NVARCHAR(MAX),
   @ReselectRecord AS BIT = 0
 AS
 BEGIN

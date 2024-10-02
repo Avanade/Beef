@@ -1,4 +1,4 @@
-CREATE PROCEDURE [Demo].[spWorkHistoryMerge]
+CREATE OR ALTER PROCEDURE [Demo].[spWorkHistoryMerge]
   @PersonId AS UNIQUEIDENTIFIER,
   @List AS [Demo].[udtWorkHistoryList] READONLY
 AS
