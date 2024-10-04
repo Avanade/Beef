@@ -45,6 +45,7 @@ public partial class PersonDataSvc : IPersonDataSvc
     private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
     private Func<FileContentResult, Guid, Task>? _getDocumentationOnAfterAsync;
     private Func<string?, Guid, Task<Result>>? _simulateWorkOnAfterAsync;
+    private Func<string?, string?, Task<Result>>? _extendResponseOnAfterAsync;
 
     #endregion
 
@@ -309,6 +310,13 @@ public partial class PersonDataSvc : IPersonDataSvc
                      .ThenAsync(r => _simulateWorkOnAfterAsync?.Invoke(r, id) ?? Result.SuccessTask)
                      .Then(r => _events.PublishValueEvent("WorkIt", new Uri($"/person/", UriKind.Relative), $"Work", "Simulated"));
     }, new InvokerArgs { IncludeTransactionScope = true, EventPublisher = _events });
+
+    /// <inheritdoc/>
+    public Task<Result<string?>> ExtendResponseAsync(string? name)
+    {
+        return Result.GoAsync(_data.ExtendResponseAsync(name))
+                     .ThenAsync(r => _extendResponseOnAfterAsync?.Invoke(r, name) ?? Result.SuccessTask);
+    }
 }
 
 #pragma warning restore

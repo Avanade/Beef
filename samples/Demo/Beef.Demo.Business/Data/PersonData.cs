@@ -166,5 +166,7 @@ namespace Beef.Demo.Business.Data
             if (value == null) throw new ArgumentNullException(nameof(value));
             return Task.CompletedTask;
         }
+
+        private Task<Result<string?>> ExtendResponseOnImplementationAsync(string? name) => name is null ? Result<string?>.Fail("Name is needed dude!").AsTask() : Result.Ok<string?>(name).AsTask();
     }
 }

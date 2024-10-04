@@ -242,6 +242,13 @@ public partial interface IPersonManager
     /// <param name="id">The <see cref="Person"/> identifier.</param>
     /// <returns>A resultant <see cref="string"/>.</returns>
     Task<Result<string?>> SimulateWorkAsync(Guid id);
+
+    /// <summary>
+    /// Extend Response.
+    /// </summary>
+    /// <param name="name">The Name.</param>
+    /// <returns>A resultant <see cref="string"/>.</returns>
+    Task<Result<string?>> ExtendResponseAsync(string? name);
 }
 
 #pragma warning restore

@@ -230,6 +230,9 @@ public partial class PersonData : IPersonData
     /// <inheritdoc/>
     public Task<Result<string?>> SimulateWorkAsync(Guid id) => SimulateWorkOnImplementationAsync(id);
 
+    /// <inheritdoc/>
+    public Task<Result<string?>> ExtendResponseAsync(string? name) => ExtendResponseOnImplementationAsync(name);
+
     /// <summary>
     /// Provides the <see cref="Person"/> property and database column mapping.
     /// </summary>

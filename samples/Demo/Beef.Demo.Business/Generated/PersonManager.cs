@@ -167,6 +167,11 @@ public partial class PersonManager : IPersonManager
     private Func<Guid, Task<Result>>? _simulateWorkOnBeforeAsync;
     private Func<string?, Guid, Task<Result>>? _simulateWorkOnAfterAsync;
 
+    private Func<string?, Task<Result>>? _extendResponseOnPreValidateAsync;
+    private Action<MultiValidator, string?>? _extendResponseOnValidate;
+    private Func<string?, Task<Result>>? _extendResponseOnBeforeAsync;
+    private Func<string?, string?, Task<Result>>? _extendResponseOnAfterAsync;
+
     #endregion
 
     /// <summary>
@@ -672,6 +677,20 @@ public partial class PersonManager : IPersonManager
                      .ThenAsync(() => _simulateWorkOnBeforeAsync?.Invoke(id) ?? Result.SuccessTask)
                      .ThenAsAsync(() => _dataService.SimulateWorkAsync(id))
                      .ThenAsync(r => _simulateWorkOnAfterAsync?.Invoke(r, id) ?? Result.SuccessTask)
+                     .Then(r => Cleaner.Clean(r));
+    }, InvokerArgs.Unspecified);
+
+    /// <inheritdoc/>
+    public Task<Result<string?>> ExtendResponseAsync(string? name) => ManagerInvoker.Current.InvokeAsync(this, (_, ct) =>
+    {
+        return Result.Go()
+                     .Then(() => Cleaner.CleanUp(name))
+                     .ThenAsync(() => _extendResponseOnPreValidateAsync?.Invoke(name) ?? Result.SuccessTask)
+                     .ValidateAsync(() => MultiValidator.Create()
+                         .Additional(mv => _extendResponseOnValidate?.Invoke(mv, name)), cancellationToken: ct)
+                     .ThenAsync(() => _extendResponseOnBeforeAsync?.Invoke(name) ?? Result.SuccessTask)
+                     .ThenAsAsync(() => _dataService.ExtendResponseAsync(name))
+                     .ThenAsync(r => _extendResponseOnAfterAsync?.Invoke(r, name) ?? Result.SuccessTask)
                      .Then(r => Cleaner.Clean(r));
     }, InvokerArgs.Unspecified);
 }
