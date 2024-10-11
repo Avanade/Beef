@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.16.1
+- *Fixed:* Upgraded dependencies related to `System.Text.Json`; resolve [Microsoft Security Advisory CVE-2024-43485](https://github.com/advisories/GHSA-8g4q-xg66-9fp4).
+
 ## v5.16.0
 - *Enhancement:* Database code-generation defaults to the use of [JSON](https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server)-serialized parameters versus UDT/TVP to minimize the need for additional database objects; specifically [User-Defined Types](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql) (UDT).
   - A new `CollectionType` property has been added to the code-generation configuration for query-based collection passing; supports `JSON` (default) and `UDT` (previous) values. Note that for JSON passing a `NVARCHAR(MAX)` type should be used.

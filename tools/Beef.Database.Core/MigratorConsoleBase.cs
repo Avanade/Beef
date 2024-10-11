@@ -3,7 +3,6 @@
 using Beef.CodeGen;
 using DbEx;
 using McMaster.Extensions.CommandLineUtils;
-using OnRamp;
 using OnRamp.Console;
 using System;
 using System.ComponentModel.DataAnnotations;
