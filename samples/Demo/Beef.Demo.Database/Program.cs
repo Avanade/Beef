@@ -20,7 +20,7 @@ namespace Beef.Demo.Database
         {
             args.AddAssembly<Program>();
             args.AddSchemaOrder("Sec", "Ref", "Demo");
-            args.UseBeefSchema();
+            args.IncludeExtendedSchemaScripts();
             return args;
         }
     }

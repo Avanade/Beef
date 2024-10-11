@@ -17,14 +17,7 @@ namespace Beef.Database.MySql
         /// Initializes an instance of the <see cref="MySqlMigration"/> class.
         /// </summary>
         /// <param name="args">The <see cref="MigrationArgs"/>.</param>
-        public MySqlMigration(MigrationArgs args) : base(args)
-        {
-            IsCodeGenEnabled = true;
-
-            // Add in the beef schema stuff where requested.
-            if (args.BeefSchema)
-                args.AddAssemblyAfter(typeof(DbEx.MySql.Migration.MySqlMigration).Assembly, typeof(MySqlMigration).Assembly);
-        }
+        public MySqlMigration(MigrationArgs args) : base(args) => IsCodeGenEnabled = true;
 
         /// <summary>
         /// Gets the <see cref="MigrationArgs"/>.

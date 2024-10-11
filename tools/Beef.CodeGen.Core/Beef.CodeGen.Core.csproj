@@ -32,8 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OnRamp" Version="2.2.2" />
-    <PackageReference Include="DbEx" Version="2.6.1" />
+    <PackageReference Include="OnRamp" Version="2.2.3" />
+    <PackageReference Include="DbEx" Version="2.7.1" />
     <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.22" />
   </ItemGroup>
 

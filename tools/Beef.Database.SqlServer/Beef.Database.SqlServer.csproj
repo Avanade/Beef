@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.25.6" />
-    <PackageReference Include="DbEx.SqlServer" Version="2.6.1" />
+    <PackageReference Include="CoreEx.Database.SqlServer" Version="3.27.0" />
+    <PackageReference Include="DbEx.SqlServer" Version="2.7.1" />
   </ItemGroup>
 
   <ItemGroup>

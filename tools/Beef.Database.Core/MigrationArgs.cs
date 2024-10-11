@@ -44,12 +44,6 @@ namespace Beef.Database
         /// <inheritdoc/>
         public bool IsSimulation { get; set; }
 
-        /// <summary>
-        /// Indicates whether to use the standard <i>Beef</i> schema objects (defaults to <c>false</c>).
-        /// </summary>
-        /// <remarks>This depends on the underlying database provider as to whether there are <i>Beef</i> schema objects to use.</remarks>
-        public bool BeefSchema { get; set; }
-
         /// <inheritdoc/>
         List<Assembly> ICodeGeneratorArgs.Assemblies => Assemblies.Select(x => x.Assembly).ToList();
 
@@ -58,11 +52,8 @@ namespace Beef.Database
         /// </summary>
         /// <param name="useBeefSchema">The option to use the standard <i>Beef</i> schema objects. Defaults to <c>true</c> where not specified.</param>
         /// <returns>The current <see cref="CodeGeneratorArgs"/> instance to support fluent-style method-chaining.</returns>
-        public MigrationArgs UseBeefSchema(bool useBeefSchema = true)
-        {
-            BeefSchema = useBeefSchema;
-            return this;
-        }
+        [Obsolete("This method is no longer supported; please use 'IncludeExtendedSchemaScripts' which will inlcude/add the resources from DbEx.", true)]
+        public MigrationArgs UseBeefSchema(bool useBeefSchema = true) => throw new NotSupportedException("This method is no longer supported; please use 'IncludeExtendedSchemaScripts' which will inlcude/add the resources from DbEx.");
 
         /// <inheritdoc/>
         public T GetParameter<T>(string key, bool throwWhereNotFound = false)

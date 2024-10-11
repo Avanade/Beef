@@ -17,14 +17,7 @@ namespace Beef.Database.Postgres
         /// Initializes an instance of the <see cref="PostgresMigration"/> class.
         /// </summary>
         /// <param name="args">The <see cref="MigrationArgs"/>.</param>
-        public PostgresMigration(MigrationArgs args) : base(args)
-        {
-            IsCodeGenEnabled = true;
-
-            // Add in the beef schema stuff where requested.
-            if (args.BeefSchema)
-                args.AddAssemblyAfter(typeof(DbEx.Postgres.Migration.PostgresMigration).Assembly, typeof(PostgresMigration).Assembly);
-        }
+        public PostgresMigration(MigrationArgs args) : base(args) => IsCodeGenEnabled = true;
 
         /// <summary>
         /// Gets the <see cref="MigrationArgs"/>.

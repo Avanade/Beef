@@ -24,5 +24,5 @@ public class Program
     /// </summary>
     /// <param name="args">The <see cref="MigrationArgs"/>.</param>
     /// <returns>The <see cref="MigrationArgs"/>.</returns>
-    public static MigrationArgs ConfigureMigrationArgs(MigrationArgs args) => args.AddAssembly<Program>().UseBeefSchema();
+    public static MigrationArgs ConfigureMigrationArgs(MigrationArgs args) => args.AddAssembly<Program>().IncludeExtendedSchemaScripts();
 }

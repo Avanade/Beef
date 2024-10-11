@@ -45,7 +45,7 @@ public class Program
     /// <returns>The <see cref="MigrationArgs"/>.</returns>
     /// <remarks>This is also invoked from the unit tests to ensure consistency of execution.</remarks>
 #if (implement_database)
-    public static MigrationArgs ConfigureMigrationArgs(MigrationArgs args) => args.AddAssembly<Program>().UseBeefSchema();
+    public static MigrationArgs ConfigureMigrationArgs(MigrationArgs args) => args.AddAssembly<Program>().IncludeExtendedSchemaScripts();
 #endif
 #if (implement_sqlserver || implement_mysql || implement_postgres)
     public static MigrationArgs ConfigureMigrationArgs(MigrationArgs args) => args.AddAssembly<Program>();

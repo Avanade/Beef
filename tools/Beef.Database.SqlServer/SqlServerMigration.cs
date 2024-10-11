@@ -18,19 +18,7 @@ namespace Beef.Database.SqlServer
         /// Initializes an instance of the <see cref="SqlServerMigration"/> class.
         /// </summary>
         /// <param name="args">The <see cref="MigrationArgs"/>.</param>
-        public SqlServerMigration(MigrationArgs args) : base(args)
-        {
-            IsCodeGenEnabled = true;
-
-            // Add in the beef schema stuff where requested.
-            if (args.BeefSchema)
-            {
-                if (!args.SchemaOrder.Contains("dbo"))
-                    args.SchemaOrder.Insert(0, "dbo");
-
-                args.AddAssemblyAfter(typeof(DbEx.SqlServer.Migration.SqlServerMigration).Assembly, typeof(SqlServerMigration).Assembly);
-            }
-        }
+        public SqlServerMigration(MigrationArgs args) : base(args) => IsCodeGenEnabled = true;
 
         /// <summary>
         /// Gets the <see cref="MigrationArgs"/>.
