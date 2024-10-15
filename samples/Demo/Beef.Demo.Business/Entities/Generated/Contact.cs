@@ -69,7 +69,7 @@ public partial class Contact : EntityBase, IIdentifier<Guid>
         yield return CreateProperty(nameof(Id), Id, v => Id = v);
         yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
         yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
-        yield return CreateProperty(nameof(StatusSid), StatusSid, v => StatusSid = v);
+        yield return CreateProperty(nameof(Status), StatusSid, v => StatusSid = v);
         yield return CreateProperty(nameof(InternalCode), InternalCode, v => InternalCode = v);
         yield return CreateProperty(nameof(Communications), Communications, v => Communications = v);
     }

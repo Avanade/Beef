@@ -84,8 +84,10 @@ Provides the _Authorization_ configuration.
 
 Property | Description
 -|-
-`authPermission` | The permission used by the `ExecutionContext.IsAuthorized(AuthPermission)` to determine whether the user is authorized.
-`authRole` | The permission used by the `ExecutionContext.IsInRole(AuthRole)` to determine whether the user is authorized.
+`authPermission` | The permission used by the `ExecutionContext.UserIsAuthorized(AuthPermission)` to determine whether the user is authorized.
+`authEntity` | The permission used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized. Defaults to `Entity.AuthEntity`. Both the `AuthEntity` and `AuthAction` are required for code-generation.
+`authAction` | The permission used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized. Both the `AuthEntity` and `AuthAction` are required for code-generation.
+`authRole` | The permission used by the `ExecutionContext.UserIsInRole(AuthRole)` to determine whether the user is authorized.
 
 <br/>
 

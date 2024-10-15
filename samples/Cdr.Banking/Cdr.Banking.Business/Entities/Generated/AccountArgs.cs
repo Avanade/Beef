@@ -48,8 +48,8 @@ public partial class AccountArgs : EntityBase
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        yield return CreateProperty(nameof(ProductCategorySid), ProductCategorySid, v => ProductCategorySid = v);
-        yield return CreateProperty(nameof(OpenStatusSid), OpenStatusSid, v => OpenStatusSid = v);
+        yield return CreateProperty(nameof(ProductCategory), ProductCategorySid, v => ProductCategorySid = v);
+        yield return CreateProperty(nameof(OpenStatus), OpenStatusSid, v => OpenStatusSid = v);
         yield return CreateProperty(nameof(IsOwned), IsOwned, v => IsOwned = v);
     }
 }

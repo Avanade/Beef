@@ -63,7 +63,7 @@ public partial class AccountDetail : Account
         yield return CreateProperty(nameof(Bsb), Bsb, v => Bsb = v);
         yield return CreateProperty(nameof(AccountNumber), AccountNumber, v => AccountNumber = v);
         yield return CreateProperty(nameof(BundleName), BundleName, v => BundleName = v);
-        yield return CreateProperty(nameof(SpecificAccountUTypeSid), SpecificAccountUTypeSid, v => SpecificAccountUTypeSid = v);
+        yield return CreateProperty(nameof(SpecificAccountUType), SpecificAccountUTypeSid, v => SpecificAccountUTypeSid = v);
         yield return CreateProperty(nameof(TermDeposit), TermDeposit, v => TermDeposit = v);
         yield return CreateProperty(nameof(CreditCard), CreditCard, v => CreditCard = v);
     }

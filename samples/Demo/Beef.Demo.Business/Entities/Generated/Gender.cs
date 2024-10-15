@@ -61,7 +61,7 @@ public partial class Gender : ReferenceDataBaseEx<Guid, Gender>
 
         yield return CreateProperty(nameof(AlternateName), AlternateName, v => AlternateName = v);
         yield return CreateProperty(nameof(TripCode), TripCode, v => TripCode = v);
-        yield return CreateProperty(nameof(CountrySid), CountrySid, v => CountrySid = v);
+        yield return CreateProperty(nameof(Country), CountrySid, v => CountrySid = v);
     }
 
     /// <summary>

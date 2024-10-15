@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.16.2
+- *Fixed:* `Operation.AuthEntity` and `Operation.AuthOperation` updated to code-gen the `Manager`-based authorization (`ExecutionContent.UserIsAuthorized`) invocation.
+- *Fixed:* Code-generation logging/auditing of endpoints updated to also include the authorization configuration.
+- *Fixed:* `CreateProperty` statement within generated entity updated to use the correct name for reference data properties.
+
 ## v5.16.1
 - *Fixed:* Upgraded dependencies related to `System.Text.Json`; resolve [Microsoft Security Advisory CVE-2024-43485](https://github.com/advisories/GHSA-8g4q-xg66-9fp4).
 

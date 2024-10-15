@@ -60,7 +60,7 @@ public partial class EmployeeArgs : EntityBase
     {
         yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
         yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
-        yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
+        yield return CreateProperty(nameof(Genders), GendersSids, v => GendersSids = v);
         yield return CreateProperty(nameof(StartFrom), StartFrom, v => StartFrom = v);
         yield return CreateProperty(nameof(StartTo), StartTo, v => StartTo = v);
         yield return CreateProperty(nameof(IsIncludeTerminated), IsIncludeTerminated, v => IsIncludeTerminated = v);

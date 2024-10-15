@@ -39,6 +39,6 @@ public partial class TerminationDetail : EntityBase
     protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
         yield return CreateProperty(nameof(Date), Date, v => Date = v);
-        yield return CreateProperty(nameof(ReasonSid), ReasonSid, v => ReasonSid = v);
+        yield return CreateProperty(nameof(Reason), ReasonSid, v => ReasonSid = v);
     }
 }

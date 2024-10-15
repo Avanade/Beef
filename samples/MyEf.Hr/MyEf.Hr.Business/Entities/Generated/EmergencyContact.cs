@@ -60,7 +60,7 @@ public partial class EmergencyContact : EntityBase, IIdentifier<Guid>
         yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
         yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
         yield return CreateProperty(nameof(PhoneNo), PhoneNo, v => PhoneNo = v);
-        yield return CreateProperty(nameof(RelationshipSid), RelationshipSid, v => RelationshipSid = v);
+        yield return CreateProperty(nameof(Relationship), RelationshipSid, v => RelationshipSid = v);
     }
 }
 

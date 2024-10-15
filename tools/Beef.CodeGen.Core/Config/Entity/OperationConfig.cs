@@ -554,17 +554,31 @@ operations: [
         #region Auth
 
         /// <summary>
-        /// Gets or sets the permission used by the `ExecutionContext.IsAuthorized(AuthPermission)` to determine whether the user is authorized.
+        /// Gets or sets the permission used by the `ExecutionContext.UserIsAuthorized(AuthPermission)` to determine whether the user is authorized.
         /// </summary>
         [JsonPropertyName("authPermission")]
-        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.IsAuthorized(AuthPermission)` to determine whether the user is authorized.")]
+        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.UserIsAuthorized(AuthPermission)` to determine whether the user is authorized.")]
         public string? AuthPermission { get; set; }
 
         /// <summary>
-        /// Gets or sets the permission used by the `ExecutionContext.IsInRole(AuthRole)` to determine whether the user is authorized.
+        /// Gets or sets the entity-based authorization action used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized.
+        /// </summary>
+        [JsonPropertyName("authEntity")]
+        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized. Defaults to `Entity.AuthEntity`. Both the `AuthEntity` and `AuthAction` are required for code-generation.")]
+        public string? AuthEntity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the entity-based authorization entity used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized.
+        /// </summary>
+        [JsonPropertyName("authAction")]
+        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized. Both the `AuthEntity` and `AuthAction` are required for code-generation.")]
+        public string? AuthAction { get; set; }
+
+        /// <summary>
+        /// Gets or sets the permission used by the `ExecutionContext.UserIsInRole(AuthRole)` to determine whether the user is authorized.
         /// </summary>
         [JsonPropertyName("authRole")]
-        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.IsInRole(AuthRole)` to determine whether the user is authorized.")]
+        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.UserIsInRole(AuthRole)` to determine whether the user is authorized.")]
         public string? AuthRole { get; set; }
 
         #endregion
@@ -1137,6 +1151,8 @@ operations: [
             WebApiReturnText = Type == "GetColl" ? StringConverter.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));
+            AuthPermission = DefaultWhereNull(AuthPermission, () => Parent!.AuthPermission);
+            AuthEntity = DefaultWhereNull(AuthEntity, () => Parent!.AuthEntity);
             AuthRole = DefaultWhereNull(AuthRole, () => Parent!.AuthRole);
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);

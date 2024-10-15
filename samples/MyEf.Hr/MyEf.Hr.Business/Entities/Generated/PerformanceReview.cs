@@ -78,7 +78,7 @@ public partial class PerformanceReview : EntityBase, IIdentifier<Guid>, IETag, I
         yield return CreateProperty(nameof(Id), Id, v => Id = v);
         yield return CreateProperty(nameof(EmployeeId), EmployeeId, v => EmployeeId = v);
         yield return CreateProperty(nameof(Date), Date, v => Date = v);
-        yield return CreateProperty(nameof(OutcomeSid), OutcomeSid, v => OutcomeSid = v);
+        yield return CreateProperty(nameof(Outcome), OutcomeSid, v => OutcomeSid = v);
         yield return CreateProperty(nameof(Reviewer), Reviewer, v => Reviewer = v);
         yield return CreateProperty(nameof(Notes), Notes, v => Notes = v);
         yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);

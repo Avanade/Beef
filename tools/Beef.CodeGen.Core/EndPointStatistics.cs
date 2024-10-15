@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Beef.CodeGen
 {
@@ -34,12 +35,54 @@ namespace Beef.CodeGen
                         Route = o.AgentWebApiRoute,
                         Method = o.WebApiMethod![4..],
                         Status = o.WebApiStatus!,
-                        Auth = o.WebApiAuthorize ?? e.WebApiAuthorize,
+                        ApiAuth = o.WebApiAuthorize ?? e.WebApiAuthorize,
                         Tags = string.Join(", ", o.WebApiTags!.Count > 0 ? o.WebApiTags : e.WebApiTags!),
-                        Name = $"{e.Name}.{o.Name}"
+                        Name = $"{e.Name}.{o.Name}",
+                        MgrAuth = GetRolePermission(o)
                     });
                 }
             }
+        }
+
+        /// <summary>
+        /// Create the role/permission text.
+        /// </summary>
+        private static string? GetRolePermission(Config.Entity.OperationConfig o)
+        {
+            if (o.IsPatch)
+            {
+                var po = o.Parent!.Operations!.Where(x => x.Name == o.WebApiUpdateOperation).FirstOrDefault();
+                if (po is not null)
+                    o = po;
+            }
+
+            if (o.ExcludeManager.HasValue && o.ExcludeManager.Value)
+                return "<manager-excluded>";
+
+            var sb = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(o.AuthRole))
+                sb.Append(o.AuthRole);
+
+            if (!string.IsNullOrEmpty(o.AuthPermission))
+            {
+                if (sb.Length > 0)
+                    sb.Append(" / ");
+
+                sb.Append(o.AuthPermission);
+            }
+
+            if (!string.IsNullOrEmpty(o.AuthEntity))
+            {
+                if (sb.Length > 0)
+                    sb.Append(" / ");
+
+                sb.Append(o.AuthEntity);
+                sb.Append('.');
+                sb.Append(string.IsNullOrEmpty(o.AuthAction) ? "<not-specified>" : o.AuthAction);
+            }
+
+            return sb.Length == 0 ? null : sb.ToString();
         }
 
         /// <summary>
@@ -53,7 +96,7 @@ namespace Beef.CodeGen
                 Route = root.RefDataWebApiRoute,
                 Method = "GET",
                 Status = "OK",
-                Auth = root.WebApiAuthorize,
+                ApiAuth = root.WebApiAuthorize,
                 Tags = null,
                 Name = "ReferenceData.GetNamed"
             });
@@ -67,7 +110,7 @@ namespace Beef.CodeGen
                     Route = e.WebApiRoutePrefix!,
                     Method = "GET",
                     Status = "OK",
-                    Auth = e.WebApiAuthorize,
+                    ApiAuth = e.WebApiAuthorize,
                     Tags = string.Join(", ", e.WebApiTags!),
                     Name = $"ReferenceData.{e.Name}GetAll"
                 });
@@ -103,22 +146,24 @@ namespace Beef.CodeGen
             var routeLength = Math.Max(5, _endPoints.Max(x => x.Route?.Length ?? 0));
             var methodLength = Math.Max(6, _endPoints.Max(x => x.Method?.Length ?? 0));
             var statusLength = Math.Max(6, _endPoints.Max(x => x.Status?.Length ?? 0));
-            var authLength = Math.Max(4, _endPoints.Max(x => x.Auth?.Length ?? 0));
+            var authLength = Math.Max(8, _endPoints.Max(x => x.ApiAuth?.Length ?? 0));
             var tagsLength = Math.Max(4, _endPoints.Max(x => x.Tags?.Length ?? 0));
+            var nameLength = Math.Max(4, _endPoints.Max(x => x.Name?.Length ?? 0));
 
             var hdrRoute = string.Format("{0, -" + routeLength + "}", "Route");
             var hdrMethod = string.Format("{0, -" + methodLength + "}", "Method");
             var hdrStatus = string.Format("{0, -" + statusLength + "}", "Status");
-            var hdrAuth = string.Format("{0, -" + authLength + "}", "Auth");
+            var hdrApiAuth = string.Format("{0, -" + authLength + "}", "Api-Auth");
             var hdrTags = string.Format("{0, -" + tagsLength + "}", "Tags");
+            var hdrName = string.Format("{0, -" + nameLength + "}", "Name");
 
             if (_endPoints.Count == 0)
                 return;
 
             var prefix = indent ? new string(' ', 6) : string.Empty;
 
-            logger.LogInformation("{Content}", $"{prefix}{hdrRoute} | {hdrMethod} | {hdrStatus} | {hdrAuth} | {hdrTags} | Name");
-            logger.LogInformation("{Content}", $"{prefix}{new string('-', routeLength + methodLength + statusLength + authLength + tagsLength + 15 + Math.Max(4, _endPoints.Max(x => x.Name?.Length ?? 0)))}");
+            logger.LogInformation("{Content}", $"{prefix}{hdrRoute} | {hdrMethod} | {hdrStatus} | {hdrApiAuth} | {hdrTags} | {hdrName} | Role/Permission");
+            logger.LogInformation("{Content}", $"{prefix}{new string('-', routeLength + methodLength + statusLength + authLength + tagsLength + nameLength + 18 + Math.Max(15, _endPoints.Max(x => x.MgrAuth?.Length ?? 0)))}");
 
             // Write the data.
             foreach (var ep in _endPoints.OrderBy(x => x.Route).ThenBy(x => x.Method).ThenBy(x => x.Name))
@@ -126,10 +171,11 @@ namespace Beef.CodeGen
                 var route = string.Format("{0, -" + routeLength + "}", ep.Route);
                 var method = string.Format("{0, -" + methodLength + "}", ep.Method);
                 var status = string.Format("{0, -" + statusLength + "}", ep.Status);
-                var auth = string.Format("{0, -" + authLength + "}", ep.Auth);
+                var auth = string.Format("{0, -" + authLength + "}", ep.ApiAuth);
                 var tags = string.Format("{0, -" + tagsLength + "}", ep.Tags);
+                var name = string.Format("{0, -" + nameLength + "}", ep.Name);
 
-                logger.LogInformation("{Content}", $"{prefix}{route} | {method.ToUpperInvariant()} | {status} | {auth} | {tags} | {ep.Name}");
+                logger.LogInformation("{Content}", $"{prefix}{route} | {method.ToUpperInvariant()} | {status} | {auth} | {tags} | {name} | {ep.MgrAuth}");
             }
         }
 
@@ -153,8 +199,9 @@ namespace Beef.CodeGen
         public string? Route { get; set; }
         public string? Method { get; set; }
         public string? Status { get; set; }
-        public string? Auth { get; set; }
+        public string? ApiAuth { get; set; }
         public string? Tags { get; set; }
         public string? Name { get; set; }
+        public string? MgrAuth { get; set; }
     }
 }

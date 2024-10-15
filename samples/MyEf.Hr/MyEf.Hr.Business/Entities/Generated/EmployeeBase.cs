@@ -84,7 +84,7 @@ public partial class EmployeeBase : EntityBase, IIdentifier<Guid>
         yield return CreateProperty(nameof(Email), Email, v => Email = v);
         yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
         yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
-        yield return CreateProperty(nameof(GenderSid), GenderSid, v => GenderSid = v);
+        yield return CreateProperty(nameof(Gender), GenderSid, v => GenderSid = v);
         yield return CreateProperty(nameof(Birthday), Birthday, v => Birthday = v);
         yield return CreateProperty(nameof(StartDate), StartDate, v => StartDate = v);
         yield return CreateProperty(nameof(Termination), Termination, v => Termination = v);

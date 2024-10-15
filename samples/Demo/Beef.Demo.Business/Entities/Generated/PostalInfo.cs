@@ -60,7 +60,7 @@ public partial class PostalInfo : EntityBase, IETag
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        yield return CreateProperty(nameof(CountrySid), CountrySid, v => CountrySid = v);
+        yield return CreateProperty(nameof(Country), CountrySid, v => CountrySid = v);
         yield return CreateProperty(nameof(City), City, v => City = v);
         yield return CreateProperty(nameof(State), State, v => State = v);
         yield return CreateProperty(nameof(Places), Places, v => Places = v);
