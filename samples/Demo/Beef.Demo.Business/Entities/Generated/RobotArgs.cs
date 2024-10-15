@@ -46,7 +46,7 @@ public partial class RobotArgs : EntityBase
     {
         yield return CreateProperty(nameof(ModelNo), ModelNo, v => ModelNo = v);
         yield return CreateProperty(nameof(SerialNo), SerialNo, v => SerialNo = v);
-        yield return CreateProperty(nameof(PowerSourcesSids), PowerSourcesSids, v => PowerSourcesSids = v);
+        yield return CreateProperty(nameof(PowerSources), PowerSourcesSids, v => PowerSourcesSids = v);
     }
 }
 

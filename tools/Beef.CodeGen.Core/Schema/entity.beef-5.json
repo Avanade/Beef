@@ -973,9 +973,17 @@
           "type": "boolean",
           "title": "Indicates whether to exclude the generation of the gRPC consuming \u0060Agent\u0060 class (\u0060XxxAgent.cs\u0060)."
         },
+        "authPermission": {
+          "type": "string",
+          "title": "The permission used by the \u0060ExecutionContext.UserIsAuthorized(AuthPermission)\u0060 to determine whether the user is authorized."
+        },
+        "authEntity": {
+          "type": "string",
+          "title": "The permission used by the \u0060ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)\u0060 to determine whether the user is authorized."
+        },
         "authRole": {
           "type": "string",
-          "title": "The role (permission) used by the \u0060ExecutionContext.IsInRole(role)\u0060 for each \u0060Operation\u0060.",
+          "title": "The role (permission) used by the \u0060ExecutionContext.UserIsInRole(role)\u0060 for each \u0060Operation\u0060.",
           "description": "Used where not overridden specifically for an \u0060Operation\u0060; i.e. acts as the default."
         },
         "grpc": {
@@ -1669,11 +1677,19 @@
         },
         "authPermission": {
           "type": "string",
-          "title": "The permission used by the \u0060ExecutionContext.IsAuthorized(AuthPermission)\u0060 to determine whether the user is authorized."
+          "title": "The permission used by the \u0060ExecutionContext.UserIsAuthorized(AuthPermission)\u0060 to determine whether the user is authorized."
+        },
+        "authEntity": {
+          "type": "string",
+          "title": "The permission used by the \u0060ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)\u0060 to determine whether the user is authorized. Defaults to \u0060Entity.AuthEntity\u0060. Both the \u0060AuthEntity\u0060 and \u0060AuthAction\u0060 are required for code-generation."
+        },
+        "authAction": {
+          "type": "string",
+          "title": "The permission used by the \u0060ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)\u0060 to determine whether the user is authorized. Both the \u0060AuthEntity\u0060 and \u0060AuthAction\u0060 are required for code-generation."
         },
         "authRole": {
           "type": "string",
-          "title": "The permission used by the \u0060ExecutionContext.IsInRole(AuthRole)\u0060 to determine whether the user is authorized."
+          "title": "The permission used by the \u0060ExecutionContext.UserIsInRole(AuthRole)\u0060 to determine whether the user is authorized."
         },
         "excludeAll": {
           "type": "boolean",

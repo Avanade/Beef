@@ -88,8 +88,8 @@ public partial class Robot : EntityBase, IIdentifier<Guid>, IETag, IChangeLogEx
         yield return CreateProperty(nameof(Id), Id, v => Id = v);
         yield return CreateProperty(nameof(ModelNo), ModelNo, v => ModelNo = v);
         yield return CreateProperty(nameof(SerialNo), SerialNo, v => SerialNo = v);
-        yield return CreateProperty(nameof(EyeColorSid), EyeColorSid, v => EyeColorSid = v);
-        yield return CreateProperty(nameof(PowerSourceSid), PowerSourceSid, v => PowerSourceSid = v);
+        yield return CreateProperty(nameof(EyeColor), EyeColorSid, v => EyeColorSid = v);
+        yield return CreateProperty(nameof(PowerSource), PowerSourceSid, v => PowerSourceSid = v);
         yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);
         yield return CreateProperty(nameof(ChangeLog), ChangeLog, v => ChangeLog = v);
     }

@@ -129,8 +129,8 @@ public partial class Transaction : EntityBase, IIdentifier<string>
         yield return CreateProperty(nameof(Id), Id, v => Id = v);
         yield return CreateProperty(nameof(AccountId), AccountId, v => AccountId = v);
         yield return CreateProperty(nameof(IsDetailAvailable), IsDetailAvailable, v => IsDetailAvailable = v);
-        yield return CreateProperty(nameof(TypeSid), TypeSid, v => TypeSid = v);
-        yield return CreateProperty(nameof(StatusSid), StatusSid, v => StatusSid = v);
+        yield return CreateProperty(nameof(Type), TypeSid, v => TypeSid = v);
+        yield return CreateProperty(nameof(Status), StatusSid, v => StatusSid = v);
         yield return CreateProperty(nameof(Description), Description, v => Description = v);
         yield return CreateProperty(nameof(PostingDateTime), PostingDateTime, v => PostingDateTime = v);
         yield return CreateProperty(nameof(ExecutionDateTime), ExecutionDateTime, v => ExecutionDateTime = v);

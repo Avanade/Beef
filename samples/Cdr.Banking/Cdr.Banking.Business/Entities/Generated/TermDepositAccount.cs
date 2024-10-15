@@ -55,6 +55,6 @@ public partial class TermDepositAccount : EntityBase
         yield return CreateProperty(nameof(MaturityDate), MaturityDate, v => MaturityDate = v);
         yield return CreateProperty(nameof(MaturityAmount), MaturityAmount, v => MaturityAmount = v);
         yield return CreateProperty(nameof(MaturityCurrency), MaturityCurrency, v => MaturityCurrency = v);
-        yield return CreateProperty(nameof(MaturityInstructionsSid), MaturityInstructionsSid, v => MaturityInstructionsSid = v);
+        yield return CreateProperty(nameof(MaturityInstructions), MaturityInstructionsSid, v => MaturityInstructionsSid = v);
     }
 }

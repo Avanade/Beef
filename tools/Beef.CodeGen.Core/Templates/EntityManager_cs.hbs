@@ -93,6 +93,9 @@ public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Ma
   {{#ifval AuthPermission}}
         {{#if WithResult}}             .UserIsAuthorized("{{AuthPermission}}"){{else}}ExecutionContext.Current.UserIsAuthorized("{{AuthPermission}}").ThrowOnError();{{/if}}
   {{/ifval}}
+  {{#ifval AuthEntity}}
+        {{#if WithResult}}             .UserIsAuthorized("{{AuthEntity}}", "{{AuthAction}}"){{else}}ExecutionContext.Current.UserIsAuthorized("{{AuthEntity}}", "{{AuthAction}}").ThrowOnError();{{/if}}
+  {{/ifval}}
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#if IdentifierGenerator}}

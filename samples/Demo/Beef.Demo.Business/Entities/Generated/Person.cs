@@ -127,8 +127,8 @@ public partial class Person : EntityBase, IIdentifier<Guid>, IPartitionKey, IETa
         yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
         yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
         yield return CreateProperty(nameof(UniqueCode), UniqueCode, v => UniqueCode = v);
-        yield return CreateProperty(nameof(GenderSid), GenderSid, v => GenderSid = v);
-        yield return CreateProperty(nameof(EyeColorSid), EyeColorSid, v => EyeColorSid = v);
+        yield return CreateProperty(nameof(Gender), GenderSid, v => GenderSid = v);
+        yield return CreateProperty(nameof(EyeColor), EyeColorSid, v => EyeColorSid = v);
         yield return CreateProperty(nameof(Birthday), Birthday, v => Birthday = v);
         yield return CreateProperty(nameof(Address), Address, v => Address = v);
         yield return CreateProperty(nameof(ETag), ETag, v => ETag = v);

@@ -64,7 +64,7 @@ public partial class PersonArgs : EntityBase, ICacheKey
     {
         yield return CreateProperty(nameof(FirstName), FirstName, v => FirstName = v);
         yield return CreateProperty(nameof(LastName), LastName, v => LastName = v);
-        yield return CreateProperty(nameof(GendersSids), GendersSids, v => GendersSids = v);
+        yield return CreateProperty(nameof(Genders), GendersSids, v => GendersSids = v);
         yield return CreateProperty(nameof(OrderBy), OrderBy, v => OrderBy = v);
     }
 }

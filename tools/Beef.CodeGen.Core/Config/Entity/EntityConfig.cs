@@ -1001,10 +1001,24 @@ entities:
         #region Auth
 
         /// <summary>
+        /// Gets or sets the permission used by the `ExecutionContext.UserIsAuthorized(AuthPermission)` to determine whether the user is authorized.
+        /// </summary>
+        [JsonPropertyName("authPermission")]
+        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.UserIsAuthorized(AuthPermission)` to determine whether the user is authorized.")]
+        public string? AuthPermission { get; set; }
+
+        /// <summary>
+        /// Gets or sets the entity-based authorization entity used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized.
+        /// </summary>
+        [JsonPropertyName("authEntity")]
+        [CodeGenProperty("Auth", Title = "The permission used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized.")]
+        public string? AuthEntity { get; set; }
+
+        /// <summary>
         /// Gets or sets the role (permission) used by the <c>ExecutionContext.IsInRole(role)</c> for each <c>Operation</c>.
         /// </summary>
         [JsonPropertyName("authRole")]
-        [CodeGenProperty("Auth", Title = "The role (permission) used by the `ExecutionContext.IsInRole(role)` for each `Operation`.", IsImportant = true,
+        [CodeGenProperty("Auth", Title = "The role (permission) used by the `ExecutionContext.UserIsInRole(role)` for each `Operation`.", IsImportant = true,
             Description = "Used where not overridden specifically for an `Operation`; i.e. acts as the default.")]
         public string? AuthRole { get; set; }
 
@@ -1734,33 +1748,33 @@ entities:
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !Operations.Any(x => x.Name == "Delete"))
-                Operations.Insert(0, new OperationConfig { Name = "Delete", Type = "Delete", PrimaryKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Delete", Type = "Delete", PrimaryKey = true, AuthAction = "Delete" });
 
             if (CompareValue(Patch, true) && !Operations.Any(x => x.Name == "Patch"))
                 Operations.Insert(0, new OperationConfig { Name = "Patch", Type = "Patch", PrimaryKey = true });
 
             if (CompareValue(Update, true) && !Operations.Any(x => x.Name == "Update"))
-                Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", PrimaryKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", PrimaryKey = true, AuthAction = "Update" });
 
             if (CompareValue(Create, true) && !Operations.Any(x => x.Name == "Create"))
-                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", WebApiRoute = "" });
+                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", WebApiRoute = "", AuthAction = "Create" });
 
             if (CompareValue(Get, true) && !Operations.Any(x => x.Name == "Get"))
-                Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", PrimaryKey = true });
+                Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", PrimaryKey = true, AuthAction = "Read" });
 
             if (CompareValue(GetByArgs, true) && !Operations.Any(x => x.Name == "GetByArgs"))
             {
                 var at = $"{Name}Args";
-                Operations.Insert(0, new OperationConfig { Name = "GetByArgs", Type = "GetColl", Paging = true, WebApiRoute = "", Parameters = [new ParameterConfig() { Name = "Args", Type = at, Validator = $"{Name}ArgsValidator" }] });
+                Operations.Insert(0, new OperationConfig { Name = "GetByArgs", Type = "GetColl", Paging = true, WebApiRoute = "", AuthAction = "Read", Parameters = [new ParameterConfig() { Name = "Args", Type = at, Validator = $"{Name}ArgsValidator" }] });
                 if (!Parent!.Entities!.Any(x => x.Name == at))
                     Root!.CodeGenArgs?.Logger?.LogWarning("{Warning}", $"Warning: Config [{BuildFullyQualifiedName(nameof(GetByArgs))}] references entity '{at}' that has not been defined; this is needed to complete implementation.");
             }
 
             if (CompareValue(GetAll, true) && !Operations.Any(x => x.Name == "GetAll"))
-                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", WebApiRoute = GetByArgs is not null && GetByArgs.Value ? "all" : "" });
+                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", WebApiRoute = GetByArgs is not null && GetByArgs.Value ? "all" : "", AuthAction = "Read" });
 
             if (CompareValue(GetByQuery, true) && !Operations.Any(x => x.Name == "GetByQuery"))
-                Operations.Insert(0, new OperationConfig { Name = "GetByQuery", Type = "GetColl", Paging = true, Query = true, WebApiRoute = "query" });
+                Operations.Insert(0, new OperationConfig { Name = "GetByQuery", Type = "GetColl", Paging = true, Query = true, WebApiRoute = "query", AuthAction = "Read" });
 
             // Prepare each operations.
             foreach (var operation in Operations)

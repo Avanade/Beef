@@ -54,7 +54,7 @@ public partial class RefDataPrimaryKey : EntityBase, IPrimaryKey
     /// <inheritdoc/>
     protected override IEnumerable<IPropertyValue> GetPropertyValues()
     {
-        yield return CreateProperty(nameof(Key1Sid), Key1Sid, v => Key1Sid = v);
+        yield return CreateProperty(nameof(Key1), Key1Sid, v => Key1Sid = v);
         yield return CreateProperty(nameof(Other), Other, v => Other = v);
     }
 }

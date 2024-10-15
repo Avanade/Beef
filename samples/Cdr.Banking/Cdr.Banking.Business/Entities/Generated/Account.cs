@@ -88,10 +88,10 @@ public partial class Account : EntityBase, IIdentifier<string>
         yield return CreateProperty(nameof(CreationDate), CreationDate, v => CreationDate = v);
         yield return CreateProperty(nameof(DisplayName), DisplayName, v => DisplayName = v);
         yield return CreateProperty(nameof(Nickname), Nickname, v => Nickname = v);
-        yield return CreateProperty(nameof(OpenStatusSid), OpenStatusSid, v => OpenStatusSid = v);
+        yield return CreateProperty(nameof(OpenStatus), OpenStatusSid, v => OpenStatusSid = v);
         yield return CreateProperty(nameof(IsOwned), IsOwned, v => IsOwned = v);
         yield return CreateProperty(nameof(MaskedNumber), MaskedNumber, v => MaskedNumber = v);
-        yield return CreateProperty(nameof(ProductCategorySid), ProductCategorySid, v => ProductCategorySid = v);
+        yield return CreateProperty(nameof(ProductCategory), ProductCategorySid, v => ProductCategorySid = v);
         yield return CreateProperty(nameof(ProductName), ProductName, v => ProductName = v);
     }
 }

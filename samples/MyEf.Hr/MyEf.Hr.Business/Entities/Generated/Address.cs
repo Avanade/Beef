@@ -59,7 +59,7 @@ public partial class Address : EntityBase
         yield return CreateProperty(nameof(Street1), Street1, v => Street1 = v);
         yield return CreateProperty(nameof(Street2), Street2, v => Street2 = v);
         yield return CreateProperty(nameof(City), City, v => City = v);
-        yield return CreateProperty(nameof(StateSid), StateSid, v => StateSid = v);
+        yield return CreateProperty(nameof(State), StateSid, v => StateSid = v);
         yield return CreateProperty(nameof(PostCode), PostCode, v => PostCode = v);
     }
 }

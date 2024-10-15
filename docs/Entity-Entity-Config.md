@@ -138,7 +138,9 @@ Provides the _Authorization_ configuration.
 
 Property | Description
 -|-
-**`authRole`** | The role (permission) used by the `ExecutionContext.IsInRole(role)` for each `Operation`.<br/>&dagger; Used where not overridden specifically for an `Operation`; i.e. acts as the default.
+`authPermission` | The permission used by the `ExecutionContext.UserIsAuthorized(AuthPermission)` to determine whether the user is authorized.
+`authEntity` | The permission used by the `ExecutionContext.UserIsAuthorized(AuthEntity, AuthAction)` to determine whether the user is authorized.
+**`authRole`** | The role (permission) used by the `ExecutionContext.UserIsInRole(role)` for each `Operation`.<br/>&dagger; Used where not overridden specifically for an `Operation`; i.e. acts as the default.
 
 <br/>
 

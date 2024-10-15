@@ -278,7 +278,7 @@ public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{Entit
 
     {{/if}}
     {{#each CoreProperties}}
-        yield return CreateProperty(nameof({{PropertyName}}), {{PropertyName}}, v => {{PropertyName}} = v{{#ifval Default}}, {{Default}}{{/ifval}});
+        yield return CreateProperty(nameof({{Name}}), {{PropertyName}}, v => {{PropertyName}} = v{{#ifval Default}}, {{Default}}{{/ifval}});
     {{/each}}
     }
   {{/ifne}}
