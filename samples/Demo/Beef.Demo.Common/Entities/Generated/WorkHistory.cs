@@ -48,7 +48,6 @@ public partial class WorkHistory : IPrimaryKey
     public CompositeKey PrimaryKey => CreatePrimaryKey(Name);
 }
 
-
 /// <summary>
 /// Represents the <c>WorkHistory</c> collection.
 /// </summary>

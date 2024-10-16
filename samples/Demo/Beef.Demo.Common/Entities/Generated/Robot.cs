@@ -59,7 +59,6 @@ public partial class Robot : IIdentifier<Guid>, IETag, IChangeLog
     public ChangeLog? ChangeLog { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>Robot</c> collection.
 /// </summary>

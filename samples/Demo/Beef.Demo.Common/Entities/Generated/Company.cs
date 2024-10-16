@@ -18,7 +18,6 @@ public partial class Company : ReferenceDataBase<Guid>
     public string? ExternalCode { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>Company</c> collection.
 /// </summary>

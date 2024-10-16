@@ -23,7 +23,6 @@ public partial class ContactComm
     public bool IsPreferred { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>ContactComm</c> collection.
 /// </summary>

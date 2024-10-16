@@ -12,7 +12,6 @@ namespace Beef.Demo.Common.Entities;
 /// </summary>
 public partial class Status : ReferenceDataBase<string?> { }
 
-
 /// <summary>
 /// Represents the <c>Status</c> collection.
 /// </summary>

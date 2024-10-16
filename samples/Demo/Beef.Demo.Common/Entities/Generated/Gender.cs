@@ -29,7 +29,6 @@ public partial class Gender : ReferenceDataBase<Guid>
     public string? Country { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>Gender</c> collection.
 /// </summary>

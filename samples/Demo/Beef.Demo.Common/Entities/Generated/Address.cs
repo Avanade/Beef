@@ -23,7 +23,6 @@ public partial class Address
     public string? City { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>Address</c> collection.
 /// </summary>

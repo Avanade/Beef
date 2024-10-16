@@ -25,7 +25,6 @@ public partial class PlaceInfo
     public string? PostCode { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <see cref="PlaceInfo"/> collection.
 /// </summary>

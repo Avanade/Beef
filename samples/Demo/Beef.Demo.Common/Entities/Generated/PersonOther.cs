@@ -39,7 +39,6 @@ public partial class PersonOther : IIdentifier<Guid>, IETag, IChangeLog
     public ChangeLog? ChangeLog { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>PersonOther</c> collection.
 /// </summary>

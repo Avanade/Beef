@@ -12,7 +12,6 @@ namespace Beef.Demo.Common.Entities;
 /// </summary>
 public partial class USState : ReferenceDataBase<Guid> { }
 
-
 /// <summary>
 /// Represents the <c>USState</c> collection.
 /// </summary>

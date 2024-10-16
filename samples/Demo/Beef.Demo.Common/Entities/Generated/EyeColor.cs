@@ -12,7 +12,6 @@ namespace Beef.Demo.Common.Entities;
 /// </summary>
 public partial class EyeColor : ReferenceDataBase<Guid> { }
 
-
 /// <summary>
 /// Represents the <c>EyeColor</c> collection.
 /// </summary>

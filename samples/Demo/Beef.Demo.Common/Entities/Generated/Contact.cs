@@ -43,7 +43,6 @@ public partial class Contact : IIdentifier<Guid>
     public ContactCommCollection? Communications { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>Contact</c> collection.
 /// </summary>

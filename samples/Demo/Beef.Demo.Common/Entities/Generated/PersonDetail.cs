@@ -18,7 +18,6 @@ public partial class PersonDetail : Person
     public WorkHistoryCollection? History { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>PersonDetail</c> collection.
 /// </summary>

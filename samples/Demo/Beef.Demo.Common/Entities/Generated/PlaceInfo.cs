@@ -23,7 +23,6 @@ public partial class PlaceInfo
     public string? PostCode { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>PlaceInfo</c> collection.
 /// </summary>

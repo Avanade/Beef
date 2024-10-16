@@ -12,7 +12,6 @@ namespace Beef.Demo.Common.Entities;
 /// </summary>
 public partial class CommunicationType : ReferenceDataBase<int> { }
 
-
 /// <summary>
 /// Represents the <c>CommunicationType</c> collection.
 /// </summary>

@@ -18,7 +18,6 @@ public partial class PowerSource : ReferenceDataBase<Guid>
     public string? AdditionalInfo { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>PowerSource</c> collection.
 /// </summary>

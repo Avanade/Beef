@@ -12,7 +12,6 @@ namespace Beef.Demo.Common.Entities;
 /// </summary>
 public partial class Country : ReferenceDataBase<Guid> { }
 
-
 /// <summary>
 /// Represents the <c>Country</c> collection.
 /// </summary>

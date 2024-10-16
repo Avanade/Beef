@@ -50,7 +50,6 @@ public partial class Robot : IIdentifier<string>, IETag, IChangeLog
     public ChangeLog? ChangeLog { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <see cref="Robot"/> collection.
 /// </summary>

@@ -80,7 +80,6 @@ public partial class Person : IIdentifier<Guid>, IETag, IChangeLog
     public ChangeLog? ChangeLog { get; set; }
 }
 
-
 /// <summary>
 /// Represents the <c>Person</c> collection.
 /// </summary>
