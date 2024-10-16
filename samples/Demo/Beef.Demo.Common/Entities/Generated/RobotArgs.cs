@@ -5,38 +5,32 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the <c>Robot</c> arguments entity.
+/// </summary>
+public partial class RobotArgs
 {
     /// <summary>
-    /// Represents the <c>Robot</c> arguments entity.
+    /// Gets or sets the Model number.
     /// </summary>
-    public partial class RobotArgs
-    {
-        /// <summary>
-        /// Gets or sets the Model number.
-        /// </summary>
-        [JsonPropertyName("model-no")]
-        public string? ModelNo { get; set; }
+    [JsonPropertyName("model-no")]
+    public string? ModelNo { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Unique serial number.
-        /// </summary>
-        [JsonPropertyName("serial-no")]
-        public string? SerialNo { get; set; }
+    /// <summary>
+    /// Gets or sets the Unique serial number.
+    /// </summary>
+    [JsonPropertyName("serial-no")]
+    public string? SerialNo { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Power Sources code(s).
-        /// </summary>
-        [JsonPropertyName("power-sources")]
-        public List<string?>? PowerSources { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the Power Sources code(s).
+    /// </summary>
+    [JsonPropertyName("power-sources")]
+    public List<string?>? PowerSources { get; set; }
 }
+
 
 #pragma warning restore
 #nullable restore

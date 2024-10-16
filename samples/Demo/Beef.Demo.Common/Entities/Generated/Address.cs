@@ -5,35 +5,30 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Address entity.
+/// </summary>
+public partial class Address
 {
     /// <summary>
-    /// Represents the Address entity.
+    /// Gets or sets the Street.
     /// </summary>
-    public partial class Address
-    {
-        /// <summary>
-        /// Gets or sets the Street.
-        /// </summary>
-        public string? Street { get; set; }
-
-        /// <summary>
-        /// Gets or sets the City.
-        /// </summary>
-        public string? City { get; set; }
-    }
+    public string? Street { get; set; }
 
     /// <summary>
-    /// Represents the <c>Address</c> collection.
+    /// Gets or sets the City.
     /// </summary>
-    public partial class AddressCollection : List<Address> { }
+    public string? City { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <c>Address</c> collection.
+/// </summary>
+public partial class AddressCollection : List<Address> { }
+
 
 #pragma warning restore
 #nullable restore

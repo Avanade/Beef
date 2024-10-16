@@ -5,51 +5,46 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the other <c>Person</c> without <c>EntityBase</c> capabilities entity.
+/// </summary>
+public partial class PersonOther : IIdentifier<Guid>, IETag, IChangeLog
 {
     /// <summary>
-    /// Represents the other <c>Person</c> without <c>EntityBase</c> capabilities entity.
+    /// Gets or sets the <c>Person</c> identifier.
     /// </summary>
-    public partial class PersonOther : IIdentifier<Guid>, IETag, IChangeLog
-    {
-        /// <summary>
-        /// Gets or sets the <c>Person</c> identifier.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the First Name.
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Last Name.
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonPropertyName("etag")]
-        public string? ETag { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Change Log.
-        /// </summary>
-        public ChangeLog? ChangeLog { get; set; }
-    }
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// Represents the <c>PersonOther</c> collection.
+    /// Gets or sets the First Name.
     /// </summary>
-    public partial class PersonOtherCollection : List<PersonOther> { }
+    public string? FirstName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Last Name.
+    /// </summary>
+    public string? LastName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [JsonPropertyName("etag")]
+    public string? ETag { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Change Log.
+    /// </summary>
+    public ChangeLog? ChangeLog { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <c>PersonOther</c> collection.
+/// </summary>
+public partial class PersonOtherCollection : List<PersonOther> { }
+
 
 #pragma warning restore
 #nullable restore

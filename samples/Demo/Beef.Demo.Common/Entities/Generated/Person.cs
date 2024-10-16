@@ -5,116 +5,111 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Person entity.
+/// </summary>
+public partial class Person : IIdentifier<Guid>, IETag, IChangeLog
 {
     /// <summary>
-    /// Represents the Person entity.
+    /// Gets or sets the <c>Person</c> identifier.
     /// </summary>
-    public partial class Person : IIdentifier<Guid>, IETag, IChangeLog
-    {
-        /// <summary>
-        /// Gets or sets the <c>Person</c> identifier.
-        /// </summary>
-        [System.Xml.Serialization.XmlElement("Id")]
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the First Name.
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Last Name.
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Unique Code.
-        /// </summary>
-        public string? UniqueCode { get; set; }
-
-        /// <summary>
-        /// Gets the corresponding <c>Gender</c> text (read-only where selected).
-        /// </summary>
-        public string? GenderText { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Gender code.
-        /// </summary>
-        public string? Gender { get; set; }
-
-        /// <summary>
-        /// Gets the corresponding <c>EyeColor</c> text (read-only where selected).
-        /// </summary>
-        public string? EyeColorText { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Eye Color code.
-        /// </summary>
-        public string? EyeColor { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Birthday.
-        /// </summary>
-        public DateTime Birthday { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Address.
-        /// </summary>
-        public Address? Address { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonPropertyName("etag")]
-        public string? ETag { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Metadata.
-        /// </summary>
-        public Dictionary<string, string>? Metadata { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Change Log.
-        /// </summary>
-        public ChangeLog? ChangeLog { get; set; }
-    }
+    [System.Xml.Serialization.XmlElement("Id")]
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// Represents the <c>Person</c> collection.
+    /// Gets or sets the First Name.
     /// </summary>
-    public partial class PersonCollection : List<Person> { }
+    public string? FirstName { get; set; }
 
     /// <summary>
-    /// Represents the <c>Person</c> collection result.
+    /// Gets or sets the Last Name.
     /// </summary>
-    public class PersonCollectionResult : CollectionResult<PersonCollection, Person>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class.
-        /// </summary>
-        public PersonCollectionResult() { }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PersonCollectionResult(PagingArgs? paging) : base(paging) { }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public PersonCollectionResult(IEnumerable<Person> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
+    public string? LastName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Unique Code.
+    /// </summary>
+    public string? UniqueCode { get; set; }
+
+    /// <summary>
+    /// Gets the corresponding <c>Gender</c> text (read-only where selected).
+    /// </summary>
+    public string? GenderText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Gender code.
+    /// </summary>
+    public string? Gender { get; set; }
+
+    /// <summary>
+    /// Gets the corresponding <c>EyeColor</c> text (read-only where selected).
+    /// </summary>
+    public string? EyeColorText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Eye Color code.
+    /// </summary>
+    public string? EyeColor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Birthday.
+    /// </summary>
+    public DateTime Birthday { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Address.
+    /// </summary>
+    public Address? Address { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [JsonPropertyName("etag")]
+    public string? ETag { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Metadata.
+    /// </summary>
+    public Dictionary<string, string>? Metadata { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Change Log.
+    /// </summary>
+    public ChangeLog? ChangeLog { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <c>Person</c> collection.
+/// </summary>
+public partial class PersonCollection : List<Person> { }
+
+/// <summary>
+/// Represents the <c>Person</c> collection result.
+/// </summary>
+public class PersonCollectionResult : CollectionResult<PersonCollection, Person>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class.
+    /// </summary>
+    public PersonCollectionResult() { }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public PersonCollectionResult(PagingArgs? paging) : base(paging) { }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public PersonCollectionResult(IEnumerable<Person> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
+}
+
 
 #pragma warning restore
 #nullable restore

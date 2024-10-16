@@ -35,8 +35,9 @@ Category | Description
 [`OData`](#OData) | Provides the _OData Data-layer_ configuration.
 [`HttpAgent`](#HttpAgent) | Provides the _HTTP Agent Data-layer_ configuration.
 [`gRPC`](#gRPC) | Provides the _gRPC_ configuration.
-[`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
-[`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
+[`Path`](#Path) | Provides the _Path (Directory)_ configuration.
+[`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration.
+[`Auth`](#Auth) | Provides the _Authorization_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 The properties with a bold name are those that are more typically used (considered more important).
@@ -188,7 +189,7 @@ Property | Description
 <br/>
 
 ## Path
-Provides the _Path (Directory)_ configuration for the generated artefacts.
+Provides the _Path (Directory)_ configuration.
 
 Property | Description
 -|-
@@ -200,7 +201,7 @@ Property | Description
 <br/>
 
 ## Namespace
-Provides the _.NET Namespace_ configuration for the generated artefacts.
+Provides the _.NET Namespace_ configuration.
 
 Property | Description
 -|-
@@ -208,6 +209,18 @@ Property | Description
 `namespaceCommon` | The Namespace (root) for the Common-related .NET artefacts.<br/>&dagger; Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.
 `namespaceBusiness` | The Namespace (root) for the Business-related .NET artefacts.<br/>&dagger; Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.
 `namespaceApi` | The Namespace (root) for the Api-related .NET artefacts.<br/>&dagger; Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
+
+<br/>
+
+## Auth
+Provides the _Authorization_ configuration.
+
+Property | Description
+-|-
+`authActionCreate` | The default `Operation.AuthAction` for an `Operation.Type` of `Create`.<br/>&dagger; Defaults to `Create`.
+`authActionRead` | The default `Operation.AuthAction` for an `Operation.Type` of `Get` or `GetColl`.<br/>&dagger; Defaults to `Read`.
+`authActionUpdate` | The default `Operation.AuthAction` for an `Operation.Type` of `Update`.<br/>&dagger; Defaults to `Update`.
+`authActionDelete` | The default `Operation.AuthAction` for an `Operation.Type` of `Delete`.<br/>&dagger; Defaults to `Delete`.
 
 <br/>
 

@@ -1148,6 +1148,15 @@ operations: [
                 _ => HasReturnValue ? $"A resultant {{{{{ReturnType}}}}}" : null
             })) + ".";
 
+            AuthAction = DefaultWhereNull(AuthAction, () => Type switch
+            {
+                "Get" or "GetColl" => Root!.AuthActionRead,
+                "Create" => Root!.AuthActionCreate,
+                "Update" => Root!.AuthActionUpdate,
+                "Delete" => Root!.AuthActionDelete,
+                _ => null
+            });
+
             WebApiReturnText = Type == "GetColl" ? StringConverter.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConverter.ToPrivateCase(Name));

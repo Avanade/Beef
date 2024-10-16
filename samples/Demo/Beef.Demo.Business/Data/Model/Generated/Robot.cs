@@ -5,56 +5,57 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data.Model
+namespace Beef.Demo.Business.Data.Model;
+
+/// <summary>
+/// Represents the Robot model.
+/// </summary>
+public partial class Robot : IIdentifier<string>, IETag, IChangeLog
 {
     /// <summary>
-    /// Represents the Robot model.
+    /// Gets or sets the identifier.
     /// </summary>
-    public partial class Robot : IIdentifier<string>, IETag, IChangeLog
-    {
-        /// <summary>
-        /// Gets or sets the identifier.
-        /// </summary>
-        public string? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Model No.
-        /// </summary>
-        public string? ModelNo { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Serial No.
-        /// </summary>
-        public string? SerialNo { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Eye Color.
-        /// </summary>
-        public string? EyeColor { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Power Source.
-        /// </summary>
-        public string? PowerSource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("_etag")]
-        [JsonPropertyName("_etag")]
-        public string? ETag { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Change Log.
-        /// </summary>
-        public ChangeLog? ChangeLog { get; set; }
-    }
+    public string? Id { get; set; }
 
     /// <summary>
-    /// Represents the <see cref="Robot"/> collection.
+    /// Gets or sets the Model No.
     /// </summary>
-    public partial class RobotCollection : List<Robot> { }
+    public string? ModelNo { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Serial No.
+    /// </summary>
+    public string? SerialNo { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Eye Color.
+    /// </summary>
+    public string? EyeColor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Power Source.
+    /// </summary>
+    public string? PowerSource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("_etag")]
+    [JsonPropertyName("_etag")]
+    public string? ETag { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Change Log.
+    /// </summary>
+    public ChangeLog? ChangeLog { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <see cref="Robot"/> collection.
+/// </summary>
+public partial class RobotCollection : List<Robot> { }
+
 
 #pragma warning restore
 #nullable restore

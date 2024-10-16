@@ -5,25 +5,19 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
-{
-    /// <summary>
-    /// Represents the US State entity.
-    /// </summary>
-    public partial class USState : ReferenceDataBase<Guid> { }
+/// <summary>
+/// Represents the US State entity.
+/// </summary>
+public partial class USState : ReferenceDataBase<Guid> { }
 
-    /// <summary>
-    /// Represents the <c>USState</c> collection.
-    /// </summary>
-    public partial class USStateCollection : List<USState> { }
-}
+
+/// <summary>
+/// Represents the <c>USState</c> collection.
+/// </summary>
+public partial class USStateCollection : List<USState> { }
+
 
 #pragma warning restore
 #nullable restore

@@ -5,25 +5,19 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
-{
-    /// <summary>
-    /// Represents the Communication Type entity.
-    /// </summary>
-    public partial class CommunicationType : ReferenceDataBase<int> { }
+/// <summary>
+/// Represents the Communication Type entity.
+/// </summary>
+public partial class CommunicationType : ReferenceDataBase<int> { }
 
-    /// <summary>
-    /// Represents the <c>CommunicationType</c> collection.
-    /// </summary>
-    public partial class CommunicationTypeCollection : List<CommunicationType> { }
-}
+
+/// <summary>
+/// Represents the <c>CommunicationType</c> collection.
+/// </summary>
+public partial class CommunicationTypeCollection : List<CommunicationType> { }
+
 
 #pragma warning restore
 #nullable restore

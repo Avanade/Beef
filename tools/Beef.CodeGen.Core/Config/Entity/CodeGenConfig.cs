@@ -38,8 +38,9 @@ entities:
     [CodeGenCategory("OData", Title = "Provides the _OData Data-layer_ configuration.")]
     [CodeGenCategory("HttpAgent", Title = "Provides the _HTTP Agent Data-layer_ configuration.")]
     [CodeGenCategory("gRPC", Title = "Provides the _gRPC_ configuration.")]
-    [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
-    [CodeGenCategory("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
+    [CodeGenCategory("Path", Title = "Provides the _Path (Directory)_ configuration.")]
+    [CodeGenCategory("Namespace", Title = "Provides the _.NET Namespace_ configuration.")]
+    [CodeGenCategory("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CodeGenCategory("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigRootBase<CodeGenConfig>
     {
@@ -503,6 +504,38 @@ entities:
 
         #endregion
 
+        #region Auth
+
+        /// <summary>
+        /// Gets the default auth action for a create.
+        /// </summary>
+        [JsonPropertyName("authActionCreate")]
+        [CodeGenProperty("Auth", Title = "The default `Operation.AuthAction` for an `Operation.Type` of `Create`.", Description = "Defaults to `Create`.")]
+        public string? AuthActionCreate { get; set; }
+
+        /// <summary>
+        /// Gets the default auth action for a get or getcoll.
+        /// </summary>
+        [JsonPropertyName("authActionRead")]
+        [CodeGenProperty("Auth", Title = "The default `Operation.AuthAction` for an `Operation.Type` of `Get` or `GetColl`.", Description = "Defaults to `Read`.")]
+        public string? AuthActionRead { get; set; }
+
+        /// <summary>
+        /// Gets the default auth action for a update.
+        /// </summary>
+        [JsonPropertyName("authActionUpdate")]
+        [CodeGenProperty("Auth", Title = "The default `Operation.AuthAction` for an `Operation.Type` of `Update`.", Description = "Defaults to `Update`.")]
+        public string? AuthActionUpdate { get; set; }
+
+        /// <summary>
+        /// Gets the default auth action for a delete.
+        /// </summary>
+        [JsonPropertyName("authActionDelete")]
+        [CodeGenProperty("Auth", Title = "The default `Operation.AuthAction` for an `Operation.Type` of `Delete`.", Description = "Defaults to `Delete`.")]
+        public string? AuthActionDelete { get; set; }
+
+        #endregion
+
         /// <summary>
         /// Gets or sets the corresponding <see cref="EntityConfig"/> collection.
         /// </summary>
@@ -633,6 +666,11 @@ entities:
             RefDataIsActiveDataName = DefaultWhereNull(RefDataIsActiveDataName, () => "IsActive");
             RefDataSortOrderDataName = DefaultWhereNull(RefDataSortOrderDataName, () => "SortOrder");
             WebApiTags ??= [];
+
+            AuthActionCreate = DefaultWhereNull(AuthActionCreate, () => "Create");
+            AuthActionRead = DefaultWhereNull(AuthActionRead, () => "Read");
+            AuthActionUpdate = DefaultWhereNull(AuthActionUpdate, () => "Update");
+            AuthActionDelete = DefaultWhereNull(AuthActionDelete, () => "Delete");
 
             if (!string.IsNullOrEmpty(WebApiRoutePrefix))
                 RefDataWebApiRoute = string.IsNullOrEmpty(RefDataWebApiRoute) ? WebApiRoutePrefix :

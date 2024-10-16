@@ -5,31 +5,25 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Company entity.
+/// </summary>
+public partial class Company : ReferenceDataBase<Guid>
 {
     /// <summary>
-    /// Represents the Company entity.
+    /// Gets or sets the External Code.
     /// </summary>
-    public partial class Company : ReferenceDataBase<Guid>
-    {
-        /// <summary>
-        /// Gets or sets the External Code.
-        /// </summary>
-        public string? ExternalCode { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the <c>Company</c> collection.
-    /// </summary>
-    public partial class CompanyCollection : List<Company> { }
+    public string? ExternalCode { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <c>Company</c> collection.
+/// </summary>
+public partial class CompanyCollection : List<Company> { }
+
 
 #pragma warning restore
 #nullable restore

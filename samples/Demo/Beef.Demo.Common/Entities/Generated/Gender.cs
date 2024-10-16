@@ -5,42 +5,36 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Gender entity.
+/// </summary>
+public partial class Gender : ReferenceDataBase<Guid>
 {
     /// <summary>
-    /// Represents the Gender entity.
+    /// Gets or sets the Alternate Name.
     /// </summary>
-    public partial class Gender : ReferenceDataBase<Guid>
-    {
-        /// <summary>
-        /// Gets or sets the Alternate Name.
-        /// </summary>
-        public string? AlternateName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Trip OData Code.
-        /// </summary>
-        [JsonIgnore]
-        public string? TripCode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Country code.
-        /// </summary>
-        public string? Country { get; set; }
-    }
+    public string? AlternateName { get; set; }
 
     /// <summary>
-    /// Represents the <c>Gender</c> collection.
+    /// Gets or sets the Trip OData Code.
     /// </summary>
-    public partial class GenderCollection : List<Gender> { }
+    [JsonIgnore]
+    public string? TripCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Country code.
+    /// </summary>
+    public string? Country { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <c>Gender</c> collection.
+/// </summary>
+public partial class GenderCollection : List<Gender> { }
+
 
 #pragma warning restore
 #nullable restore

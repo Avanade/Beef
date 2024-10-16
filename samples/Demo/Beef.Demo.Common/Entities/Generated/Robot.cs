@@ -5,95 +5,90 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Robot entity.
+/// </summary>
+public partial class Robot : IIdentifier<Guid>, IETag, IChangeLog
 {
     /// <summary>
-    /// Represents the Robot entity.
+    /// Gets or sets the <c>Robot</c> identifier.
     /// </summary>
-    public partial class Robot : IIdentifier<Guid>, IETag, IChangeLog
-    {
-        /// <summary>
-        /// Gets or sets the <c>Robot</c> identifier.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Model number.
-        /// </summary>
-        public string? ModelNo { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Unique serial number.
-        /// </summary>
-        public string? SerialNo { get; set; }
-
-        /// <summary>
-        /// Gets the corresponding <c>EyeColor</c> text (read-only where selected).
-        /// </summary>
-        public string? EyeColorText { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Eye Color code.
-        /// </summary>
-        public string? EyeColor { get; set; }
-
-        /// <summary>
-        /// Gets the corresponding <c>PowerSource</c> text (read-only where selected).
-        /// </summary>
-        public string? PowerSourceText { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Power Source code.
-        /// </summary>
-        public string? PowerSource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonPropertyName("etag")]
-        public string? ETag { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Change Log.
-        /// </summary>
-        public ChangeLog? ChangeLog { get; set; }
-    }
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// Represents the <c>Robot</c> collection.
+    /// Gets or sets the Model number.
     /// </summary>
-    public partial class RobotCollection : List<Robot> { }
+    public string? ModelNo { get; set; }
 
     /// <summary>
-    /// Represents the <c>Robot</c> collection result.
+    /// Gets or sets the Unique serial number.
     /// </summary>
-    public class RobotCollectionResult : CollectionResult<RobotCollection, Robot>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class.
-        /// </summary>
-        public RobotCollectionResult() { }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public RobotCollectionResult(IEnumerable<Robot> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
+    public string? SerialNo { get; set; }
+
+    /// <summary>
+    /// Gets the corresponding <c>EyeColor</c> text (read-only where selected).
+    /// </summary>
+    public string? EyeColorText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Eye Color code.
+    /// </summary>
+    public string? EyeColor { get; set; }
+
+    /// <summary>
+    /// Gets the corresponding <c>PowerSource</c> text (read-only where selected).
+    /// </summary>
+    public string? PowerSourceText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Power Source code.
+    /// </summary>
+    public string? PowerSource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [JsonPropertyName("etag")]
+    public string? ETag { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Change Log.
+    /// </summary>
+    public ChangeLog? ChangeLog { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <c>Robot</c> collection.
+/// </summary>
+public partial class RobotCollection : List<Robot> { }
+
+/// <summary>
+/// Represents the <c>Robot</c> collection result.
+/// </summary>
+public class RobotCollectionResult : CollectionResult<RobotCollection, Robot>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class.
+    /// </summary>
+    public RobotCollectionResult() { }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public RobotCollectionResult(IEnumerable<Robot> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
+}
+
 
 #pragma warning restore
 #nullable restore

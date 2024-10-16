@@ -5,54 +5,40 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CoreEx.Configuration;
-using CoreEx.Entities;
-using CoreEx.Http;
-using CoreEx.Json;
-using Microsoft.Extensions.Logging;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+namespace Beef.Demo.Common.Agents;
 
-namespace Beef.Demo.Common.Agents
+/// <summary>
+/// Defines the <see cref="Gender"/> HTTP agent.
+/// </summary>
+public partial interface IGenderAgent
 {
     /// <summary>
-    /// Defines the <see cref="Gender"/> HTTP agent.
+    /// Gets the specified <see cref="Gender"/>.
     /// </summary>
-    public partial interface IGenderAgent
-    {
-        /// <summary>
-        /// Gets the specified <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Gender?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+    /// <param name="id">The <see cref="Gender"/> identifier.</param>
+    /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="HttpResult"/>.</returns>
+    Task<HttpResult<Gender?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Creates a new <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Gender>> CreateAsync(Gender value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Creates a new <see cref="Gender"/>.
+    /// </summary>
+    /// <param name="value">The <see cref="Gender"/>.</param>
+    /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="HttpResult"/>.</returns>
+    Task<HttpResult<Gender>> CreateAsync(Gender value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Updates an existing <see cref="Gender"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<Gender>> UpdateAsync(Gender value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
+    /// <summary>
+    /// Updates an existing <see cref="Gender"/>.
+    /// </summary>
+    /// <param name="value">The <see cref="Gender"/>.</param>
+    /// <param name="id">The <see cref="Gender"/> identifier.</param>
+    /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="HttpResult"/>.</returns>
+    Task<HttpResult<Gender>> UpdateAsync(Gender value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 }
 
 #pragma warning restore

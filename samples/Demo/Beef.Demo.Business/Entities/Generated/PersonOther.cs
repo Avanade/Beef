@@ -5,51 +5,46 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Business.Entities;
 
-namespace Beef.Demo.Business.Entities
+/// <summary>
+/// Represents the other <see cref="Person"/> without <see cref="EntityBase"/> capabilities entity.
+/// </summary>
+public partial class PersonOther : IIdentifier<Guid>, IETag, IChangeLog
 {
     /// <summary>
-    /// Represents the other <see cref="Person"/> without <see cref="EntityBase"/> capabilities entity.
+    /// Gets or sets the <see cref="Person"/> identifier.
     /// </summary>
-    public partial class PersonOther : IIdentifier<Guid>, IETag, IChangeLog
-    {
-        /// <summary>
-        /// Gets or sets the <see cref="Person"/> identifier.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the First Name.
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Last Name.
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonPropertyName("etag")]
-        public string? ETag { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Change Log.
-        /// </summary>
-        public ChangeLog? ChangeLog { get; set; }
-    }
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// Represents the <see cref="PersonOther"/> collection.
+    /// Gets or sets the First Name.
     /// </summary>
-    public partial class PersonOtherCollection : List<PersonOther> { }
+    public string? FirstName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Last Name.
+    /// </summary>
+    public string? LastName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [JsonPropertyName("etag")]
+    public string? ETag { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Change Log.
+    /// </summary>
+    public ChangeLog? ChangeLog { get; set; }
 }
+
+
+/// <summary>
+/// Represents the <see cref="PersonOther"/> collection.
+/// </summary>
+public partial class PersonOtherCollection : List<PersonOther> { }
+
 
 #pragma warning restore
 #nullable restore

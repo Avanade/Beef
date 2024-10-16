@@ -1748,19 +1748,19 @@ entities:
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !Operations.Any(x => x.Name == "Delete"))
-                Operations.Insert(0, new OperationConfig { Name = "Delete", Type = "Delete", PrimaryKey = true, AuthAction = "Delete" });
+                Operations.Insert(0, new OperationConfig { Name = "Delete", Type = "Delete", PrimaryKey = true });
 
             if (CompareValue(Patch, true) && !Operations.Any(x => x.Name == "Patch"))
                 Operations.Insert(0, new OperationConfig { Name = "Patch", Type = "Patch", PrimaryKey = true });
 
             if (CompareValue(Update, true) && !Operations.Any(x => x.Name == "Update"))
-                Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", PrimaryKey = true, AuthAction = "Update" });
+                Operations.Insert(0, new OperationConfig { Name = "Update", Type = "Update", PrimaryKey = true });
 
             if (CompareValue(Create, true) && !Operations.Any(x => x.Name == "Create"))
-                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", WebApiRoute = "", AuthAction = "Create" });
+                Operations.Insert(0, new OperationConfig { Name = "Create", Type = "Create", WebApiRoute = "" });
 
             if (CompareValue(Get, true) && !Operations.Any(x => x.Name == "Get"))
-                Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", PrimaryKey = true, AuthAction = "Read" });
+                Operations.Insert(0, new OperationConfig { Name = "Get", Type = "Get", PrimaryKey = true });
 
             if (CompareValue(GetByArgs, true) && !Operations.Any(x => x.Name == "GetByArgs"))
             {
@@ -1771,10 +1771,10 @@ entities:
             }
 
             if (CompareValue(GetAll, true) && !Operations.Any(x => x.Name == "GetAll"))
-                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", WebApiRoute = GetByArgs is not null && GetByArgs.Value ? "all" : "", AuthAction = "Read" });
+                Operations.Insert(0, new OperationConfig { Name = "GetAll", Type = "GetColl", WebApiRoute = GetByArgs is not null && GetByArgs.Value ? "all" : "" });
 
             if (CompareValue(GetByQuery, true) && !Operations.Any(x => x.Name == "GetByQuery"))
-                Operations.Insert(0, new OperationConfig { Name = "GetByQuery", Type = "GetColl", Paging = true, Query = true, WebApiRoute = "query", AuthAction = "Read" });
+                Operations.Insert(0, new OperationConfig { Name = "GetByQuery", Type = "GetColl", Paging = true, Query = true, WebApiRoute = "query" });
 
             // Prepare each operations.
             foreach (var operation in Operations)

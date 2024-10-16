@@ -5,36 +5,24 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CoreEx.Entities;
-using CoreEx.Http;
-using CoreEx.Json;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+namespace Beef.Demo.Common.Agents;
 
-namespace Beef.Demo.Common.Agents
+/// <summary>
+/// Provides the <b>Config</b> HTTP agent.
+/// </summary>
+public partial class ConfigAgent : TypedHttpClientBase<ConfigAgent>, IConfigAgent
 {
     /// <summary>
-    /// Provides the <b>Config</b> HTTP agent.
+    /// Initializes a new instance of the <see cref="ConfigAgent"/> class.
     /// </summary>
-    public partial class ConfigAgent : TypedHttpClientBase<ConfigAgent>, IConfigAgent
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigAgent"/> class.
-        /// </summary>
-        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-        /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-        /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-        public ConfigAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
+    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+    public ConfigAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 
-        /// <inheritdoc/>
-        public Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => PostAsync<System.Collections.IDictionary>("api/v1/envvars", requestOptions: requestOptions, cancellationToken: cancellationToken);
-    }
+    /// <inheritdoc/>
+    public Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+        => PostAsync<System.Collections.IDictionary>("api/v1/envvars", requestOptions: requestOptions, cancellationToken: cancellationToken);
 }
 
 #pragma warning restore

@@ -5,40 +5,34 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the <c>Person</c> arguments entity.
+/// </summary>
+public partial class PersonArgs
 {
     /// <summary>
-    /// Represents the <c>Person</c> arguments entity.
+    /// Gets or sets the First Name.
     /// </summary>
-    public partial class PersonArgs
-    {
-        /// <summary>
-        /// Gets or sets the First Name.
-        /// </summary>
-        public string? FirstName { get; set; }
+    public string? FirstName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Last Name.
-        /// </summary>
-        public string? LastName { get; set; }
+    /// <summary>
+    /// Gets or sets the Last Name.
+    /// </summary>
+    public string? LastName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Genders code(s).
-        /// </summary>
-        public List<string?>? Genders { get; set; }
+    /// <summary>
+    /// Gets or sets the Genders code(s).
+    /// </summary>
+    public List<string?>? Genders { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Order By.
-        /// </summary>
-        public Common.Entities.OrderBy? OrderBy { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the Order By.
+    /// </summary>
+    public Common.Entities.OrderBy? OrderBy { get; set; }
 }
+
 
 #pragma warning restore
 #nullable restore
