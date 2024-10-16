@@ -350,6 +350,26 @@
           "title": "The Namespace (root) for the Api-related .NET artefacts.",
           "description": "Defaults to \u0060NamespaceBase\u0060 \u002B \u0060.\u0060 \u002B \u0060ApiName\u0060 (runtime parameter). For example \u0060Beef.Demo.Api\u0060."
         },
+        "authActionCreate": {
+          "type": "string",
+          "title": "The default \u0060Operation.AuthAction\u0060 for an \u0060Operation.Type\u0060 of \u0060Create\u0060.",
+          "description": "Defaults to \u0060Create\u0060."
+        },
+        "authActionRead": {
+          "type": "string",
+          "title": "The default \u0060Operation.AuthAction\u0060 for an \u0060Operation.Type\u0060 of \u0060Get\u0060 or \u0060GetColl\u0060.",
+          "description": "Defaults to \u0060Read\u0060."
+        },
+        "authActionUpdate": {
+          "type": "string",
+          "title": "The default \u0060Operation.AuthAction\u0060 for an \u0060Operation.Type\u0060 of \u0060Update\u0060.",
+          "description": "Defaults to \u0060Update\u0060."
+        },
+        "authActionDelete": {
+          "type": "string",
+          "title": "The default \u0060Operation.AuthAction\u0060 for an \u0060Operation.Type\u0060 of \u0060Delete\u0060.",
+          "description": "Defaults to \u0060Delete\u0060."
+        },
         "entities": {
           "type": "array",
           "title": "The corresponding \u0060Entity\u0060 collection.",

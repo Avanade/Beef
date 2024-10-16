@@ -5,31 +5,24 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Power Source entity.
+/// </summary>
+public partial class PowerSource : ReferenceDataBase<Guid>
 {
     /// <summary>
-    /// Represents the Power Source entity.
+    /// Gets or sets the Additional Info.
     /// </summary>
-    public partial class PowerSource : ReferenceDataBase<Guid>
-    {
-        /// <summary>
-        /// Gets or sets the Additional Info.
-        /// </summary>
-        public string? AdditionalInfo { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the <c>PowerSource</c> collection.
-    /// </summary>
-    public partial class PowerSourceCollection : List<PowerSource> { }
+    public string? AdditionalInfo { get; set; }
 }
+
+/// <summary>
+/// Represents the <c>PowerSource</c> collection.
+/// </summary>
+public partial class PowerSourceCollection : List<PowerSource> { }
+
 
 #pragma warning restore
 #nullable restore

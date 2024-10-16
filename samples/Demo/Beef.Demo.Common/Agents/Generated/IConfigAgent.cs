@@ -5,34 +5,20 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CoreEx.Configuration;
-using CoreEx.Entities;
-using CoreEx.Http;
-using CoreEx.Json;
-using Microsoft.Extensions.Logging;
-using Beef.Demo.Common.Entities;
-using RefDataNamespace = Beef.Demo.Common.Entities;
+namespace Beef.Demo.Common.Agents;
 
-namespace Beef.Demo.Common.Agents
+/// <summary>
+/// Defines the <b>Config</b> HTTP agent.
+/// </summary>
+public partial interface IConfigAgent
 {
     /// <summary>
-    /// Defines the <b>Config</b> HTTP agent.
+    /// Get Env Vars.
     /// </summary>
-    public partial interface IConfigAgent
-    {
-        /// <summary>
-        /// Get Env Vars.
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="HttpResult"/>.</returns>
-        Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
-    }
+    /// <param name="requestOptions">The optional <see cref="HttpRequestOptions"/>.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+    /// <returns>A <see cref="HttpResult"/>.</returns>
+    Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default);
 }
 
 #pragma warning restore

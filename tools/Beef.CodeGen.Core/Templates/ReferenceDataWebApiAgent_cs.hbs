@@ -7,50 +7,35 @@
 #pragma warning disable
 
 {{/if}}
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CoreEx.Entities;
-using CoreEx.Http;
-using CoreEx.Json;
-using CoreEx.RefData;
-using {{Root.NamespaceCommon}}.Entities;
-{{#ifval Root.RefDataCommonNamespace}}
-using RefDataNamespace = {{Root.RefDataCommonNamespace}};
-{{/ifval}}
+namespace {{Root.NamespaceCommon}}.Agents;
 
-namespace {{Root.NamespaceCommon}}.Agents
+/// <summary>
+/// Provides the <b>ReferenceData</b> HTTP agent.
+/// </summary>
+public partial class ReferenceDataAgent : TypedHttpClientBase<ReferenceDataAgent>, IReferenceDataAgent
 {
     /// <summary>
-    /// Provides the <b>ReferenceData</b> HTTP agent.
+    /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
     /// </summary>
-    public partial class ReferenceDataAgent : TypedHttpClientBase<ReferenceDataAgent>, IReferenceDataAgent
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
-        /// </summary>
-        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-        /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-        /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-        public ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
+    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+    public ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 
 {{#each RefDataEntities}}
-        /// <inheritdoc/>
-        public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+    /// <inheritdoc/>
+    public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+        => GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
 
 {{/each}}
-        /// <inheritdoc/>
-        public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        {
-            var ro = requestOptions ?? new HttpRequestOptions();
-            if (names != null)
-                ro.UrlQueryString += string.Join("&", names);
-                
-            return GetAsync("{{Root.RefDataWebApiRoute}}", ro, null, cancellationToken);
-        }
+    /// <inheritdoc/>
+    public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+    {
+        var ro = requestOptions ?? new HttpRequestOptions();
+        if (names != null)
+            ro.UrlQueryString += string.Join("&", names);
+            
+        return GetAsync("{{Root.RefDataWebApiRoute}}", ro, null, cancellationToken);
     }
 }{{#if Root.PreprocessorDirectives}}
 

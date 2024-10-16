@@ -5,29 +5,29 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data.Model
+namespace Beef.Demo.Business.Data.Model;
+
+/// <summary>
+/// Represents the Product model.
+/// </summary>
+public partial class Product
 {
     /// <summary>
-    /// Represents the Product model.
+    /// Gets or sets the ID.
     /// </summary>
-    public partial class Product
-    {
-        /// <summary>
-        /// Gets or sets the ID.
-        /// </summary>
-        public int ID { get; set; }
+    public int ID { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Name.
-        /// </summary>
-        public string? Name { get; set; }
+    /// <summary>
+    /// Gets or sets the Name.
+    /// </summary>
+    public string? Name { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Description.
-        /// </summary>
-        public string? Description { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the Description.
+    /// </summary>
+    public string? Description { get; set; }
 }
+
 
 #pragma warning restore
 #nullable restore

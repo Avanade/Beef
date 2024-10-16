@@ -5,25 +5,18 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
-{
-    /// <summary>
-    /// Represents the Country entity.
-    /// </summary>
-    public partial class Country : ReferenceDataBase<Guid> { }
+/// <summary>
+/// Represents the Country entity.
+/// </summary>
+public partial class Country : ReferenceDataBase<Guid> { }
 
-    /// <summary>
-    /// Represents the <c>Country</c> collection.
-    /// </summary>
-    public partial class CountryCollection : List<Country> { }
-}
+/// <summary>
+/// Represents the <c>Country</c> collection.
+/// </summary>
+public partial class CountryCollection : List<Country> { }
+
 
 #pragma warning restore
 #nullable restore

@@ -5,79 +5,73 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Contact entity.
+/// </summary>
+public partial class Contact : IIdentifier<Guid>
 {
     /// <summary>
-    /// Represents the Contact entity.
+    /// Gets or sets the <c>Contact</c> identifier.
     /// </summary>
-    public partial class Contact : IIdentifier<Guid>
-    {
-        /// <summary>
-        /// Gets or sets the <c>Contact</c> identifier.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the First Name.
-        /// </summary>
-        public string? FirstName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Last Name.
-        /// </summary>
-        public string? LastName { get; set; }
-
-        /// <summary>
-        /// Gets the corresponding <c>Status</c> text (read-only where selected).
-        /// </summary>
-        public string? StatusDescription { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Status code.
-        /// </summary>
-        public string? Status { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Communications.
-        /// </summary>
-        public ContactCommCollection? Communications { get; set; }
-    }
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// Represents the <c>Contact</c> collection.
+    /// Gets or sets the First Name.
     /// </summary>
-    public partial class ContactCollection : List<Contact> { }
+    public string? FirstName { get; set; }
 
     /// <summary>
-    /// Represents the <c>Contact</c> collection result.
+    /// Gets or sets the Last Name.
     /// </summary>
-    public class ContactCollectionResult : CollectionResult<ContactCollection, Contact>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class.
-        /// </summary>
-        public ContactCollectionResult() { }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public ContactCollectionResult(PagingArgs? paging) : base(paging) { }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public ContactCollectionResult(IEnumerable<Contact> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
+    public string? LastName { get; set; }
+
+    /// <summary>
+    /// Gets the corresponding <c>Status</c> text (read-only where selected).
+    /// </summary>
+    public string? StatusDescription { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Status code.
+    /// </summary>
+    public string? Status { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Communications.
+    /// </summary>
+    public ContactCommCollection? Communications { get; set; }
 }
+
+/// <summary>
+/// Represents the <c>Contact</c> collection.
+/// </summary>
+public partial class ContactCollection : List<Contact> { }
+
+/// <summary>
+/// Represents the <c>Contact</c> collection result.
+/// </summary>
+public class ContactCollectionResult : CollectionResult<ContactCollection, Contact>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class.
+    /// </summary>
+    public ContactCollectionResult() { }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public ContactCollectionResult(PagingArgs? paging) : base(paging) { }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContactCollectionResult"/> class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public ContactCollectionResult(IEnumerable<Contact> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
+}
+
 
 #pragma warning restore
 #nullable restore

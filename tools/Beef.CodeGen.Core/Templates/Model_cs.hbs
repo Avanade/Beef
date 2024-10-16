@@ -8,47 +8,22 @@
 #pragma warning disable
 
 {{/if}}
-{{! ===== Using ===== }}
-{{#unless Root.IsDataModel}}
-using System;{{set-value 'HasUsingStatement' true}}
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-  {{#ifval RefDataType}}
-using CoreEx.RefData;
-  {{/ifval}}
-{{/unless}}
-{{#unless Root.IsDataModel}}
-  {{#if Root.UsingNamespace1}}
-using {{Root.UsingNamespace1}};{{set-value 'HasUsingStatement' true}}
-  {{/if}}
-  {{#if Root.UsingNamespace2}}
-using {{Root.UsingNamespace2}};{{set-value 'HasUsingStatement' true}}
-  {{/if}}
-  {{#if Root.UsingNamespace3}}
-using {{Root.UsingNamespace3}};{{set-value 'HasUsingStatement' true}}
-  {{/if}}
-{{/unless}}
-{{#if HasUsingStatement}}
-
-{{/if}}
 {{! ===== Class ===== }}
-namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}}
-{
-    /// <summary>
-    /// {{#if Root.IsDataModel}}{{ModelSummaryText}}{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryText}}{{else}}{{SummaryText}}{{/ifeq}}{{/if}}
-    /// </summary>
+namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{/if}};
+
+/// <summary>
+/// {{#if Root.IsDataModel}}{{ModelSummaryText}}{{else}}{{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryText}}{{else}}{{SummaryText}}{{/ifeq}}{{/if}}
+/// </summary>
 {{#if Root.IsDataModel}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval DataModelInherits}} : {{{DataModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval DataModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
+public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval DataModelInherits}} : {{{DataModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval DataModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
 {{else}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval CommonImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{CommonImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
+public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval CommonImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{CommonImplements}}}{{/ifval}}{{#ifval RefDataType}}{{#ifeq CoreProperties.Count 0}} { }{{/ifeq}}{{/ifval}}
 {{/if}}
 {{#ifnull RefDataType}}
-    {
+{
 {{else}}
   {{#ifne CoreProperties.Count 0}}
-    {
+{
   {{/ifne}}
 {{/ifnull}}
 {{! ===== Properties ===== }}
@@ -61,101 +36,101 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
       {{#unless RefDataList}}
         {{#unless Root.IsDataModel}}
           {{#ifeq RefDataText 'Optional' 'Always'}}
-        /// <summary>
-        /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryRefDataText}}{{else}}{{SummaryRefDataText}}{{/ifeq}}
-        /// </summary>
+    /// <summary>
+    /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments SummaryRefDataText}}{{else}}{{SummaryRefDataText}}{{/ifeq}}
+    /// </summary>
             {{#ifval JsonName}}
               {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
+    [Newtonsoft.Json.JsonProperty("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
               {{/ifeq}}
-        [JsonPropertyName("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
+    [JsonPropertyName("{{#if Root.IsDataModel}}{{JsonDataModelName}}{{else}}{{JsonName}}{{/if}}Text")]
             {{/ifval}}
-        public string? {{RefDataTextName}} { get; set; }
+    public string? {{RefDataTextName}} { get; set; }
 
           {{/ifeq}}
         {{/unless}}
       {{/unless}}
     {{/unless}}
   {{/ifval}}
-        /// <summary>
-        /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments ModelSummaryText}}{{else}}{{ModelSummaryText}}{{/ifeq}}
-        /// </summary>
+    /// <summary>
+    /// {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments ModelSummaryText}}{{else}}{{ModelSummaryText}}{{/ifeq}}
+    /// </summary>
   {{#if Root.IsDataModel}}   
     {{#if DataModelSerializationIgnore}}
       {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
       {{/ifeq}}
-        [JsonIgnore]
+    [JsonIgnore]
     {{else}}
       {{#ifval JsonDataModelName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonProperty("{{JsonDataModelName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
+    [Newtonsoft.Json.JsonProperty("{{JsonDataModelName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{/ifeq}}
-        [JsonPropertyName("{{JsonDataModelName}}")]
+    [JsonPropertyName("{{JsonDataModelName}}")]
       {{/ifval}}
       {{#if SerializationAlwaysInclude}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonIgnore(Condition=JsonIgnoreCondition.Never)]
+    [Newtonsoft.Json.JsonIgnore(Condition=JsonIgnoreCondition.Never)]
         {{/ifeq}}
-        [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
+    [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
       {{/if}}
     {{/if}}
   {{else}}
     {{#if SerializationIgnore}}
       {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
       {{/ifeq}}
-        [JsonIgnore]
+    [JsonIgnore]
     {{else}}
       {{#ifval JsonName}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
+    [JsonProperty("{{JsonName}}"{{#if SerializationAlwaysInclude}}, DefaultValueHandling.Include{{/if}})]
         {{else}}
-        [JsonPropertyName("{{JsonName}}")]
+    [JsonPropertyName("{{JsonName}}")]
         {{/ifeq}}
       {{/ifval}}
       {{#if SerializationAlwaysInclude}}
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
+    [JsonProperty({{#if SerializationAlwaysInclude}}DefaultValueHandling.Include{{/if}})]
         {{/ifeq}}
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
       {{/if}}
     {{/if}}
   {{/if}}
     {{#unless Root.IsDataModel}}
       {{#ifval Annotation1}}
-        {{Annotation1}}
+    {{Annotation1}}
       {{/ifval}}
       {{#ifval Annotation2}}
-        {{Annotation2}}
+    {{Annotation2}}
       {{/ifval}}
       {{#ifval Annotation3}}
-        {{Annotation3}}
+    {{Annotation3}}
       {{/ifval}}
     {{/unless}}
-        public {{{ModelType}}} {{Name}} { get; set; }
+    public {{{ModelType}}} {{Name}} { get; set; }
 {{/each}}
 {{#unless HasIdentifier}}
   {{#unless RefDataType}}
     {{#ifne PrimaryKeyProperties.Count 0}}
         
-        /// <summary>
-        /// Creates the primary <see cref="CompositeKey"/>.
-        /// </summary>
-        /// <returns>The primary <see cref="CompositeKey"/>.</returns>
+    /// <summary>
+    /// Creates the primary <see cref="CompositeKey"/>.
+    /// </summary>
+    /// <returns>The primary <see cref="CompositeKey"/>.</returns>
     {{#each PrimaryKeyProperties}}
-        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+    /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
     {{/each}}
         public static CompositeKey CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{ArgumentName}}{{/each}}) => CompositeKey.Create({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
 
-        /// <summary>
-        /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
-        /// </summary>
+    /// <summary>
+    /// Gets the primary <see cref="CompositeKey"/> (consists of the following property(s): {{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+    /// </summary>
       {{#ifeq JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
       {{/ifeq}}
-        [JsonIgnore]
-        public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{Name}}{{/each}});
+    [JsonIgnore]
+    public CompositeKey PrimaryKey => CreatePrimaryKey({{#each PrimaryKeyProperties}}{{#unless @first}}, {{/unless}}{{Name}}{{/each}});
     {{/ifne}}
   {{/unless}}
 {{/unless}}
@@ -163,70 +138,69 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
 {{#unless RefDataType}}
   {{#ifne PartitionKeyProperties.Count 0}}
         
-        /// <summary>
-        /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
-        /// </summary>
-        /// <returns>The partition key.</returns>
+    /// <summary>
+    /// Creates the <see cref="IPartitionKey.PartitionKey"/>.
+    /// </summary>
+    /// <returns>The partition key.</returns>
   {{#each PartitionKeyProperties}}
-        /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
+    /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static string? CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{ArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}).ToString();
+    public static string? CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PrivateType}}} {{ArgumentName}}{{/each}}) => CompositeKey.Create({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}).ToString();
 
-        /// <summary>
-        /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
-        /// </summary>
+    /// <summary>
+    /// Gets the Partition Key (consists of the following property(s): {{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
+    /// </summary>
     {{#ifeq JsonSerializer 'Newtonsoft'}}
-        [Newtonsoft.Json.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     {{/ifeq}}
-        [JsonIgnore]
-        public string? PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{Name}}{{/each}});
+    [JsonIgnore]
+    public string? PartitionKey => CreatePartitionKey({{#each PartitionKeyProperties}}{{#unless @first}}, {{/unless}}{{Name}}{{/each}});
   {{/ifne}}
 {{/unless}}
 {{/if}}
 {{#ifnull RefDataType}}
-    }
+}
 {{else}}
   {{#ifne CoreProperties.Count 0}}
-    }
+}
   {{/ifne}}
 {{/ifnull}}
 {{! ===== Collection ===== }}
 {{#if Collection}}
 
-    /// <summary>
-    /// Represents the {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments EntityNameSeeComments}}{{else}}{{EntityNameSeeComments}}{{/ifeq}} collection.
-    /// </summary>
-    public partial class {{{EntityCollectionName}}} : {{{CollectionInherits}}} { }
+/// <summary>
+/// Represents the {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments EntityNameSeeComments}}{{else}}{{EntityNameSeeComments}}{{/ifeq}} collection.
+/// </summary>
+public partial class {{{EntityCollectionName}}} : {{{CollectionInherits}}} { }
 {{/if}}
 {{#if CollectionResult}}
   {{#unless Root.IsDataModel}}
 
+/// <summary>
+/// Represents the {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments EntityNameSeeComments}}{{else}}{{EntityNameSeeComments}}{{/ifeq}} collection result.
+/// </summary>
+public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
+{
     /// <summary>
-    /// Represents the {{#ifeq Root.RuntimeEntityScope 'Common'}}{{sanitize-comments EntityNameSeeComments}}{{else}}{{EntityNameSeeComments}}{{/ifeq}} collection result.
+    /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class.
     /// </summary>
-    public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
-    {
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class.
-        /// </summary>
-        public {{{EntityCollectionResultName}}}() { }
-        
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="paging"/>.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
-        
-        /// <summary>
-        /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="items"/> to add.
-        /// </summary>
-        /// <param name="items">The items to add.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
-    }
+    public {{{EntityCollectionResultName}}}() { }
+    
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="paging"/>.
+    /// </summary>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
+    
+    /// <summary>
+    /// Initializes a new instance of the {{{see-comments EntityCollectionResultName}}} class with <paramref name="items"/> to add.
+    /// </summary>
+    /// <param name="items">The items to add.</param>
+    /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+    public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> items, PagingArgs? paging = null) : base(paging) => Items.AddRange(items);
+}
   {{/unless}}
-{{/if}}
-}{{#if Root.PreprocessorDirectives}}
+{{/if}}{{#if Root.PreprocessorDirectives}}
 
 #pragma warning restore
 #nullable restore{{/if}}

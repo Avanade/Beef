@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.17.0
+- *Enhancement:* The `Common`-project related code-generated artefacts have all been updated to leverage `global using` and file scoped namespace declarations.
+  - A new [`GlobalUsings.cs`](./templates/Beef.Template.Solution/content/Company.AppName.Common/GlobalUsings.cs) will need to be manually added to existing `Common` projects to enable; see [this](./templates/Beef.Template.Solution/content/Company.AppName.Common/GlobalUsings.cs) for an example and alter the last two namespaces accordingly. 
+  - The `*.Common.csproj` will need to be manually updated to include `<LangVersion>Preview</LangVersion>` and `<ImplicitUsings>true</ImplicitUsings>`.
+
 ## v5.16.2
 - *Fixed:* `Operation.AuthEntity` and `Operation.AuthOperation` updated to code-gen the `Manager`-based authorization (`ExecutionContent.UserIsAuthorized`) invocation.
 - *Fixed:* Code-generation logging/auditing of endpoints updated to also include the authorization configuration.

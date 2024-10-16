@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="content\Company.AppName.Common\GlobalUsings.cs" />
     <None Remove="content\Company.AppName.Services.Test\appsettings.unittest.json" />
     <None Remove="content\Company.AppName.Services.Test\Company.AppName.Services.Test.csproj" />
     <None Remove="content\Company.AppName.Services.Test\Data\Data.yaml" />

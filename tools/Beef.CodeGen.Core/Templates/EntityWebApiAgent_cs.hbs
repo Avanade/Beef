@@ -8,40 +8,26 @@
 #pragma warning disable
 
 {{/if}}
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CoreEx.Entities;
-using CoreEx.Http;
-using CoreEx.Json;
-using {{Root.NamespaceCommon}}.Entities;
-{{#ifval Root.RefDataCommonNamespace}}
-using RefDataNamespace = {{Root.RefDataCommonNamespace}};
-{{/ifval}}
+namespace {{Root.NamespaceCommon}}.Agents;
 
-namespace {{Root.NamespaceCommon}}.Agents
+/// <summary>
+/// Provides the {{{EntityNameSeeComments}}} HTTP agent.
+/// </summary>
+public partial class {{Name}}Agent : TypedHttpClientBase<{{Name}}Agent>, I{{Name}}Agent
 {
     /// <summary>
-    /// Provides the {{{EntityNameSeeComments}}} HTTP agent.
+    /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
     /// </summary>
-    public partial class {{Name}}Agent : TypedHttpClientBase<{{Name}}Agent>, I{{Name}}Agent
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
-        /// </summary>
-        /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-        /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-        /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-        public {{Name}}Agent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
+    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+    public {{Name}}Agent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 {{#each WebApiAgentOperations}}
 
-        /// <inheritdoc/>
-        public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#ifor IsPagingArgs IsQueryArgs}} = null{{/ifor}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-            => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}{{ValueParameter.ArgumentName}}, {{/if}}requestOptions: requestOptions{{#if Query}}.IncludeQuery(query){{/if}}{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
+    /// <inheritdoc/>
+    public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#ifor IsPagingArgs IsQueryArgs}} = null{{/ifor}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
+        => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}{{ValueParameter.ArgumentName}}, {{/if}}requestOptions: requestOptions{{#if Query}}.IncludeQuery(query){{/if}}{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
 {{/each}}
-    }
 }{{#if Root.PreprocessorDirectives}}
 
 #pragma warning restore

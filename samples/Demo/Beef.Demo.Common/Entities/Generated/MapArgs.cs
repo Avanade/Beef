@@ -5,25 +5,19 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
+/// <summary>
+/// Represents the Mapping arguments entity.
+/// </summary>
+public partial class MapArgs
 {
     /// <summary>
-    /// Represents the Mapping arguments entity.
+    /// Gets or sets the Coordinates.
     /// </summary>
-    public partial class MapArgs
-    {
-        /// <summary>
-        /// Gets or sets the Coordinates.
-        /// </summary>
-        public MapCoordinates? Coordinates { get; set; }
-    }
+    public MapCoordinates? Coordinates { get; set; }
 }
+
 
 #pragma warning restore
 #nullable restore

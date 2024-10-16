@@ -5,43 +5,43 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data.Model
+namespace Beef.Demo.Business.Data.Model;
+
+/// <summary>
+/// Represents the Postal Info model.
+/// </summary>
+public partial class PostalInfo : IETag
 {
     /// <summary>
-    /// Represents the Postal Info model.
+    /// Gets or sets the Country code.
     /// </summary>
-    public partial class PostalInfo : IETag
-    {
-        /// <summary>
-        /// Gets or sets the Country code.
-        /// </summary>
-        [JsonPropertyName("country abbreviation")]
-        public string? Country { get; set; }
+    [JsonPropertyName("country abbreviation")]
+    public string? Country { get; set; }
 
-        /// <summary>
-        /// Gets or sets the City.
-        /// </summary>
-        [JsonPropertyName("place name")]
-        public string? City { get; set; }
+    /// <summary>
+    /// Gets or sets the City.
+    /// </summary>
+    [JsonPropertyName("place name")]
+    public string? City { get; set; }
 
-        /// <summary>
-        /// Gets or sets the State.
-        /// </summary>
-        [JsonPropertyName("state abbreviation")]
-        public string? State { get; set; }
+    /// <summary>
+    /// Gets or sets the State.
+    /// </summary>
+    [JsonPropertyName("state abbreviation")]
+    public string? State { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Places.
-        /// </summary>
-        public PlaceInfoCollection? Places { get; set; }
+    /// <summary>
+    /// Gets or sets the Places.
+    /// </summary>
+    public PlaceInfoCollection? Places { get; set; }
 
-        /// <summary>
-        /// Gets or sets the ETag.
-        /// </summary>
-        [JsonIgnore]
-        public string? ETag { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the ETag.
+    /// </summary>
+    [JsonIgnore]
+    public string? ETag { get; set; }
 }
+
 
 #pragma warning restore
 #nullable restore

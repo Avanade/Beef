@@ -5,31 +5,31 @@
 #nullable enable
 #pragma warning disable
 
-namespace Beef.Demo.Business.Data.Model
+namespace Beef.Demo.Business.Data.Model;
+
+/// <summary>
+/// Represents the Place Info model.
+/// </summary>
+public partial class PlaceInfo
 {
     /// <summary>
-    /// Represents the Place Info model.
+    /// Gets or sets the Name.
     /// </summary>
-    public partial class PlaceInfo
-    {
-        /// <summary>
-        /// Gets or sets the Name.
-        /// </summary>
-        [JsonPropertyName("place name")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Post Code.
-        /// </summary>
-        [JsonPropertyName("post code")]
-        public string? PostCode { get; set; }
-    }
+    [JsonPropertyName("place name")]
+    public string? Name { get; set; }
 
     /// <summary>
-    /// Represents the <see cref="PlaceInfo"/> collection.
+    /// Gets or sets the Post Code.
     /// </summary>
-    public partial class PlaceInfoCollection : List<PlaceInfo> { }
+    [JsonPropertyName("post code")]
+    public string? PostCode { get; set; }
 }
+
+/// <summary>
+/// Represents the <see cref="PlaceInfo"/> collection.
+/// </summary>
+public partial class PlaceInfoCollection : List<PlaceInfo> { }
+
 
 #pragma warning restore
 #nullable restore

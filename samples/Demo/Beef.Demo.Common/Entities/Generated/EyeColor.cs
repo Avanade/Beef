@@ -5,25 +5,18 @@
 #nullable enable
 #pragma warning disable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using CoreEx.Entities;
-using CoreEx.RefData;
+namespace Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.Common.Entities
-{
-    /// <summary>
-    /// Represents the Eye Color entity.
-    /// </summary>
-    public partial class EyeColor : ReferenceDataBase<Guid> { }
+/// <summary>
+/// Represents the Eye Color entity.
+/// </summary>
+public partial class EyeColor : ReferenceDataBase<Guid> { }
 
-    /// <summary>
-    /// Represents the <c>EyeColor</c> collection.
-    /// </summary>
-    public partial class EyeColorCollection : List<EyeColor> { }
-}
+/// <summary>
+/// Represents the <c>EyeColor</c> collection.
+/// </summary>
+public partial class EyeColorCollection : List<EyeColor> { }
+
 
 #pragma warning restore
 #nullable restore
