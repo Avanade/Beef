@@ -18,7 +18,7 @@ This logic of getting, setting and clearing the cache is included within the pri
 
 To support the goals of an [Event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) an event publish can be included.
 
-An [`EventData`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventData.cs) publish is invoked where the eventing infrastructure has been included (configured) during [code-generation](./tools/Beef.CodeGen.Core). The [`IEventPublisher`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventPublisher.cs) implementation is responsible for orchestraing the publishing and sending of the event message(s). 
+An [`EventData`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/EventData.cs) publish is invoked where the eventing infrastructure has been included (configured) during [code-generation](../tools/Beef.CodeGen.Core). The [`IEventPublisher`](https://github.com/Avanade/CoreEx/blob/main/src/CoreEx/Events/IEventPublisher.cs) implementation is responsible for orchestraing the publishing and sending of the event message(s). 
 
 _Note:_ This is _always_ performed directly after the primary operation logic such that the _event_ is only published where successful. This is may not be transactional (depends on implementation) so if the event publish fails there may be no automatic rollback capabilitity. The implementor will need to decide the corrective action for this type of failure; i.e. consider the transaction outbox pattern.
 
