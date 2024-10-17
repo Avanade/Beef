@@ -40,7 +40,8 @@ public class FixtureSetUp
             if (count == 0)
             {
                 using var test = ApiTester.Create<Startup>();
-                var cosmosDb = test.Services.GetRequiredService<AppNameCosmosDb>();
+                using var scope = test.Services.CreateScope();
+                var cosmosDb = scope.ServiceProvider.GetRequiredService<AppNameCosmosDb>();
 
                 // Create the Cosmos Db (where not exists).
                 await cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);

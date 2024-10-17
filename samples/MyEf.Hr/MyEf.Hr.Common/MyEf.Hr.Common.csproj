@@ -7,6 +7,6 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreEx" Version="3.27.1" />
+    <PackageReference Include="CoreEx" Version="3.27.2" />
   </ItemGroup>
 </Project>
