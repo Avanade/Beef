@@ -59,10 +59,10 @@ namespace Beef.Database
         /// <inheritdoc/>
         protected override void OnBeforeExecute(CommandLineApplication app)
         {
-            ConsoleOptions.Add(nameof(MigrationArgs.ScriptFileName), app.Option("-s|--script", "Script orchestration file name. [CodeGen]", CommandOptionType.SingleValue));
-            ConsoleOptions.Add(nameof(MigrationArgs.ConfigFileName), app.Option("-c|--config", "Configuration data file name. [CodeGen]", CommandOptionType.SingleValue));
-            ConsoleOptions.Add(nameof(MigrationArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output (e.g. error within build pipeline). [CodeGen]", CommandOptionType.NoValue));
-            ConsoleOptions.Add(nameof(MigrationArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation (i.e. does not update the artefacts). [CodeGen]", CommandOptionType.NoValue));
+            ConsoleOptions.Add(nameof(MigrationArgs.ScriptFileName), app.Option("-s|--script", "Script orchestration file name (CodeGen command).", CommandOptionType.SingleValue));
+            ConsoleOptions.Add(nameof(MigrationArgs.ConfigFileName), app.Option("-c|--config", "Configuration data file name (CodeGen command).", CommandOptionType.SingleValue));
+            ConsoleOptions.Add(nameof(MigrationArgs.ExpectNoChanges), app.Option("-enc|--expect-no-changes", "Indicates to expect _no_ changes in the artefact output; e.g. error within build pipeline (CodeGen command).", CommandOptionType.NoValue));
+            ConsoleOptions.Add(nameof(MigrationArgs.IsSimulation), app.Option("-sim|--simulation", "Indicates whether the code-generation is a simulation; i.e. does not update the artefacts (CodeGen command).", CommandOptionType.NoValue));
         }
 
         /// <inheritdoc/>
@@ -78,7 +78,9 @@ namespace Beef.Database
                 return vr;
 
             if (Args.OutputDirectory == null)
-                Args.OutputDirectory = new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
+                Args.OutputDirectory = Args.MigrationCommand.HasFlag(MigrationCommand.Script)
+                    ? new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()) 
+                    : new DirectoryInfo(OnRamp.Console.CodeGenConsole.GetBaseExeDirectory()).Parent;
 
             if (Args.MigrationCommand.HasFlag(MigrationCommand.CodeGen))
             {
