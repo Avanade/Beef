@@ -118,7 +118,7 @@ public class ExecutionContext : CoreEx.ExecutionContext
     /// <summary>
     /// Gets the list of account (identifiers) that the user has access/permission to.
     /// </summary>
-    public List<string> Accounts { get; } = new();
+    public List<string> Accounts { get; } = [];
 }
 ```
 
@@ -212,10 +212,10 @@ In this case, we are setting this using the code-generation for the operation. T
 # Data access will be auto-implemented for Cosmos as defined for the entity.
 # Cosmos PartitionKey will be set to the accountId parameter value for data access.
 # 
-{ name: GetTransactions, text: Get transaction for account, type: GetColl, webApiRoute: '{accountId}/ransactions', paging: true, cosmosPartitionKey: accountId,
+{ name: GetTransactions, text: Get transaction for account, type: GetColl, webApiRoute: '{accountId}/transactions', paging: true, cosmosPartitionKey: accountId,
   parameters: [
     # Note usage of ValidatorCode which will inject the code as-is into the validation logic; being a common validator 'Validators.Account' that will perform the authorization check.
-    { name: AccountId, type: string, validatorCode: Common(Validators.AccountId), webApiFrom: romRoute, isMandatory: true },
+    { name: AccountId, type: string, validatorCode: Common(Validators.AccountId), webApiFrom: FromRoute, isMandatory: true },
     { name: Args, type: TransactionArgs, validator: TransactionArgsValidator }
   ]
 }
