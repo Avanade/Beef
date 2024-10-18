@@ -13,5 +13,5 @@ public class ExecutionContext : CoreEx.ExecutionContext
     /// <summary>
     /// Gets the list of account (identifiers) that the user has access/permission to.
     /// </summary>
-    public List<string> Accounts { get; } = new();
+    public List<string> Accounts { get; } = [];
 }
