@@ -77,3 +77,4 @@ global using Company.AppName.Business.Data;
 global using Company.AppName.Business.DataSvc;
 global using Company.AppName.Business.Validation;
 global using RefDataNamespace = Company.AppName.Business.Entities;
+global using ExecutionContext = CoreEx.ExecutionContext;

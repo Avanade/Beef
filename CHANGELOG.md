@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v5.17.1
+- *Fixed:* The database console `Script` command execution has been updated to output to the correct directory path.
+
 ## v5.17.0
 - *Enhancement:* The `Common`-project related code-generated artefacts have all been updated to leverage `global using` and file scoped namespace declarations.
   - A new [`GlobalUsings.cs`](./templates/Beef.Template.Solution/content/Company.AppName.Common/GlobalUsings.cs) will need to be manually added to existing `Common` projects to enable; see [this](./templates/Beef.Template.Solution/content/Company.AppName.Common/GlobalUsings.cs) for an example and alter the last two namespaces accordingly. 

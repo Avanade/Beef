@@ -26,7 +26,9 @@ namespace Cdr.Banking.Test
                 if (count == 0)
                 {
                     using var test = ApiTester.Create<Startup>();
-                    _cosmosDb = test.Services.GetRequiredService<ICosmos>();
+                    using var scope = test.Services.CreateScope();
+
+                    _cosmosDb = scope.ServiceProvider.GetRequiredService<ICosmos>();
 
                     await _cosmosDb.Database.Client.CreateDatabaseIfNotExistsAsync(_cosmosDb.Database.Id, cancellationToken: ct).ConfigureAwait(false);
 
