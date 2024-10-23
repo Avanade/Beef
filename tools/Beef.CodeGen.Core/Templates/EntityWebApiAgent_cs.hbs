@@ -13,20 +13,18 @@ namespace {{Root.NamespaceCommon}}.Agents;
 /// <summary>
 /// Provides the {{{EntityNameSeeComments}}} HTTP agent.
 /// </summary>
-public partial class {{Name}}Agent : TypedHttpClientBase<{{Name}}Agent>, I{{Name}}Agent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class {{Name}}Agent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<{{Name}}Agent>(client, jsonSerializer, executionContext), I{{Name}}Agent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public {{Name}}Agent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
 {{#each WebApiAgentOperations}}
+  {{#unless @first}}
 
+  {{/unless}}
     /// <inheritdoc/>
     public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}HttpPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#ifor IsPagingArgs IsQueryArgs}} = null{{/ifor}}, {{/each}}HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}{{ValueParameter.ArgumentName}}, {{/if}}requestOptions: requestOptions{{#if Query}}.IncludeQuery(query){{/if}}{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne ValueLessParameters.Count 0}}, args: HttpArgs.Create({{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}){{/ifne}}, cancellationToken: cancellationToken);
+        => {{AgentOperationHttpMethod}}("{{AgentWebApiRoute}}", {{#ifeq Type 'Patch'}}patchOption, {{/ifeq}}{{#if HasValue}}{{ValueParameter.ArgumentName}}, {{else}}{{#ifeq CoreParameters.Count 0}}requestOptions: {{/ifeq}}{{/if}}requestOptions{{#if Query}}.IncludeQuery(query){{/if}}{{#if Paging}}.IncludePaging(paging){{/if}}{{#ifne CoreParameters.Count 0}}, [{{#each CoreParameters}}{{#unless @first}}, {{/unless}}new HttpArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, HttpArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}], cancellationToken{{else}}, cancellationToken: cancellationToken{{/ifne}});
 {{/each}}
 }{{#if Root.PreprocessorDirectives}}
 

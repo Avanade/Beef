@@ -36,6 +36,7 @@ namespace Beef.Demo.Business.Data
         private Task MarkOnImplementationAsync()
         {
             using var scope = _logger.BeginScope(new Dictionary<string, object> { { "MyKey", "MyValue" } });
+            CoreEx.ExecutionContext.Current.Messages.Add(MessageType.Warning, "Software licence is overdue; please pay immediately or services will be halted.");
             _logger.LogWarning("Mark operation implementation currently does not exist.");
             return Task.CompletedTask;
         }

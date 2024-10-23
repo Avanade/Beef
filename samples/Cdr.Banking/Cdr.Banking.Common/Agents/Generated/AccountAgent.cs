@@ -7,33 +7,28 @@ namespace Cdr.Banking.Common.Agents;
 /// <summary>
 /// Provides the <see cref="Account"/> HTTP agent.
 /// </summary>
-public partial class AccountAgent : TypedHttpClientBase<AccountAgent>, IAccountAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class AccountAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<AccountAgent>(client, jsonSerializer, executionContext), IAccountAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AccountAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public AccountAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<AccountCollectionResult>("api/v1/banking/accounts", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<AccountArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<AccountCollectionResult>("api/v1/banking/accounts", requestOptions.IncludePaging(paging), [new HttpArg<AccountArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<AccountCollectionResult>> GetAccountsQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<AccountCollectionResult>("api/v1/banking/accounts/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
+        => GetAsync<AccountCollectionResult>("api/v1/banking/accounts/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<AccountDetail?>> GetDetailAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<AccountDetail?>("api/v1/banking/accounts/{accountId}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
+        => GetAsync<AccountDetail?>("api/v1/banking/accounts/{accountId}", requestOptions, [new HttpArg<string?>("accountId", accountId)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Balance?>> GetBalanceAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Balance?>("api/v1/banking/accounts/{accountId}/balance", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
+        => GetAsync<Balance?>("api/v1/banking/accounts/{accountId}/balance", requestOptions, [new HttpArg<string?>("accountId", accountId)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> GetStatementAsync(string? accountId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync("api/v1/banking/accounts/{accountId}/statement", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId)), cancellationToken: cancellationToken);
+        => GetAsync("api/v1/banking/accounts/{accountId}/statement", requestOptions, [new HttpArg<string?>("accountId", accountId)], cancellationToken);
 }

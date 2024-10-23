@@ -7,37 +7,32 @@ namespace MyEf.Hr.Common.Agents;
 /// <summary>
 /// Provides the <see cref="PerformanceReview"/> HTTP agent.
 /// </summary>
-public partial class PerformanceReviewAgent : TypedHttpClientBase<PerformanceReviewAgent>, IPerformanceReviewAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class PerformanceReviewAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<PerformanceReviewAgent>(client, jsonSerializer, executionContext), IPerformanceReviewAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PerformanceReviewAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public PerformanceReviewAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<PerformanceReview?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PerformanceReview?>("reviews/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<PerformanceReview?>("reviews/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PerformanceReview>> UpdateAsync(PerformanceReview value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<PerformanceReview, PerformanceReview>("reviews/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<PerformanceReview, PerformanceReview>("reviews/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PerformanceReview>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<PerformanceReview>("reviews/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PatchAsync<PerformanceReview>("reviews/{id}", patchOption, value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => DeleteAsync("reviews/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => DeleteAsync("reviews/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PerformanceReviewCollectionResult>> GetByEmployeeIdAsync(Guid employeeId, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PerformanceReviewCollectionResult>("employees/{employeeId}/reviews", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<Guid>("employeeId", employeeId)), cancellationToken: cancellationToken);
+        => GetAsync<PerformanceReviewCollectionResult>("employees/{employeeId}/reviews", requestOptions.IncludePaging(paging), [new HttpArg<Guid>("employeeId", employeeId)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PerformanceReview>> CreateAsync(PerformanceReview value, Guid employeeId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<PerformanceReview, PerformanceReview>("employees/{employeeId}/reviews", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("employeeId", employeeId)), cancellationToken: cancellationToken);
+        => PostAsync<PerformanceReview, PerformanceReview>("employees/{employeeId}/reviews", value, requestOptions, [new HttpArg<Guid>("employeeId", employeeId)], cancellationToken);
 }

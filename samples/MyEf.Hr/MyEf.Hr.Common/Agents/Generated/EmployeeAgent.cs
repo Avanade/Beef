@@ -7,45 +7,40 @@ namespace MyEf.Hr.Common.Agents;
 /// <summary>
 /// Provides the <see cref="Employee"/> HTTP agent.
 /// </summary>
-public partial class EmployeeAgent : TypedHttpClientBase<EmployeeAgent>, IEmployeeAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class EmployeeAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<EmployeeAgent>(client, jsonSerializer, executionContext), IEmployeeAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EmployeeAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public EmployeeAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<Employee?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Employee?>("employees/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<Employee?>("employees/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Employee>> CreateAsync(Employee value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Employee, Employee>("employees", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Employee, Employee>("employees", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Employee>> UpdateAsync(Employee value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Employee, Employee>("employees/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<Employee, Employee>("employees/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Employee>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<Employee>("employees/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PatchAsync<Employee>("employees/{id}", patchOption, value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => DeleteAsync("employees/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => DeleteAsync("employees/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<EmployeeBaseCollectionResult>> GetByArgsAsync(EmployeeArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<EmployeeBaseCollectionResult>("employees", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<EmployeeBaseCollectionResult>("employees", requestOptions.IncludePaging(paging), [new HttpArg<EmployeeArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<EmployeeBaseCollectionResult>> GetByQueryAsync(QueryArgs? query = null, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<EmployeeBaseCollectionResult>("employees/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
+        => GetAsync<EmployeeBaseCollectionResult>("employees/query", requestOptions: requestOptions.IncludeQuery(query).IncludePaging(paging), cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Employee>> TerminateAsync(TerminationDetail value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<TerminationDetail, Employee>("employees/{id}/terminate", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PostAsync<TerminationDetail, Employee>("employees/{id}/terminate", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 }

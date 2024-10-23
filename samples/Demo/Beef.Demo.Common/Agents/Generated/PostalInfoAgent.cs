@@ -10,35 +10,30 @@ namespace Beef.Demo.Common.Agents;
 /// <summary>
 /// Provides the <see cref="PostalInfo"/> HTTP agent.
 /// </summary>
-public partial class PostalInfoAgent : TypedHttpClientBase<PostalInfoAgent>, IPostalInfoAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class PostalInfoAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<PostalInfoAgent>(client, jsonSerializer, executionContext), IPostalInfoAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PostalInfoAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public PostalInfoAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<PostalInfo?>> GetPostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PostalInfo?>("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
+        => GetAsync<PostalInfo?>("api/v1/postal/{country}/{state}/{city}", requestOptions, [new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PostalInfo>> CreatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
+        => PostAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions, [new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PostalInfo>> UpdatePostCodesAsync(PostalInfo value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
+        => PutAsync<PostalInfo, PostalInfo>("api/v1/postal/{country}/{state}/{city}", value, requestOptions, [new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PostalInfo>> PatchPostCodesAsync(HttpPatchOption patchOption, string value, string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
+        => PatchAsync<PostalInfo>("api/v1/postal/{country}/{state}/{city}", patchOption, value, requestOptions, [new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> DeletePostCodesAsync(string? country, string? state, string? city, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => DeleteAsync("api/v1/postal/{country}/{state}/{city}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)), cancellationToken: cancellationToken);
+        => DeleteAsync("api/v1/postal/{country}/{state}/{city}", requestOptions, [new HttpArg<string?>("country", country), new HttpArg<string?>("state", state), new HttpArg<string?>("city", city)], cancellationToken);
 }
 
 #pragma warning restore

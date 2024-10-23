@@ -10,16 +10,11 @@ namespace Beef.Demo.Common.Agents;
 /// <summary>
 /// Provides the <b>Config</b> HTTP agent.
 /// </summary>
-public partial class ConfigAgent : TypedHttpClientBase<ConfigAgent>, IConfigAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class ConfigAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<ConfigAgent>(client, jsonSerializer, executionContext), IConfigAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public ConfigAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<System.Collections.IDictionary>> GetEnvVarsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
         => PostAsync<System.Collections.IDictionary>("api/v1/envvars", requestOptions: requestOptions, cancellationToken: cancellationToken);

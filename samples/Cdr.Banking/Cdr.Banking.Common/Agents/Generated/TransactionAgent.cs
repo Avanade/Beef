@@ -7,17 +7,12 @@ namespace Cdr.Banking.Common.Agents;
 /// <summary>
 /// Provides the <see cref="Transaction"/> HTTP agent.
 /// </summary>
-public partial class TransactionAgent : TypedHttpClientBase<TransactionAgent>, ITransactionAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class TransactionAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<TransactionAgent>(client, jsonSerializer, executionContext), ITransactionAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TransactionAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public TransactionAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<TransactionCollectionResult>("api/v1/banking/accounts/{accountId}/transactions", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<string?>("accountId", accountId), new HttpArg<TransactionArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<TransactionCollectionResult>("api/v1/banking/accounts/{accountId}/transactions", requestOptions.IncludePaging(paging), [new HttpArg<string?>("accountId", accountId), new HttpArg<TransactionArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 }

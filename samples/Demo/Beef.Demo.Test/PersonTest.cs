@@ -1209,10 +1209,17 @@ namespace Beef.Demo.Test
                 .ExpectEvent("Demo.Mark", "Marked")
                 .Run(a => a.MarkAsync());
 
-            AgentTester.Test<PersonAgent>()
+            var hr = AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.Accepted)
                 .ExpectEvent(new EventData<string> { Subject = "Demo.Mark", Action = "Marked", Value = "Wahlberg" })
-                .Run(a => a.MarkAsync());
+                .Run(a => a.MarkAsync())
+                .Result;
+
+            Assert.That(hr.Messages, Is.Not.Null);
+            Assert.That(hr.Messages, Has.Count.EqualTo(1));
+            Assert.That(hr.Messages[0].Type, Is.EqualTo(MessageType.Warning));
+            Assert.That(hr.Messages[0].Text, Is.EqualTo("Software licence is overdue; please pay immediately or services will be halted."));
+
         }
 
         [Test, TestSetUp]

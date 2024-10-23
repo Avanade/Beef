@@ -12,20 +12,15 @@ namespace {{Root.NamespaceCommon}}.Agents;
 /// <summary>
 /// Provides the <b>ReferenceData</b> HTTP agent.
 /// </summary>
-public partial class ReferenceDataAgent : TypedHttpClientBase<ReferenceDataAgent>, IReferenceDataAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<ReferenceDataAgent>(client, jsonSerializer, executionContext), IReferenceDataAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
 {{#each RefDataEntities}}
     /// <inheritdoc/>
     public Task<HttpResult<{{RefDataQualifiedEntityCollectionName}}>> {{Name}}GetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<{{RefDataQualifiedEntityCollectionName}}>("{{WebApiRoutePrefix}}", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
 {{/each}}
     /// <inheritdoc/>

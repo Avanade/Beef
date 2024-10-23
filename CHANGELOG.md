@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v5.17.1
 - *Fixed:* The database console `Script` command execution has been updated to output to the correct directory path.
+- *Fixed:* The `Agent` code-generation artefacts have been further simplified/improved.
 
 ## v5.17.0
 - *Enhancement:* The `Common`-project related code-generated artefacts have all been updated to leverage `global using` and file scoped namespace declarations.
