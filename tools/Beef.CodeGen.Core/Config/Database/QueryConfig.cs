@@ -126,6 +126,14 @@ queries:
             Description = "Defaults to `Schema`.")]
         public string? ViewSchema { get; set; }
 
+        /// <summary>
+        /// Indicates whether the existing `View` database object should be replaced/altered or whether the object is dropped and recreated.
+        /// </summary>
+        [JsonPropertyName("viewReplace")]
+        [CodeGenProperty("Key", Title = "Indicates whether the existing `View` database object should be replaced/altered or whether the object is dropped and recreated.",
+            Description = "Defaults to `CodeGeneration.Replace`.")]
+        public bool? ViewReplace { get; set; }
+
         #endregion
 
         #region Auth
@@ -345,6 +353,7 @@ queries:
             Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x[..1].ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
             ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
+            ViewReplace = DefaultWhereNull(ViewReplace, () => Parent!.Replace);
 
             if (!string.IsNullOrEmpty(Permission) && Permission.Split(".", StringSplitOptions.RemoveEmptyEntries).Length == 1)
                 Permission += ".Read";

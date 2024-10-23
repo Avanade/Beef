@@ -10,47 +10,42 @@ namespace Beef.Demo.Common.Agents;
 /// <summary>
 /// Provides the <see cref="Person"/> HTTP agent.
 /// </summary>
-public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class PersonAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<PersonAgent>(client, jsonSerializer, executionContext), IPersonAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PersonAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public PersonAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<Person>> CreateAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Person, Person>("api/v1/persons", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Person, Person>("api/v1/persons", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => DeleteAsync("api/v1/persons/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => DeleteAsync("api/v1/persons/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Person?>("api/v1/persons/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<Person?>("api/v1/persons/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person?>> GetExAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Person?>("api/v1/persons/ex/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<Person?>("api/v1/persons/ex/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> UpdateAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Person, Person>("api/v1/persons/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<Person, Person>("api/v1/persons/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Person, Person>("api/v1/persons/withRollback/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<Person, Person>("api/v1/persons/withRollback/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<Person>("api/v1/persons/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PatchAsync<Person>("api/v1/persons/{id}", patchOption, value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonCollectionResult>> GetAllAsync(PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PersonCollectionResult>("api/v1/persons/all", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(), cancellationToken: cancellationToken);
+        => GetAsync<PersonCollectionResult>("api/v1/persons/all", requestOptions: requestOptions.IncludePaging(paging), cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonCollectionResult>> GetAll2Async(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
@@ -58,15 +53,15 @@ public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgen
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonCollectionResult>> GetByArgsAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PersonCollectionResult>("api/v1/persons", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<PersonCollectionResult>("api/v1/persons", requestOptions.IncludePaging(paging), [new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonDetailCollectionResult>> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PersonDetailCollectionResult>("api/v1/persons/argsdetail", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<PersonDetailCollectionResult>("api/v1/persons/argsdetail", requestOptions.IncludePaging(paging), [new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> MergeAsync(Guid fromId, Guid toId, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Person>("api/v1/persons/merge", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("fromId", fromId), new HttpArg<Guid>("toId", toId)), cancellationToken: cancellationToken);
+        => PostAsync<Person>("api/v1/persons/merge", requestOptions, [new HttpArg<Guid>("fromId", fromId), new HttpArg<Guid>("toId", toId)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> MarkAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
@@ -74,7 +69,7 @@ public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgen
 
     /// <inheritdoc/>
     public Task<HttpResult<MapCoordinates>> MapAsync(MapArgs? args, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<MapCoordinates>("api/v1/persons/map", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<MapArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => PostAsync<MapCoordinates>("api/v1/persons/map", requestOptions, [new HttpArg<MapArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person?>> GetNoArgsAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
@@ -82,27 +77,27 @@ public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgen
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonDetail?>> GetDetailAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PersonDetail?>("api/v1/persons/{id}/detail", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<PersonDetail?>("api/v1/persons/{id}/detail", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonDetail>> UpdateDetailAsync(PersonDetail value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<PersonDetail, PersonDetail>("api/v1/persons/{id}/detail", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<PersonDetail, PersonDetail>("api/v1/persons/{id}/detail", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonDetail>> PatchDetailAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> AddAsync(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync("api/v1/persons/fromBody", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Person>("person", person, HttpArgType.FromBody)), cancellationToken: cancellationToken);
+        => PostAsync("api/v1/persons/fromBody", requestOptions, [new HttpArg<Person>("person", person, HttpArgType.FromBody)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> Add2Async(Person person, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Person>("api/v1/persons/acceptsBody", person, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Person>("api/v1/persons/acceptsBody", person, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> Add3Async(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Person>("api/v1/persons/acceptsBodyValue", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Person>("api/v1/persons/acceptsBodyValue", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> CustomManagerOnlyAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
@@ -110,15 +105,15 @@ public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgen
 
     /// <inheritdoc/>
     public Task<HttpResult<Person?>> GetNullAsync(string? name, List<string>? names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Person?>("api/v1/persons/null", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("name", name), new HttpArg<List<string>?>("names", names)), cancellationToken: cancellationToken);
+        => GetAsync<Person?>("api/v1/persons/null", requestOptions, [new HttpArg<string?>("name", name), new HttpArg<List<string>?>("names", names)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> EventPublishNoSendAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Person, Person>("api/v1/persons/publishnosend", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PutAsync<Person, Person>("api/v1/persons/publishnosend", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<PersonCollectionResult>> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<PersonCollectionResult>("api/v1/persons/args", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<PersonCollectionResult>("api/v1/persons/args", requestOptions.IncludePaging(paging), [new HttpArg<PersonArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> ThrowErrorAsync(HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
@@ -126,43 +121,43 @@ public partial class PersonAgent : TypedHttpClientBase<PersonAgent>, IPersonAgen
 
     /// <inheritdoc/>
     public Task<HttpResult<string>> InvokeApiViaAgentAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<string>("api/v1/persons/invokeApi", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PostAsync<string>("api/v1/persons/invokeApi", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> ParamCollAsync(AddressCollection? addresses, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync("api/v1/persons/paramcoll", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<AddressCollection?>("addresses", addresses, HttpArgType.FromBody)), cancellationToken: cancellationToken);
+        => PostAsync("api/v1/persons/paramcoll", requestOptions, [new HttpArg<AddressCollection?>("addresses", addresses, HttpArgType.FromBody)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person?>> GetWithEfAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Person?>("api/v1/persons/ef/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<Person?>("api/v1/persons/ef/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> CreateWithEfAsync(Person value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Person, Person>("api/v1/persons/ef", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Person, Person>("api/v1/persons/ef", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> UpdateWithEfAsync(Person value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Person, Person>("api/v1/persons/ef/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<Person, Person>("api/v1/persons/ef/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> DeleteWithEfAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => DeleteAsync("api/v1/persons/ef/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => DeleteAsync("api/v1/persons/ef/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Person>> PatchWithEfAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<Person>("api/v1/persons/ef/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PatchAsync<Person>("api/v1/persons/ef/{id}", patchOption, value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> GetDocumentationAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync("api/v1/persons/{id}/documentation", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync("api/v1/persons/{id}/documentation", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<string?>> SimulateWorkAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<string?>("api/v1/persons/simulate", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<string?>("api/v1/persons/simulate", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<string?>> ExtendResponseAsync(string? name, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<string?>("api/v1/persons/extend-response", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<string?>("name", name)), cancellationToken: cancellationToken);
+        => PostAsync<string?>("api/v1/persons/extend-response", requestOptions, [new HttpArg<string?>("name", name)], cancellationToken);
 }
 
 #pragma warning restore

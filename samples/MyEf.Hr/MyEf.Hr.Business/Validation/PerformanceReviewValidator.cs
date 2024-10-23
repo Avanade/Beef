@@ -17,7 +17,7 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
         _employeeManager = employeeManager ?? throw new ArgumentNullException(nameof(employeeManager));
 
         Property(x => x.EmployeeId).Mandatory();
-        Property(x => x.Date).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => CoreEx.ExecutionContext.Current.Timestamp, _ => "today");
+        Property(x => x.Date).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => ExecutionContext.Current.Timestamp, _ => "today");
         Property(x => x.Notes).String(4000);
         Property(x => x.Reviewer).Mandatory().String(256);
         Property(x => x.Outcome).Mandatory().IsValid();
@@ -39,7 +39,7 @@ public class PerformanceReviewValidator : Validator<PerformanceReview>
                                   .When(v => v is null, _ => Result.NotFoundError()).ConfigureAwait(false);
 
             if (prr.IsFailure)
-                return prr.AsResult();
+                return prr.Bind();
 
             if (context.Value.EmployeeId != prr.Value.EmployeeId)
                 return Result.Done(() => context.AddError(x => x.EmployeeId, ValidatorStrings.ImmutableFormat));

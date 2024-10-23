@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE [Test].[spTableDelete]
+CREATE PROCEDURE [Test].[spTableDelete]
   @TableId AS UNIQUEIDENTIFIER,
   @UpdatedBy AS NVARCHAR(250) NULL = NULL,
   @UpdatedDate AS DATETIME2 NULL = NULL

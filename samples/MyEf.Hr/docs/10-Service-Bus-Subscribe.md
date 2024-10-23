@@ -149,7 +149,11 @@ The aforementioned services registration code of interest is as follows.
 {
     o.EventDataDeserializationErrorHandling = ErrorHandling.HandleBySubscriber;
 })
-.AddTypedHttpClient<OktaHttpClient>("OktaApi");
+.AddTypedHttpClient<OktaHttpClient>("OktaApi", (sp, hc) =>
+{
+    var settings = sp.GetRequiredService<SecuritySettings>();
+    hc.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
+}).AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(retryCount: 3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 ```
 
 <br/>
@@ -252,12 +256,7 @@ namespace MyEf.Hr.Security.Subscriptions;
 
 public class OktaHttpClient : TypedHttpClientBase<OktaHttpClient>
 {
-    public OktaHttpClient(HttpClient client, SecuritySettings settings, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) 
-        : base(client, jsonSerializer, executionContext)
-    {
-        Client.BaseAddress = new Uri(settings.OktaHttpClientBaseUri);
-        DefaultOptions.EnsureSuccess().ThrowKnownException();
-    }
+    public OktaHttpClient(HttpClient client) : base(client) => DefaultOptions.EnsureSuccess().ThrowKnownException();
 
     /// <summary>
     /// Gets the identifier for the email (see <see href="https://developer.okta.com/docs/reference/api/users/#list-users-with-search"/>).

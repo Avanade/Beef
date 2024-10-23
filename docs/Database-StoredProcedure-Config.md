@@ -66,6 +66,7 @@ Property | Description
 **`type`** | The stored procedure operation type. Valid options are: `Get`, `GetColl`, `Create`, `Update`, `Upsert`, `Delete`, `Merge`.<br/>&dagger; Defaults to `GetColl`.
 **`paging`** | Indicates whether standardized paging support should be added.<br/>&dagger; This only applies where the stored procedure operation `Type` is `GetColl`.
 `storedProcedureName` | The `StoredProcedure` name in the database.<br/>&dagger; Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`.
+`replace` | Indicates whether the existing `StoredProcedure` database object should be replaced/altered or whether the object is dropped and recreated.<br/>&dagger; Defaults to `CodeGeneration.Replace`.
 
 <br/>
 

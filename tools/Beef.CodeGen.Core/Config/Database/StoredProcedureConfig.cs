@@ -94,6 +94,14 @@ tables:
             Description = "Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`.")]
         public string? StoredProcedureName { get; set; }
 
+        /// <summary>
+        /// Indicates whether the existing `StoredProcedure` database object should be replaced/altered or whether the object is dropped and recreated.
+        /// </summary>
+        [JsonPropertyName("replace")]
+        [CodeGenProperty("Key", Title = "Indicates whether the existing `StoredProcedure` database object should be replaced/altered or whether the object is dropped and recreated.",
+            Description = "Defaults to `CodeGeneration.Replace`.")]
+        public bool? Replace { get; set; }
+
         #endregion
 
         #region Additional
@@ -301,6 +309,7 @@ tables:
         {
             CollectionType = DefaultWhereNull(CollectionType, () => Parent!.CollectionType);
             StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"sp{Parent!.Name}{Name}");
+            Replace = DefaultWhereNull(Replace, () => Parent!.Replace);
             Type = DefaultWhereNull(Type, () => "GetColl");
             OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);
             Permission = DefaultWhereNull(Permission?.ToUpperInvariant(), () => Parent!.Permission == null ? null : Parent!.Permission!.ToUpperInvariant() + "." + Type switch

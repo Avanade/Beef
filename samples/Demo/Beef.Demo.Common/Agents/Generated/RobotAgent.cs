@@ -10,43 +10,38 @@ namespace Beef.Demo.Common.Agents;
 /// <summary>
 /// Provides the <see cref="Robot"/> HTTP agent.
 /// </summary>
-public partial class RobotAgent : TypedHttpClientBase<RobotAgent>, IRobotAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class RobotAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<RobotAgent>(client, jsonSerializer, executionContext), IRobotAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RobotAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public RobotAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<Robot?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Robot?>("api/v1/robots/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<Robot?>("api/v1/robots/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Robot>> CreateAsync(Robot value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Robot, Robot>("api/v1/robots", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Robot, Robot>("api/v1/robots", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Robot>> UpdateAsync(Robot value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Robot, Robot>("api/v1/robots/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<Robot, Robot>("api/v1/robots/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Robot>> PatchAsync(HttpPatchOption patchOption, string value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PatchAsync<Robot>("api/v1/robots/{id}", patchOption, value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PatchAsync<Robot>("api/v1/robots/{id}", patchOption, value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> DeleteAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => DeleteAsync("api/v1/robots/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => DeleteAsync("api/v1/robots/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RobotCollectionResult>("api/v1/robots", requestOptions: requestOptions.IncludePaging(paging), args: HttpArgs.Create(new HttpArg<RobotArgs?>("args", args, HttpArgType.FromUriUseProperties)), cancellationToken: cancellationToken);
+        => GetAsync<RobotCollectionResult>("api/v1/robots", requestOptions.IncludePaging(paging), [new HttpArg<RobotArgs?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult> RaisePowerSourceChangeAsync(Guid id, string? powerSource, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync("api/v1/robots/{id}/powerSource/{powerSource}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id), new HttpArg<string?>("powerSource", powerSource)), cancellationToken: cancellationToken);
+        => PostAsync("api/v1/robots/{id}/powerSource/{powerSource}", requestOptions, [new HttpArg<Guid>("id", id), new HttpArg<string?>("powerSource", powerSource)], cancellationToken);
 }
 
 #pragma warning restore

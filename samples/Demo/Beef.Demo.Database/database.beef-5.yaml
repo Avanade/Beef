@@ -6,7 +6,7 @@ collectionType: UDT
 
 queries:
   # New "Query" configuration.
-- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [ CreatedBy,  UpdatedBy ], permission: TestSec,
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, viewReplace: false, excludeColumns: [ CreatedBy,  UpdatedBy ], permission: TestSec,
     joins: [
       { name: Person, schema: Demo, excludeColumns: [ CreatedDate,  UpdatedDate ], aliasColumns: [ RowVersion^RowVersionP ],
         on: [
@@ -35,7 +35,7 @@ tables:
 - { name: Table3, schema: Test, get: true, create: true, update: true, delete: true, upsert: true }
 
   # Special test to generate all variations.
-- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], orgUnitImmutable: true, permission: TestSec,
+- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, replace: false, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], orgUnitImmutable: true, permission: TestSec,
     storedProcedures: [
       { name: GetByArgs, type: GetColl, excludeColumns: [ Count ],
         parameters: [

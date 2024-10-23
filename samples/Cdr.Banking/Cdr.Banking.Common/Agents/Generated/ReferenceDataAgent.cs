@@ -7,39 +7,34 @@ namespace Cdr.Banking.Common.Agents;
 /// <summary>
 /// Provides the <b>ReferenceData</b> HTTP agent.
 /// </summary>
-public partial class ReferenceDataAgent : TypedHttpClientBase<ReferenceDataAgent>, IReferenceDataAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<ReferenceDataAgent>(client, jsonSerializer, executionContext), IReferenceDataAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public ReferenceDataAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<RefDataNamespace.OpenStatusCollection>> OpenStatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RefDataNamespace.OpenStatusCollection>("api/v1/ref/openstatuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<RefDataNamespace.OpenStatusCollection>("api/v1/ref/openstatuses", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
     /// <inheritdoc/>
     public Task<HttpResult<RefDataNamespace.ProductCategoryCollection>> ProductCategoryGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RefDataNamespace.ProductCategoryCollection>("api/v1/ref/productcategories", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<RefDataNamespace.ProductCategoryCollection>("api/v1/ref/productcategories", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
     /// <inheritdoc/>
     public Task<HttpResult<RefDataNamespace.AccountUTypeCollection>> AccountUTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RefDataNamespace.AccountUTypeCollection>("api/v1/ref/accountutypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<RefDataNamespace.AccountUTypeCollection>("api/v1/ref/accountutypes", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
     /// <inheritdoc/>
     public Task<HttpResult<RefDataNamespace.MaturityInstructionsCollection>> MaturityInstructionsGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RefDataNamespace.MaturityInstructionsCollection>("api/v1/ref/maturityinstructions", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<RefDataNamespace.MaturityInstructionsCollection>("api/v1/ref/maturityinstructions", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
     /// <inheritdoc/>
     public Task<HttpResult<RefDataNamespace.TransactionTypeCollection>> TransactionTypeGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RefDataNamespace.TransactionTypeCollection>("api/v1/ref/transactiontypes", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<RefDataNamespace.TransactionTypeCollection>("api/v1/ref/transactiontypes", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
     /// <inheritdoc/>
     public Task<HttpResult<RefDataNamespace.TransactionStatusCollection>> TransactionStatusGetAllAsync(ReferenceDataFilter? args = null, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<RefDataNamespace.TransactionStatusCollection>("api/v1/ref/transactionstatuses", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<ReferenceDataFilter>("args", args!, HttpArgType.FromUriUseProperties)), cancellationToken);      
+        => GetAsync<RefDataNamespace.TransactionStatusCollection>("api/v1/ref/transactionstatuses", requestOptions, [new HttpArg<ReferenceDataFilter?>("args", args, HttpArgType.FromUriUseProperties)], cancellationToken);      
 
     /// <inheritdoc/>
     public Task<HttpResult> GetNamedAsync(string[] names, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)

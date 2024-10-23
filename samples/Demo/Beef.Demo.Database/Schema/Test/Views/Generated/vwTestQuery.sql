@@ -1,4 +1,4 @@
-CREATE OR ALTER VIEW [Test].[vwTestQuery]
+CREATE VIEW [Test].[vwTestQuery]
 AS
   /*
    * This is automatically generated; any changes will be lost.

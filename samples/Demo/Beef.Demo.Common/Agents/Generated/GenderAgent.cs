@@ -10,27 +10,22 @@ namespace Beef.Demo.Common.Agents;
 /// <summary>
 /// Provides the <see cref="Gender"/> HTTP agent.
 /// </summary>
-public partial class GenderAgent : TypedHttpClientBase<GenderAgent>, IGenderAgent
+/// <param name="client">The underlying <see cref="HttpClient"/>.</param>
+/// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
+/// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
+public partial class GenderAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : TypedHttpClientBase<GenderAgent>(client, jsonSerializer, executionContext), IGenderAgent
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GenderAgent"/> class.
-    /// </summary>
-    /// <param name="client">The underlying <see cref="HttpClient"/>.</param>
-    /// <param name="jsonSerializer">The optional <see cref="IJsonSerializer"/>.</param>
-    /// <param name="executionContext">The optional <see cref="CoreEx.ExecutionContext"/>.</param>
-    public GenderAgent(HttpClient client, IJsonSerializer? jsonSerializer = null, CoreEx.ExecutionContext? executionContext = null) : base(client, jsonSerializer, executionContext) { }
-
     /// <inheritdoc/>
     public Task<HttpResult<Gender?>> GetAsync(Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => GetAsync<Gender?>("api/v1/demo/ref/genders/{id}", requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => GetAsync<Gender?>("api/v1/demo/ref/genders/{id}", requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Gender>> CreateAsync(Gender value, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PostAsync<Gender, Gender>("api/v1/demo/ref/genders", value, requestOptions: requestOptions, cancellationToken: cancellationToken);
+        => PostAsync<Gender, Gender>("api/v1/demo/ref/genders", value, requestOptions, cancellationToken: cancellationToken);
 
     /// <inheritdoc/>
     public Task<HttpResult<Gender>> UpdateAsync(Gender value, Guid id, HttpRequestOptions? requestOptions = null, CancellationToken cancellationToken = default)
-        => PutAsync<Gender, Gender>("api/v1/demo/ref/genders/{id}", value, requestOptions: requestOptions, args: HttpArgs.Create(new HttpArg<Guid>("id", id)), cancellationToken: cancellationToken);
+        => PutAsync<Gender, Gender>("api/v1/demo/ref/genders/{id}", value, requestOptions, [new HttpArg<Guid>("id", id)], cancellationToken);
 }
 
 #pragma warning restore

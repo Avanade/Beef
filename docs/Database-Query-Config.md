@@ -46,6 +46,7 @@ Property | Description
 **`name`** | The name of the primary table of the query. [Mandatory]
 `schema` | The schema name of the primary table of the view.<br/>&dagger; Defaults to `CodeGeneration.Schema`.
 `alias` | The `Schema.Table` alias name.<br/>&dagger; Will automatically default where not specified.
+`viewReplace` | Indicates whether the existing `View` database object should be replaced/altered or whether the object is dropped and recreated.<br/>&dagger; Defaults to `CodeGeneration.Replace`.
 
 <br/>
 
