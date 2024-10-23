@@ -40,3 +40,4 @@ global using MyEf.Hr.Business.Data;
 global using MyEf.Hr.Business.DataSvc;
 global using MyEf.Hr.Business.Validation;
 global using RefDataNamespace = MyEf.Hr.Business.Entities;
+global using ExecutionContext = CoreEx.ExecutionContext;

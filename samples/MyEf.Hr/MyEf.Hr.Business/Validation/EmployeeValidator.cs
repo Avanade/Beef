@@ -34,7 +34,7 @@ public class EmployeeValidator : Validator<Employee>
         Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
         Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
         Property(x => x.Gender).Mandatory().IsValid();
-        Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => CoreEx.ExecutionContext.SystemTime.UtcNow.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
+        Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => ExecutionContext.Current.Timestamp.Date.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
         Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01, 0, 0, 0, DateTimeKind.Utc), "January 1, 1999");
         Property(x => x.PhoneNo).Mandatory().Common(CommonValidators.PhoneNo);
         Property(x => x.Address).Entity(_addressValidator);
@@ -70,9 +70,9 @@ public class EmployeeValidator : Validator<Employee>
     public static CommonValidator<Guid> CanDelete { get; } = CommonValidator.Create<Guid>(cv => cv.CustomAsync((context, _) =>
     {
         // Unable to use inheritance DI for a Common Validator so the ExecutionContext.GetService will get/create the instance in the same manner.
-        return Result.GoAsync(CoreEx.ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value))
+        return Result.GoAsync(ExecutionContext.GetRequiredService<IEmployeeDataSvc>().GetAsync(context.Value))
             .When(existing => existing is null, _ => Result.NotFoundError())
-            .When(existing => existing!.StartDate <= CoreEx.ExecutionContext.Current.Timestamp, _ => Result.ValidationError("An employee cannot be deleted after they have started their employment."))
+            .When(existing => existing!.StartDate <= ExecutionContext.Current.Timestamp, _ => Result.ValidationError("An employee cannot be deleted after they have started their employment."))
             .AsResult();
     }));
 }
