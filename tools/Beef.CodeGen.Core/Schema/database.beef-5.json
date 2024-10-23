@@ -12,6 +12,11 @@
           "title": "The name of the \u0060Schema\u0060 where the artefacts are defined in, or should be created in, the database.",
           "description": "This is used as the default \u0060Schema\u0060 for all child objects."
         },
+        "replace": {
+          "type": "boolean",
+          "title": "Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.",
+          "description": "Defaults to \u0060true\u0060."
+        },
         "columnNameIsDeleted": {
           "type": "string",
           "title": "The column name for the \u0060IsDeleted\u0060 capability.",
@@ -222,6 +227,11 @@
           "type": "string",
           "title": "The \u0060Schema.Table\u0060 alias name.",
           "description": "Will automatically default where not specified."
+        },
+        "replace": {
+          "type": "boolean",
+          "title": "Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.",
+          "description": "Defaults to \u0060CodeGeneration.Replace\u0060."
         },
         "includeColumns": {
           "type": "array",
@@ -439,6 +449,11 @@
           "type": "string",
           "title": "The \u0060StoredProcedure\u0060 name in the database.",
           "description": "Defaults to \u0060sp\u0060 \u002B \u0060Table.Name\u0060 \u002B \u0060Name\u0060; e.g. \u0060spTableName\u0060 or \u0060spPersonGet\u0060."
+        },
+        "replace": {
+          "type": "boolean",
+          "title": "Indicates whether the existing \u0060StoredProcedure\u0060 database object should be replaced/altered or whether the object is dropped and recreated.",
+          "description": "Defaults to \u0060CodeGeneration.Replace\u0060."
         },
         "reselectStatement": {
           "type": "string",
@@ -776,6 +791,11 @@
           "type": "string",
           "title": "The schema name for the \u0060View\u0060.",
           "description": "Defaults to \u0060Schema\u0060."
+        },
+        "viewReplace": {
+          "type": "boolean",
+          "title": "Indicates whether the existing \u0060View\u0060 database object should be replaced/altered or whether the object is dropped and recreated.",
+          "description": "Defaults to \u0060CodeGeneration.Replace\u0060."
         },
         "permission": {
           "type": "string",

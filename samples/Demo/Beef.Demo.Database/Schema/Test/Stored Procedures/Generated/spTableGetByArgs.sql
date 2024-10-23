@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE [Test].[spTableGetByArgs]
+CREATE PROCEDURE [Test].[spTableGetByArgs]
   @Name AS NVARCHAR(50) NULL = NULL,
   @MinCount AS INT,
   @MaxCount AS INT NULL = NULL

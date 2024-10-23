@@ -63,6 +63,7 @@ Property | Description
 **`name`** | The name of the `Table` in the database. [Mandatory]
 **`schema`** | The name of the `Schema` where the `Table` is defined in the database.<br/>&dagger; Defaults to `CodeGeneration.Schema`.
 `alias` | The `Schema.Table` alias name.<br/>&dagger; Will automatically default where not specified.
+`replace` | Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.<br/>&dagger; Defaults to `CodeGeneration.Replace`.
 
 <br/>
 

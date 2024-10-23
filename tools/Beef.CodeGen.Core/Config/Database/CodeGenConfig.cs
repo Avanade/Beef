@@ -46,6 +46,14 @@ namespace Beef.CodeGen.Config.Database
             Description = "This is used as the default `Schema` for all child objects.")]
         public string? Schema { get; set; }
 
+        /// <summary>
+        /// Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.
+        /// </summary>
+        [JsonPropertyName("replace")]
+        [CodeGenProperty("Key", Title = "Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.",
+            Description = "Defaults to `true`.")]
+        public bool? Replace { get; set; }
+
         #endregion
 
         #region Infer
@@ -397,6 +405,7 @@ namespace Beef.CodeGen.Config.Database
             await LoadDbTablesConfigAsync().ConfigureAwait(false);
 
             Schema = DefaultWhereNull(Schema, () => "dbo");
+            Replace = DefaultWhereNull(Replace, () => true);
             EfModel = DefaultWhereNull(EfModel, () => false);
 
             PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");

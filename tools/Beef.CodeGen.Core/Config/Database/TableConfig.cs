@@ -85,6 +85,14 @@ tables:
             Description = "Will automatically default where not specified.")]
         public string? Alias { get; set; }
 
+        /// <summary>
+        /// Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.
+        /// </summary>
+        [JsonPropertyName("replace")]
+        [CodeGenProperty("Key", Title = "Indicates whether the existing database object should be replaced/altered or whether the object is dropped and recreated.",
+            Description = "Defaults to `CodeGeneration.Replace`.")]
+        public bool? Replace { get; set; }
+
         #endregion
 
         #region Columns
@@ -504,6 +512,7 @@ tables:
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{CodeGenConfig.FormatSchemaTableName(Schema, Name)}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConverter.ToSentenceCase(Name)!.Split(' ').Select(x => x[..1].ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            Replace = DefaultWhereNull(Replace, () => Parent!.Replace);
             EfModel = DefaultWhereNull(EfModel, () => Parent!.EfModel);
             EfModelName = DefaultWhereNull(EfModelName, () => Root.RenameForDotNet(Name));
             OrgUnitImmutable = DefaultWhereNull(OrgUnitImmutable, () => Parent!.OrgUnitImmutable);

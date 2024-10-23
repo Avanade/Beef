@@ -1,5 +1,5 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE OR ALTER PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
+CREATE {{#if Replace}}OR ALTER {{/if}}PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
 {{#each ArgumentParameters}}
   {{ParameterSql}}{{#unless @last}},{{/unless}}
 {{/each}}
