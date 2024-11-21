@@ -2,8 +2,8 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using UnitTestEx.NUnit;
-using UnitTestEx.NUnit.Internal;
+using UnitTestEx;
+using UnitTestEx.AspNetCore;
 
 namespace Beef.Test.NUnit
 {

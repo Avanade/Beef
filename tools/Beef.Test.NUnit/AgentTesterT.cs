@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using System;
 using System.Net.Http;
 using UnitTestEx;
-using UnitTestEx.NUnit.Internal;
+using UnitTestEx.AspNetCore;
 
 namespace Beef.Test.NUnit
 {
