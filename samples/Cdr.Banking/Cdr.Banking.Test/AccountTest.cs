@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net;
 using UnitTestEx;
 using UnitTestEx.Expectations;
-using UnitTestEx.NUnit;
 
 namespace Cdr.Banking.Test
 {

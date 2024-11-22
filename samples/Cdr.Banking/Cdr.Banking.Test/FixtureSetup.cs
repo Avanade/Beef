@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using UnitTestEx;
-using UnitTestEx.NUnit;
 using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Test

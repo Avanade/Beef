@@ -6,7 +6,6 @@ using System;
 using System.Net;
 using UnitTestEx;
 using UnitTestEx.Expectations;
-using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {

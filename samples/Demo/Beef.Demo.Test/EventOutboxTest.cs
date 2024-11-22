@@ -7,7 +7,6 @@ using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
 using UnitTestEx;
-using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {

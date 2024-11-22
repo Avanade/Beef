@@ -16,7 +16,6 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using UnitTestEx;
 global using UnitTestEx.Expectations;
-global using UnitTestEx.NUnit;
 global using My.Hr.Api;
 global using My.Hr.Business;
 global using My.Hr.Business.Data;
