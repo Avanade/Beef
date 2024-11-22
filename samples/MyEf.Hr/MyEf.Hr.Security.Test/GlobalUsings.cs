@@ -8,4 +8,3 @@ global using NUnit.Framework.Internal;
 global using System.Net;
 global using UnitTestEx;
 global using UnitTestEx.Expectations;
-global using UnitTestEx.NUnit;

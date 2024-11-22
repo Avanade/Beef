@@ -357,7 +357,7 @@ From Visual Studio, add a new Project named `MyEf.Hr.Security.Test` (within the 
 
 Make the following house cleaning changes to the new project:
 
-1. Add the `UnitTestEx.NUnit` NuGet package as a dependency.
+1. Add the `UnitTestEx.NUnit`, `CoreEx.UnitTesting.Azure.Functions` and `CoreEx.UnitTesting.Azure.ServiceBus` NuGet packages as dependencies.
 2. Add `MyHr.Ef.Security.Subscriptions` as a project reference dependency.
 3. Rename `Usings.cs` to `GlobalUsings.cs` and replace with content from [`GlobalUsings`](../MyEf.Hr.Security.Test/GlobalUsings.cs).
 

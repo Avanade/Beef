@@ -17,7 +17,6 @@ using System.Net;
 using System.Threading.Tasks;
 using UnitTestEx;
 using UnitTestEx.Expectations;
-using UnitTestEx.NUnit;
 using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Test

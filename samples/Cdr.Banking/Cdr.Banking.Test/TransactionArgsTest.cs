@@ -6,7 +6,6 @@ using System;
 using System.Threading.Tasks;
 using UnitTestEx;
 using UnitTestEx.Expectations;
-using UnitTestEx.NUnit;
 
 namespace Cdr.Banking.Test
 {

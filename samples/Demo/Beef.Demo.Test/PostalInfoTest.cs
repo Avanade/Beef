@@ -9,7 +9,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using UnitTestEx.Expectations;
-using UnitTestEx.NUnit;
+using UnitTestEx;
 
 namespace Beef.Demo.Test
 {

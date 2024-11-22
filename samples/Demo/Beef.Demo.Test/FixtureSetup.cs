@@ -6,7 +6,6 @@ using DbEx;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using UnitTestEx;
-using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {

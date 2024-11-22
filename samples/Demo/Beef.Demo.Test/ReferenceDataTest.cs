@@ -13,7 +13,6 @@ using System.Net;
 using System.Threading.Tasks;
 using UnitTestEx;
 using UnitTestEx.Expectations;
-using UnitTestEx.NUnit;
 
 namespace Beef.Demo.Test
 {
