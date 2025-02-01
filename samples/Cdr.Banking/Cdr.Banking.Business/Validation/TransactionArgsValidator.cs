@@ -12,7 +12,7 @@ public class TransactionArgsValidator : Validator<TransactionArgs>
     {
         // Default FromDate where not provided, as 90 days less than ToDate; where no ToDate then assume today (now). Make sure FromDate is not greater than ToDate.
         Property(x => x.FromDate)
-            .Default(a => (a.ToDate!.HasValue ? a.ToDate.Value : CoreEx.ExecutionContext.SystemTime.UtcNow).AddDays(-90))
+            .Default(a => (a.ToDate!.HasValue ? a.ToDate.Value : SystemTime.Timestamp).AddDays(-90))
             .CompareProperty(CompareOperator.LessThanEqual, y => y.ToDate).DependsOn(y => y.ToDate);
 
         // Make sure MinAmount is not greater than MaxAmount.

@@ -10,7 +10,7 @@ namespace My.Hr.Business.Data;
 public partial class EmployeeData : IEmployeeData
 {
     private readonly IDatabase _db;
-    private readonly IEfDb _ef;
+    private readonly HrEfDb _ef;
     private readonly IEventPublisher _events;
     private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
 
@@ -18,9 +18,9 @@ public partial class EmployeeData : IEmployeeData
     /// Initializes a new instance of the <see cref="EmployeeData"/> class.
     /// </summary>
     /// <param name="db">The <see cref="IDatabase"/>.</param>
-    /// <param name="ef">The <see cref="IEfDb"/>.</param>
+    /// <param name="ef">The <see cref="HrEfDb"/>.</param>
     /// <param name="events">The <see cref="IEventPublisher"/>.</param>
-    public EmployeeData(IDatabase db, IEfDb ef, IEventPublisher events)
+    public EmployeeData(IDatabase db, HrEfDb ef, IEventPublisher events)
         { _db = db.ThrowIfNull(); _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); EmployeeDataCtor(); }
 
     partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.

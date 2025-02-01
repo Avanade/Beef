@@ -5,7 +5,7 @@ namespace Cdr.Banking.Business.Data;
 
 public partial class AccountData
 {
-    private static QueryArgsConfig _config = QueryArgsConfig.Create()
+    private static readonly QueryArgsConfig _config = QueryArgsConfig.Create()
         .WithFilter(filter => filter
             .AddReferenceDataField<OpenStatus>(nameof(Model.Account.OpenStatus), c => c.WithValue(os => os == OpenStatus.All ? throw new FormatException("Value not valid for filtering.") : os))
             .AddReferenceDataField<ProductCategory>(nameof(Model.Account.ProductCategory))
@@ -49,7 +49,7 @@ public partial class AccountData
     private Task<Result<Balance?>> GetBalanceOnImplementationAsync(string? accountId)
     {
         // Use the 'Account' model and select for the specified id to access the balance property.
-        return Result.GoAsync(_cosmos.Accounts.ModelContainer.Query(q => q.Where(x => x.Id == accountId)).SelectFirstOrDefaultWithResultAsync())
+        return Result.GoAsync(_cosmos.Accounts.Model.Query(q => q.Where(x => x.Id == accountId)).SelectFirstOrDefaultWithResultAsync())
             .WhenAs(a => a is not null, a =>
             {
                 var bal = _cosmos.Mapper.Map<Model.Balance, Balance>(a!.Balance);

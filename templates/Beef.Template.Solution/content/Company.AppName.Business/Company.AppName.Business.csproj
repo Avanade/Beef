@@ -24,13 +24,13 @@
     <!--#endif -->
     <PackageReference Include="CoreEx.Validation" Version="CoreExVersion" />
     <!--#if (implement_sqlserver) -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.12" />
     <!--#endif -->
     <!--#if (implement_mysql) -->
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     <!--#endif -->
     <!--#if (implement_postgres) -->
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
     <!--#endif -->
   </ItemGroup>
 </Project>

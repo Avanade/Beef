@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreEx.Database" Version="3.30.0" />
-    <PackageReference Include="DbEx" Version="2.8.0" />
+    <PackageReference Include="CoreEx.Database" Version="3.31.0" />
+    <PackageReference Include="DbEx" Version="2.8.1" />
   </ItemGroup>
 
   <ItemGroup>

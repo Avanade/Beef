@@ -9,16 +9,16 @@ namespace My.Hr.Business.Data;
 /// </summary>
 public partial class PerformanceReviewData : IPerformanceReviewData
 {
-    private readonly IEfDb _ef;
+    private readonly HrEfDb _ef;
     private readonly IEventPublisher _events;
     private Func<IQueryable<EfModel.PerformanceReview>, Guid, IQueryable<EfModel.PerformanceReview>>? _getByEmployeeIdOnQuery;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PerformanceReviewData"/> class.
     /// </summary>
-    /// <param name="ef">The <see cref="IEfDb"/>.</param>
+    /// <param name="ef">The <see cref="HrEfDb"/>.</param>
     /// <param name="events">The <see cref="IEventPublisher"/>.</param>
-    public PerformanceReviewData(IEfDb ef, IEventPublisher events)
+    public PerformanceReviewData(HrEfDb ef, IEventPublisher events)
         { _ef = ef.ThrowIfNull(); _events = events.ThrowIfNull(); PerformanceReviewDataCtor(); }
 
     partial void PerformanceReviewDataCtor(); // Enables additional functionality to be added to the constructor.
