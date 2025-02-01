@@ -9,13 +9,13 @@ namespace My.Hr.Business.Data;
 /// </summary>
 public partial class ReferenceDataData : IReferenceDataData
 {
-    private readonly IEfDb _ef;
+    private readonly HrEfDb _ef;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
     /// </summary>
-    /// <param name="ef">The <see cref="IEfDb"/>.</param>
-    public ReferenceDataData(IEfDb ef)
+    /// <param name="ef">The <see cref="HrEfDb"/>.</param>
+    public ReferenceDataData(HrEfDb ef)
         { _ef = ef.ThrowIfNull(); ReferenceDataDataCtor(); }
 
     partial void ReferenceDataDataCtor(); // Enables additional functionality to be added to the constructor.

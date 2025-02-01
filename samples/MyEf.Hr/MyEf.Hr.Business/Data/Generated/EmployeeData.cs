@@ -9,15 +9,15 @@ namespace MyEf.Hr.Business.Data;
 /// </summary>
 public partial class EmployeeData : IEmployeeData
 {
-    private readonly IEfDb _ef;
+    private readonly HrEfDb _ef;
     private Func<IQueryable<EfModel.Employee>, EmployeeArgs?, IQueryable<EfModel.Employee>>? _getByArgsOnQuery;
     private Func<IQueryable<EfModel.Employee>, QueryArgs?, IQueryable<EfModel.Employee>>? _getByQueryOnQuery;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmployeeData"/> class.
     /// </summary>
-    /// <param name="ef">The <see cref="IEfDb"/>.</param>
-    public EmployeeData(IEfDb ef)
+    /// <param name="ef">The <see cref="HrEfDb"/>.</param>
+    public EmployeeData(HrEfDb ef)
         { _ef = ef.ThrowIfNull(); EmployeeDataCtor(); }
 
     partial void EmployeeDataCtor(); // Enables additional functionality to be added to the constructor.

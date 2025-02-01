@@ -10,6 +10,7 @@ entities:
 //#if (implement_sqlserver)
 refDataType: Guid
 autoImplement: EntityFramework
+entityFrameworkType: AppNameEfDb
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
   - { name: Gender, entityFrameworkModel: EfModel.Gender }
@@ -17,6 +18,7 @@ entities:
 //#if (implement_mysql)
 refDataType: int
 autoImplement: EntityFramework
+entityFrameworkType: AppNameEfDb
 etagDefaultMapperConverter: EncodedStringToDateTimeConverter
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
@@ -25,15 +27,16 @@ entities:
 //#if (implement_postgres)
 refDataType: int
 autoImplement: EntityFramework
+entityFrameworkType: AppNameEfDb
 etagDefaultMapperConverter: EncodedStringToUInt32Converter
 entities:
   # The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework.
   - { name: Gender, entityFrameworkModel: EfModel.Gender }
 //#endif
 //#if (implement_cosmos)
-cosmosName: AppNameCosmosDb
 refDataType: Guid
 autoImplement: Cosmos
+cosmosType: AppNameCosmosDb
 entities:
   # The following is an example read-only reference data Entity accessing Cosmos DB.
   - { name: Gender, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.Gender, dataModel: true }

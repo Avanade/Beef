@@ -42,6 +42,7 @@ eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 webApiAutoLocation: true
 autoImplement: EntityFramework
+entityFrameworkType: AppNameEfDb
 //#if (implement_mysql)
 etagDefaultMapperConverter: EncodedStringToDateTimeConverter
 //#endif
@@ -84,13 +85,13 @@ entities:
   }
 //#endif
 //#if (implement_cosmos)
-cosmosType: AppNameCosmosDb
 eventSubjectRoot: Company
 eventActionFormat: PastTense
 eventSourceRoot: Company/AppName
 eventSourceKind: Relative
 webApiAutoLocation: true
 autoImplement: Cosmos
+cosmosType: AppNameCosmosDb
 refDataText: true
 entities:
   # The following is an example Entity with CRUD and Query operations defined accessing a Cosmos DB.

@@ -33,13 +33,13 @@ namespace Cdr.Banking.Test
 
                     var ac = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
                     {
-                        Id = _cosmosDb.Accounts.Container.Id,
+                        Id = _cosmosDb.Accounts.CosmosContainer.Id,
                         PartitionKeyPath = "/_partitionKey"
                     }, cancellationToken: ct).ConfigureAwait(false);
 
                     var tc = await _cosmosDb.Database.ReplaceOrCreateContainerAsync(new Cosmos.ContainerProperties
                     {
-                        Id = _cosmosDb.Transactions.Container.Id,
+                        Id = _cosmosDb.Transactions.CosmosContainer.Id,
                         PartitionKeyPath = "/accountId"
                     }, cancellationToken: ct).ConfigureAwait(false);
 

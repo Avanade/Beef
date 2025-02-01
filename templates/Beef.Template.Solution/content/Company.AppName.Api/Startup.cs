@@ -122,7 +122,7 @@ public class Startup
 #endif
 
         // Add Azure monitor open telemetry.
-        services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "Company.AppName.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
+        //services.AddOpenTelemetry().UseAzureMonitor().WithTracing(b => b.AddSource("CoreEx.*", "Company.AppName.*", "Microsoft.EntityFrameworkCore.*", "EntityFrameworkCore.*"));
 
         // Add the swagger capabilities.
         services.AddSwaggerGen(options =>

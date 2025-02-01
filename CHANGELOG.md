@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v5.18.1
+- *Fixed:* Upgraded `CoreEx` to include all related fixes and improvements; possible related updates that may be required are:
+  - The Entity Framework (EF) `AddEfDb<T>` previously registered the `T` as the `IEfDB` (shorthand for `AddEfDb<IEfDb, T>`); this has been corrected to register the `T` as the `T` only. Therefore, the registering should be updated to be more explcit, or the `IEfDb` dependency references should use the explicit `T` where required.
+  - The Cosmos DB configuration must now be on the container and not the database; any lazy-loading references of the container can be removed as these are now cached internally.
+
 ## v5.18.0
 - *Enhancement:* Added `net9.0` support.
 - *Enhancement:* Deprecated `net7.0` support; no longer supported by [Microsoft](https://dotnet.microsoft.com/en-us/platform/support/policy).

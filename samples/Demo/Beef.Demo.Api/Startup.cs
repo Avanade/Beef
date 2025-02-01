@@ -1,5 +1,6 @@
 ﻿using Beef.Demo.Common.Agents;
 using CoreEx.Database;
+using CoreEx.EntityFrameworkCore;
 using CoreEx.Events;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -54,7 +55,7 @@ namespace Beef.Demo.Api
             //        .AddSingleton<ITripOData>(_ => new TripOData(new Uri(WebApiStartup.GetConnectionString(_config, "TripOData"))));
             services.AddDatabase(sp => new Database(() => new SqlConnection(sp.GetRequiredService<DemoSettings>().DatabaseConnectionString), sp.GetRequiredService<ILogger<Database>>()))
                     .AddDbContext<EfDbContext>()
-                    .AddEfDb<EfDb>();
+                    .AddEfDb<IEfDb, EfDb>();
 
             services.AddSingleton(sp =>
             {
