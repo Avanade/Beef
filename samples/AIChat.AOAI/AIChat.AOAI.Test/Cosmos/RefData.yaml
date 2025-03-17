@@ -1,0 +1,5 @@
+﻿Ref:
+  - Role:
+    - USER: User
+    - SYSTEM: System
+    - ASSITANT: Assistant

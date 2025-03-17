@@ -1,0 +1,7 @@
+﻿webApiRoutePrefix: ref
+cosmosName: AOAICosmosDb
+refDataType: Guid
+autoImplement: Cosmos
+entities:
+  # The following is an example read-only reference data Entity accessing Cosmos DB.
+  - { name: Role, cosmosContainerId: RefData, cosmosValueContainer: true, cosmosModel: Model.Role, dataModel: true }

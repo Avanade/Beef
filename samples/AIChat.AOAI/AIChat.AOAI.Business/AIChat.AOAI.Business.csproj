@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+	<NoWarn>$(NoWarn);CA2007;IDE1006;SKEXP0001;SKEXP0110;SKEXP0050;OPENAI001;SKEXP0010</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CoreEx" Version="3.30.0" />
+    <PackageReference Include="CoreEx.Cosmos" Version="3.30.0" />
+    <PackageReference Include="CoreEx.Validation" Version="3.30.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.41.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="1.41.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Validation\" />
+  </ItemGroup>
+</Project>

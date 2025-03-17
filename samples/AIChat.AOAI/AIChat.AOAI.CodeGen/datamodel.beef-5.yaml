@@ -1,0 +1,13 @@
+# Defines the internal model (persisted in Cosmos).
+jsonSerializer: Newtonsoft
+etagJsonName: _etag
+entities:
+- { name: Chat, text: Chat model for data persistence,
+    properties: [
+      { name: Id, text: '{{Chat}} identifier', type: string, primaryKey: true },
+      { name: Role },
+      { name: Prompt },
+      { name: ETag, },
+      { name: ChangeLog, type: ChangeLog }
+    ]
+  }

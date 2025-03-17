@@ -1,0 +1,70 @@
+﻿cosmosType: AOAICosmosDb
+eventSubjectRoot: AIChat
+eventActionFormat: PastTense
+eventSourceRoot: AIChat/AOAI
+eventSourceKind: Relative
+webApiAutoLocation: true
+autoImplement: Cosmos
+refDataText: true
+entities:
+  # The following is an example Entity with CRUD and Query operations defined accessing a Cosmos DB.
+
+- { 
+    name: Chat, 
+    collection: true, 
+    collectionResult: true, 
+    identifierGenerator: true, 
+    webApiRoutePrefix: chats, 
+    behavior: c, 
+    cosmosContainerId: Chats, 
+    cosmosModel: Model.Chat,
+    managerCtorParams: [
+        "Kernel",
+    ],
+    properties: [
+      { name: Id, type: Guid, primaryKey: true, dataConverter: 'TypeToStringConverter<Guid>' },
+      { name: Role, type: ^Role },
+      { name: Prompt, type: string },
+      { name: ETag, type: string, jsonDataModelName: _etag },
+      { name: ChangeLog, type: ChangeLog }
+    ],
+    operations: [
+      { 
+        name: GetChatCompletions, 
+        type: Custom, 
+        returnType: ChatCollectionResult,
+        paging: true, 
+        eventPublish: None,
+        excludeWebApi: true, 
+        excludeWebApiAgent: true, 
+        excludeIManager: true, 
+        excludeManager: true,
+        parameters: [
+          { name: Completions, type: int }
+        ]
+      },
+      { 
+        name: ChatCompletion, 
+        type: Custom, 
+        webApiRoute: completion, 
+        returnType: ChatCompletionResponse,
+        eventPublish: None,
+        excludeIDataSvc: true, 
+        excludeDataSvc: true, 
+        excludeIData: true, 
+        excludeData: true,
+        managerCustom: true,
+        parameters: [
+          { name: Message, type: string }
+        ]
+      }
+    ]
+  }
+
+- {
+    name: ChatCompletionResponse,
+    excludeAll: true,
+    properties: [
+      { name: Message, type: string }
+    ]
+  }
