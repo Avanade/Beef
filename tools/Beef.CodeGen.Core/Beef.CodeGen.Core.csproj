@@ -34,7 +34,7 @@
   <ItemGroup>
     <PackageReference Include="OnRamp" Version="2.2.4" />
     <PackageReference Include="DbEx" Version="2.8.1" />
-    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.23" />
+    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.30" />
   </ItemGroup>
 
   <Import Project="..\..\Common.targets" />
